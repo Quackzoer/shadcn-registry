@@ -51,18 +51,21 @@ export const delayedAction = (
   });
 };
 
-export const dialog = (render: (props: unknown) => React.ReactNode, options?: Partial<DialogProps>) => {
-  return dialogObservable.showDialog({
-    render,
-    ...options
-  });
-};
+const basicDialog = dialogObservable.showDialog;
 
 const typeToConfirmDialog = ({itemName}:{itemName: string}) => {
-  return dialog((props: DialogProps) => TypeToConfirmDialog({ ...props, itemName }), { important: true });
+  return basicDialog({
+    render: (props) => TypeToConfirmDialog({ ...props, itemName }),
+    important: true,
+  });
 }
 
-dialog.delete = deleteConfirm;
-dialog.countdown = countdown;
-dialog.delayedAction = delayedAction;
-dialog.typeToConfirm = typeToConfirmDialog;
+export const dialog = Object.assign(
+  basicDialog,
+  {
+    delete: deleteConfirm,
+    countdown: countdown,
+    delayedAction: delayedAction,
+    typeToConfirm: typeToConfirmDialog,
+  }
+)

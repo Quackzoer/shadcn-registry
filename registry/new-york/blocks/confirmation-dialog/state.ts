@@ -16,7 +16,7 @@ export class DialogObservable {
     this.subscribers.forEach(callback => callback(action, data));
   }
 
-  async showDialog(props: Partial<DialogProps>): Promise<DialogResult> {
+  async showDialog<T>(props: Partial<DialogProps<T>>): Promise<DialogResult> {
     const id = `dialog-${++this.dialogId}`;
 
     return new Promise((resolve) => {
