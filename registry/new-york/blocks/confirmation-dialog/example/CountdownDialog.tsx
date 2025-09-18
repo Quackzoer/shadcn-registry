@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from 'react';
 import type { DialogProps } from '../types';
 
@@ -43,7 +45,7 @@ export function CountdownDialog(props: DialogProps & {
             </svg>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">{props.title || 'Timed Action'}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{ 'Timed Action'}</h3>
             <p className="text-sm text-muted-foreground">
               {props.autoConfirm
                 ? `Auto-confirming in ${timeRemaining}s`
@@ -53,10 +55,6 @@ export function CountdownDialog(props: DialogProps & {
           </div>
         </div>
 
-        {/* Message */}
-        {props.message && (
-          <p className="text-foreground">{props.message}</p>
-        )}
 
         {/* Progress Bar */}
         {props.showProgress !== false && (

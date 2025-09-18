@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import type { DialogProps } from './types';
 import { dialogObservable } from './state';
-import { type DialogAction, DismissReason } from './types';
-import { Dialog } from '@/registry/new-york/ui/dialog';
+import { DismissReason } from './types';
+import { Dialog, DialogContent } from '@/registry/new-york/ui/dialog';
 
 function ConfirmationDialog(props: DialogProps) {
 
@@ -13,10 +13,8 @@ function ConfirmationDialog(props: DialogProps) {
     return () => props.onClose?.();
   }, [props]);
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget && !props.important) {
-      dialogObservable.dismissDialog(props.id, DismissReason.BACKDROP_CLICK);
-    }
+  const handleBackdropClick = () => {
+    dialogObservable.dismissDialog(props.id, DismissReason.BACKDROP_CLICK);
   };
 
   const confirm = (value?: unknown) => {
@@ -49,8 +47,12 @@ function ConfirmationDialog(props: DialogProps) {
   };
 
   return (
-    <Dialog >
-      
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent onInteractOutside={e=>{
+        if(props.important){ e.preventDefault() } else { handleBackdropClick() }
+      }} className={props.blur ? 'backdrop-blur-sm' : ''}>
+        {props.render && props.render(renderProps)}
+      </DialogContent>
     </Dialog>
   );
 }
@@ -62,10 +64,18 @@ export function DialogProvider() {
     const unsubscribe = dialogObservable.subscribe((action, data) => {
       switch (action) {
         case 'SHOW_DIALOG':
-          setDialogs(current => [...current, data]);
+          setDialogs(current => [...current, {
+            ...data as DialogProps,
+            open: true,
+            onOpenChange: (open: boolean) => {
+              if (!open) {
+                dialogObservable.dismissDialog(data.id as string, DismissReason.CLOSE);
+              }
+            }
+          }]);
           break;
         case 'HIDE_DIALOG':
-          setDialogs(current => current.filter(d => d.id !== data.id));
+          setDialogs(current => current.filter(d => d.id !== (data as any).id));
           break;
       }
     });

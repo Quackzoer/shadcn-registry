@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
-import type { DialogRenderProps } from '../types';
+"use client"
 
-interface DelayedActionDialogProps extends DialogRenderProps {
+import { useState, useEffect } from 'react';
+import { DialogProps } from '../types';
+
+interface DelayedActionDialogProps extends DialogProps {
   delaySeconds: number;
   warningMessage?: string;
   allowCancel?: boolean;
@@ -58,7 +60,7 @@ export function DelayedActionDialog(props: DelayedActionDialogProps) {
             )}
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">{props.title || 'Please Wait'}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{'Please Wait'}</h3>
             <p className="text-sm text-muted-foreground">
               {canInteract
                 ? 'You can now proceed'
@@ -79,10 +81,6 @@ export function DelayedActionDialog(props: DelayedActionDialogProps) {
           </div>
         )}
 
-        {/* Main Message */}
-        {props.message && (
-          <p className="text-foreground">{props.message}</p>
-        )}
 
         {/* Progress Indicators */}
         {!canInteract && (

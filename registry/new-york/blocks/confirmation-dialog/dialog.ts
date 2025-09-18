@@ -1,3 +1,4 @@
+import React from 'react';
 import { CountdownDialog } from './example/CountdownDialog';
 import { DelayedActionDialog } from './example/DelayedActionDialog';
 import { TypeToConfirmDialog } from './example/TypeToConfirm';
@@ -50,11 +51,18 @@ export const delayedAction = (
   });
 };
 
-export const dialog = Object.assign(
-  {},
-  {
-    delete: deleteConfirm,
-    countdown,
-    delayedAction,
-  }
-);
+export const dialog = (render: (props: unknown) => React.ReactNode, options?: Partial<DialogProps>) => {
+  return dialogObservable.showDialog({
+    render,
+    ...options
+  });
+};
+
+const typeToConfirmDialog = ({itemName}:{itemName: string}) => {
+  return dialog((props: DialogProps) => TypeToConfirmDialog({ ...props, itemName }), { important: true });
+}
+
+dialog.delete = deleteConfirm;
+dialog.countdown = countdown;
+dialog.delayedAction = delayedAction;
+dialog.typeToConfirm = typeToConfirmDialog;
