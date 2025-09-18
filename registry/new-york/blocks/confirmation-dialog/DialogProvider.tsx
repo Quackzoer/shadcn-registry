@@ -48,9 +48,11 @@ function ConfirmationDialog(props: DialogProps) {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent onInteractOutside={e=>{
-        if(props.important){ e.preventDefault() } else { handleBackdropClick() }
-      }} className={props.blur ? 'backdrop-blur-sm' : ''}>
+      <DialogContent
+        onInteractOutside={e => {
+          if (props.important) { e.preventDefault() } else { handleBackdropClick() }
+        }}
+      >
         {props.render && props.render(renderProps)}
       </DialogContent>
     </Dialog>

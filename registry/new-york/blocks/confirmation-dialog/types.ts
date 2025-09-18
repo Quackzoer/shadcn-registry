@@ -8,7 +8,6 @@ export interface DialogProps<T = unknown> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   important?: boolean;
-  blur?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   render: (props: DialogProps) => React.ReactNode;
