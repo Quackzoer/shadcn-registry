@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DialogProps, DismissReason } from "../types";
 
-export function TypeToConfirmDialog(props: DialogProps<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC> & { itemName: string }) {
+export function TypeToConfirmDialog(props: DialogProps<{itemName: string}> & { itemName: string }) {
   const schema = z.object({
     itemName: z.literal(props.itemName)
   })
