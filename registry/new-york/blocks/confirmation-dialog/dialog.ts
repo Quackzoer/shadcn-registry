@@ -3,19 +3,25 @@ import { CountdownDialog } from './example/CountdownDialog';
 import { DelayedActionDialog } from './example/DelayedActionDialog';
 import { TypeToConfirmDialog } from './example/TypeToConfirm';
 import { dialogObservable } from './state';
-import type { DialogProps } from './types';
+import type { DialogProps, DialogResult, DismissReason } from './types';
 
 
 
-export const dialog = (render: (props: DialogProps) => React.ReactNode, options?: Partial<DialogProps>) => {
+export const dialog = <TValue = unknown, TDeny = TValue, TDismiss extends DismissReason = DismissReason>(
+  render: (props: DialogProps<TValue, TDeny, TDismiss>) => React.ReactNode,
+  options?: Partial<DialogProps<TValue, TDeny, TDismiss>>
+): Promise<DialogResult<TValue, TDeny, TDismiss>> => {
   return dialogObservable.showDialog({
     render,
     ...options
   });
 };
 
-const deleteConfirmDialog = ({itemName}:{itemName: string}) => {
-  return dialog((props: DialogProps) => TypeToConfirmDialog({ ...props, itemName }), { important: true });
+const deleteConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResult<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>> => {
+  return dialog<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>(
+    (props: DialogProps<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>) => TypeToConfirmDialog({ ...props, itemName }),
+    { important: true }
+  );
 }
 
 const countdownDialog = ({
@@ -26,13 +32,15 @@ const countdownDialog = ({
   countdownSeconds: number;
   autoConfirm?: boolean;
   showProgress?: boolean;
-}) => {
-  return dialog((props: DialogProps) => CountdownDialog({
-    ...props,
-    countdownSeconds,
-    autoConfirm,
-    showProgress,
-  }));
+}): Promise<DialogResult<string, string, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC>> => {
+  return dialog<string, string, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC>(
+    (props: DialogProps<string, string, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC>) => CountdownDialog({
+      ...props,
+      countdownSeconds,
+      autoConfirm,
+      showProgress,
+    })
+  );
 }
 
 const delayedActionDialog = ({
@@ -45,18 +53,23 @@ const delayedActionDialog = ({
   warningMessage?: string;
   allowCancel?: boolean;
   dangerAction?: boolean;
-}) => {
-  return dialog((props: DialogProps) => DelayedActionDialog({
-    ...props,
-    delaySeconds,
-    warningMessage,
-    allowCancel,
-    dangerAction,
-  }));
+}): Promise<DialogResult<boolean, boolean, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC>> => {
+  return dialog<boolean, boolean, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC>(
+    (props: DialogProps<boolean, boolean, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC>) => DelayedActionDialog({
+      ...props,
+      delaySeconds,
+      warningMessage,
+      allowCancel,
+      dangerAction,
+    })
+  );
 }
 
-const typeToConfirmDialog = ({itemName}:{itemName: string}) => {
-  return dialog((props: DialogProps) => TypeToConfirmDialog({ ...props, itemName }), { important: true });
+const typeToConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResult<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>> => {
+  return dialog<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>(
+    (props: DialogProps<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>) => TypeToConfirmDialog({ ...props, itemName }),
+    { important: true }
+  );
 }
 
 dialog.delete = deleteConfirmDialog;

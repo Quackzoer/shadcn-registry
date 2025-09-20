@@ -1,20 +1,22 @@
+import React from 'react';
+
 export interface DialogAction {
   value: unknown;
   isConfirmed?: boolean;
 }
 
-export interface DialogProps<T = unknown> {
+export interface DialogProps<TValue = unknown, TDeny = TValue, TDismiss extends DismissReason = DismissReason> {
   id: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   important?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
-  render: (props: DialogProps) => React.ReactNode;
-  confirm: (value?: T) => void;
-  deny: (value?: T) => void;
+  render: (props: DialogProps<TValue, TDeny, TDismiss>) => React.ReactNode;
+  confirm: (value?: TValue) => void;
+  deny: (value?: TDeny) => void;
   cancel: () => void;
-  dismiss: (reason: DismissReason, value?: unknown) => void;
+  dismiss: (reason: TDismiss, value?: unknown) => void;
   closeDialog: () => void;
 }
 
@@ -27,10 +29,16 @@ export enum DismissReason {
   OVERLAY = 'overlay'
 }
 
-export interface DialogResult<T = unknown> {
+export interface DialogResult<TValue = unknown, TDeny = TValue, TDismiss extends DismissReason = DismissReason> {
   isConfirmed: boolean;
   isDenied: boolean;
   isDismissed: boolean;
+  value?: TValue | TDeny;
+  dismissReason?: TDismiss;
+  dismissValue?: unknown;
+}
+
+export type DismissData<T = unknown> = {
+  reason: DismissReason;
   value?: T;
-  dismiss?: DismissReason;
 }

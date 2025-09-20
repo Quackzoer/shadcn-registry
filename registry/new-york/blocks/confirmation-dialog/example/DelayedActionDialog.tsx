@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { AlertTriangle, Clock, Check } from "lucide-react";
-import { DialogProps } from '../types';
+import { DialogProps, DismissReason } from '../types';
 
-interface DelayedActionDialogProps extends DialogProps {
+interface DelayedActionDialogProps extends DialogProps<boolean, boolean, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC> {
   delaySeconds: number;
   warningMessage?: string;
   allowCancel?: boolean;

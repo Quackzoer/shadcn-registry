@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Clock } from "lucide-react";
-import type { DialogProps } from '../types';
+import type { DialogProps, DismissReason } from '../types';
 
-export function CountdownDialog(props: DialogProps & {
+export function CountdownDialog(props: DialogProps<string, string, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC> & {
   countdownSeconds: number;
   autoConfirm?: boolean;
   showProgress?: boolean;
