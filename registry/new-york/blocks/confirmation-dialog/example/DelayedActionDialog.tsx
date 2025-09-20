@@ -6,7 +6,7 @@ import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-yor
 import { AlertTriangle, Clock, Check } from "lucide-react";
 import { DialogProps, DismissReason } from '../types';
 
-interface DelayedActionDialogProps extends DialogProps<boolean, boolean, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC> {
+interface DelayedActionDialogProps extends DialogProps<boolean> {
   delaySeconds: number;
   warningMessage?: string;
   allowCancel?: boolean;

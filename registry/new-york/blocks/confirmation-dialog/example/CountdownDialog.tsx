@@ -6,7 +6,7 @@ import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-yor
 import { Clock } from "lucide-react";
 import type { DialogProps, DismissReason } from '../types';
 
-export function CountdownDialog(props: DialogProps<string, string, DismissReason.TIMER | DismissReason.CANCEL | DismissReason.ESC> & {
+export function CountdownDialog(props: DialogProps<string> & {
   countdownSeconds: number;
   autoConfirm?: boolean;
   showProgress?: boolean;

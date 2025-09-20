@@ -73,7 +73,7 @@ const typeToConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResul
   );
 }
 
-const confirm = ({title, description}: ConfirmDialogProps): Promise<DialogResult> => {
+const confirm = ({title, description}: ConfirmDialogProps)=> {
   return dialog(
     (props) => ConfirmDialog({ ...props, title, description }),
     { important: true }
