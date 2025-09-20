@@ -7,7 +7,7 @@ import type { DialogProps } from './types';
 
 
 
-export const dialog = (render: (props: any) => React.ReactNode, options?: Partial<DialogProps>) => {
+export const dialog = (render: (props: DialogProps) => React.ReactNode, options?: Partial<DialogProps>) => {
   return dialogObservable.showDialog({
     render,
     ...options
