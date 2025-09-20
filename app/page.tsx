@@ -61,6 +61,23 @@ export default function Home() {
             </div>
           </DialogContent>
         </Dialog>
+        <Button
+          onClick={async () => {
+            const result = await dialog.typeToConfirm({
+              itemName: 'some-file.txt'
+            });
+            console.log(result);
+            if (result) {
+              const confirmResult = await dialog.confirm({
+                title: 'Are you sure?',
+                description: 'This action cannot be undone.'
+              });
+              console.log(confirmResult);
+            }
+          }}
+        >
+          Chained dialog (1. Type to confirm 2. Confirm dialog)
+        </Button>
       </main>
       <DialogProvider />
     </div>

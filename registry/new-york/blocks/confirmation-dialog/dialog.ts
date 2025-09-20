@@ -4,6 +4,7 @@ import { DelayedActionDialog } from './example/DelayedActionDialog';
 import { TypeToConfirmDialog } from './example/TypeToConfirm';
 import { dialogObservable } from './state';
 import type { DialogProps, DialogResult, DismissReason } from './types';
+import { ConfirmDialog, ConfirmDialogProps } from './example/Confirm';
 
 
 
@@ -72,7 +73,15 @@ const typeToConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResul
   );
 }
 
+const confirm = ({title, description}: ConfirmDialogProps): Promise<DialogResult<{itemName: string}, {itemName: string}, DismissReason.CANCEL | DismissReason.ESC>> => {
+  return dialog(
+    (props: DialogProps) => ConfirmDialog({ ...props, title, description }),
+    { important: true }
+  );
+}
+
 dialog.delete = deleteConfirmDialog;
 dialog.countdown = countdownDialog;
 dialog.delayedAction = delayedActionDialog;
 dialog.typeToConfirm = typeToConfirmDialog;
+dialog.confirm = confirm;
