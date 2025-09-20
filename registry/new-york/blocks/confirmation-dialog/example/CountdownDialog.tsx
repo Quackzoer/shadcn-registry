@@ -1,6 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import { Button } from "@/registry/new-york/ui/button";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
+import { Clock } from "lucide-react";
 import type { DialogProps } from '../types';
 
 export function CountdownDialog(props: DialogProps & {
@@ -35,25 +38,26 @@ export function CountdownDialog(props: DialogProps & {
   };
 
   return (
-    <div className="bg-card rounded-lg shadow-xl max-w-md w-full mx-4 p-6 border">
-      <div className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center gap-3">
+    <div>
+      <DialogHeader>
+        <div className="flex items-center gap-3 mb-4">
           <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+            <Clock className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">{ 'Timed Action'}</h3>
-            <p className="text-sm text-muted-foreground">
+            <DialogTitle className="text-lg font-semibold text-foreground">
+              Timed Action
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
               {props.autoConfirm
                 ? `Auto-confirming in ${timeRemaining}s`
                 : `Action available in ${timeRemaining}s`
               }
-            </p>
+            </DialogDescription>
           </div>
         </div>
+      </DialogHeader>
+      <div className="space-y-4">
 
 
         {/* Progress Bar */}
@@ -104,27 +108,24 @@ export function CountdownDialog(props: DialogProps & {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3">
-          <button
+        <div className="flex justify-end space-x-3 pt-2">
+          <Button
+            type="button"
             onClick={handleCancel}
-            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
+            variant="outline"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleConfirm}
             disabled={timeRemaining > 0 && !props.autoConfirm}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              timeRemaining > 0 && !props.autoConfirm
-                ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
-            }`}
+            variant="default"
           >
             {timeRemaining > 0 && !props.autoConfirm
               ? `Confirm (${timeRemaining}s)`
               : 'Confirm'
             }
-          </button>
+          </Button>
         </div>
       </div>
     </div>

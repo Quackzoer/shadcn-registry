@@ -18,7 +18,9 @@ export default function Home() {
       <main className="flex flex-col flex-1 gap-8">
         <Button
           onClick={() => {
-            dialog.countdown(10).then((result) => {
+            dialog.countdown({
+              countdownSeconds: 5,
+            }).then((result) => {
               console.log(result)
             })
           }}

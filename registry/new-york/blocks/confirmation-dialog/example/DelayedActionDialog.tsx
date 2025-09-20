@@ -1,6 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import { Button } from "@/registry/new-york/ui/button";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
+import { AlertTriangle, Clock, Check } from "lucide-react";
 import { DialogProps } from '../types';
 
 interface DelayedActionDialogProps extends DialogProps {
@@ -40,35 +43,34 @@ export function DelayedActionDialog(props: DelayedActionDialogProps) {
   };
 
   return (
-    <div className="bg-card rounded-lg shadow-xl max-w-md w-full mx-4 p-6 border">
-      <div className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center gap-3">
+    <div>
+      <DialogHeader>
+        <div className="flex items-center gap-3 mb-4">
           <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
             props.dangerAction
               ? 'bg-destructive/10'
               : 'bg-orange-500/10'
           }`}>
             {props.dangerAction ? (
-              <svg className="w-5 h-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+              <AlertTriangle className="w-5 h-5 text-destructive" />
             ) : (
-              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Clock className="w-5 h-5 text-orange-500" />
             )}
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">{'Please Wait'}</h3>
-            <p className="text-sm text-muted-foreground">
+            <DialogTitle className="text-lg font-semibold text-foreground">
+              Please Wait
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
               {canInteract
                 ? 'You can now proceed'
                 : `Please wait ${timeRemaining} seconds before continuing`
               }
-            </p>
+            </DialogDescription>
           </div>
         </div>
+      </DialogHeader>
+      <div className="space-y-4">
 
         {/* Warning Message */}
         {props.warningMessage && (
@@ -140,34 +142,27 @@ export function DelayedActionDialog(props: DelayedActionDialogProps) {
         {canInteract && (
           <div className="flex justify-center py-4">
             <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
+              <Check className="w-6 h-6" />
               <span className="font-medium">Ready to proceed</span>
             </div>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end space-x-3 pt-2">
           {(props.allowCancel !== false) && (
-            <button
+            <Button
+              type="button"
               onClick={handleCancel}
-              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
+              variant="outline"
             >
               Cancel
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={handleConfirm}
             disabled={!canInteract}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              !canInteract
-                ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                : props.dangerAction
-                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
-            }`}
+            variant={props.dangerAction ? "destructive" : "default"}
           >
             {!canInteract
               ? `Please wait (${timeRemaining}s)`
@@ -175,7 +170,7 @@ export function DelayedActionDialog(props: DelayedActionDialogProps) {
               ? 'Confirm Action'
               : 'Continue'
             }
-          </button>
+          </Button>
         </div>
       </div>
     </div>
