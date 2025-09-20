@@ -4,6 +4,7 @@ import * as React from "react"
 import { DialogProvider } from "@/registry/new-york/blocks/confirmation-dialog/DialogProvider"
 import { Button } from "@/registry/new-york/ui/button"
 import { dialog } from "@/registry/new-york/blocks/confirmation-dialog/dialog"
+import { Dialog, DialogContent, DialogTrigger } from "@/registry/new-york/ui/dialog"
 
 export default function Home() {
   return (
@@ -35,6 +36,29 @@ export default function Home() {
         >
           Type to confirm dialog
         </Button>
+        <Dialog>
+          <DialogTrigger>
+            <Button>
+              Open dialog with custom content
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <div>
+              <Button
+                onClick={() => {
+                  dialog.countdown(5, {
+                    autoConfirm: true,
+                    // showProgress: false
+                  }).then((result) => {
+                    console.log(result)
+                  })
+                }}
+              >
+                Open dynamic dialog
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
       <DialogProvider />
     </div>
