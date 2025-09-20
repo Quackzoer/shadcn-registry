@@ -1,18 +1,18 @@
 import type { DialogProps, DialogResult, DismissReason } from './types';
 
 export class DialogObservable {
-  private subscribers: Array<(action: string, data: unknown) => void> = [];
+  private subscribers: Array<(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: DialogProps) => void> = [];
   private dialogId = 0;
   private pendingDialogs = new Map<string, { resolve: (value: DialogResult<unknown>) => void;  }>();
 
-  subscribe(callback: (action: string, data: unknown) => void) {
+  subscribe(callback: (action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: DialogProps) => void) {
     this.subscribers.push(callback);
     return () => {
       this.subscribers = this.subscribers.filter(sub => sub !== callback);
     };
   }
 
-  private notify(action: string, data: unknown) {
+  private notify(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: DialogProps) {
     this.subscribers.forEach(callback => callback(action, data));
   }
 
