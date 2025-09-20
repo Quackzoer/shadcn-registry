@@ -1,10 +1,10 @@
 import React from 'react';
+import { ConfirmDialog } from './example/Confirm';
 import { CountdownDialog } from './example/CountdownDialog';
 import { DelayedActionDialog } from './example/DelayedActionDialog';
 import { TypeToConfirmDialog } from './example/TypeToConfirm';
 import { dialogObservable } from './state';
-import type { DialogProps, DialogResult, DismissReason } from './types';
-import { ConfirmDialog, ConfirmDialogProps } from './example/Confirm';
+import type { DialogProps, DialogResult } from './types';
 
 
 
@@ -73,7 +73,7 @@ const typeToConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResul
   );
 }
 
-const confirm = ({title, description}: ConfirmDialogProps)=> {
+const confirm = ({title, description}: {title: string; description: string})=> {
   return dialog(
     (props) => ConfirmDialog({ ...props, title, description }),
     { important: true }
