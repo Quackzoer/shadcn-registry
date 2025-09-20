@@ -3,7 +3,7 @@ import type { DialogProps, DialogResult, DismissReason } from './types';
 export class DialogObservable {
   private subscribers: Array<(action: string, data: unknown) => void> = [];
   private dialogId = 0;
-  private pendingDialogs = new Map<string, { resolve: (value: DialogResult) => void;  }>();
+  private pendingDialogs = new Map<string, { resolve: (value: DialogResult<unknown>) => void;  }>();
 
   subscribe(callback: (action: string, data: unknown) => void) {
     this.subscribers.push(callback);
@@ -16,7 +16,7 @@ export class DialogObservable {
     this.subscribers.forEach(callback => callback(action, data));
   }
 
-  async showDialog<T>(props: Partial<DialogProps<T>>): Promise<DialogResult> {
+  async showDialog<TValue = unknown, TDeny = TValue, TDismiss extends DismissReason = DismissReason>(props: Partial<DialogProps<TValue, TDeny, TDismiss>>): Promise<DialogResult<TValue, TDeny, TDismiss>> {
     const id = `dialog-${++this.dialogId}`;
 
     return new Promise((resolve) => {
@@ -64,8 +64,8 @@ export class DialogObservable {
         isConfirmed: false,
         isDenied: false,
         isDismissed: true,
-        value,
-        dismiss: reason,
+        dismissReason: reason,
+        dismissValue: value,
       });
       this.pendingDialogs.delete(id);
       this.notify('HIDE_DIALOG', { id });
