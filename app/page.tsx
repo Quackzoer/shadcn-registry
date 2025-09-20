@@ -46,9 +46,9 @@ export default function Home() {
             <div>
               <Button
                 onClick={() => {
-                  dialog.countdown(5, {
+                  dialog.countdown({
+                    countdownSeconds: 5,
                     autoConfirm: true,
-                    // showProgress: false
                   }).then((result) => {
                     console.log(result)
                   })
