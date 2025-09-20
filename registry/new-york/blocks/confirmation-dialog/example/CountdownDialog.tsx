@@ -18,7 +18,7 @@ export function CountdownDialog(props: DialogProps & {
       }, 1000);
       return () => clearTimeout(timer);
     } else if (timeRemaining === 0 && props.autoConfirm) {
-      props.confirm(true);
+      props.confirm('auto-confirmed');
     }
   }, [timeRemaining, isActive, props]);
 
@@ -31,7 +31,7 @@ export function CountdownDialog(props: DialogProps & {
 
   const handleConfirm = () => {
     setIsActive(false);
-    props.confirm(true);
+    props.confirm('confirm pressed');
   };
 
   return (
