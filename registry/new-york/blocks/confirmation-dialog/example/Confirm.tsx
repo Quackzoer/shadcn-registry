@@ -6,12 +6,12 @@ import { Trash2 } from "lucide-react";
 import { ReactNode } from "react";
 import { DialogProps } from "../types";
 
-export interface ConfirmDialogProps extends DialogProps {
+export interface ConfirmDialogProps<T> extends DialogProps<T> {
   title: ReactNode;
   description: ReactNode;
 }
 
-export function ConfirmDialog(props: ConfirmDialogProps) {
+export function ConfirmDialog<T>(props: ConfirmDialogProps<T>) {
 
 
   return (

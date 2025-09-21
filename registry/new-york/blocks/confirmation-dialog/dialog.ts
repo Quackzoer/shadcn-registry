@@ -105,7 +105,7 @@ const confirm = ({
   description: string;
 } & Partial<DialogProps<boolean>>)=> {
   return dialog(
-    (props) => ConfirmDialog({ ...props, title, description }),
+    (props) => ConfirmDialog<boolean>({ ...props, title, description }),
     { important: true, ...options }
   );
 }
