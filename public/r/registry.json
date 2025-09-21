@@ -4,29 +4,44 @@
   "homepage": "https://acme.com",
   "items": [
     {
-      "name": "hello-world",
+      "name": "confirmation-dialog",
       "type": "registry:component",
-      "title": "Hello World",
-      "description": "A simple hello world component",
-      "registryDependencies": ["button"],
+      "title": "Confirmation Dialog",
+      "description": "A confirmation dialog component.",
+      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
+      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
-          "path": "registry/new-york/blocks/hello-world/hello-world.tsx",
+          "path": "registry/new-york/blocks/confirmation-dialog/example/Confirm.tsx",
           "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "example-form",
-      "type": "registry:component",
-      "title": "Example Form",
-      "description": "A contact form with Zod validation.",
-      "dependencies": ["zod"],
-      "registryDependencies": ["button", "input", "label", "textarea", "card"],
-      "files": [
+        },
         {
-          "path": "registry/new-york/blocks/example-form/example-form.tsx",
+          "path": "registry/new-york/blocks/confirmation-dialog/example/CountdownDialog.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/example/DelayedActionDialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/example/TypeToConfirm.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/DialogProvider.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/dialog.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/state.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/types.ts",
+          "type": "registry:lib"
         }
       ]
     },
