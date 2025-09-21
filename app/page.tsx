@@ -45,7 +45,9 @@ export default function Home() {
             }).then((result) => {
               console.log(result)
             })
-            dialog.countdown(5)
+            dialog.countdown({
+              countdownSeconds: 10,
+            })
           }}
         >
           Two dialogs at once

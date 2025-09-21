@@ -22,35 +22,41 @@ dialog.dismiss = (id?: string, reason: DismissReason = DismissReason.CLOSE, valu
   if (id) {
     dialogObservable.dismissDialog(id, reason, value);
   } else {
-    // Dismiss all dialogs if no ID provided (Sonner pattern)
     dialogObservable.dismissAllDialogs(reason, value);
   }
 };
 
 
-const deleteConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResult<{itemName: string}>> => {
+const deleteConfirmDialog = ({
+  itemName,
+  ...options
+}: {
+  itemName: string;
+} & Partial<DialogProps<{itemName: string}>>): Promise<DialogResult<{itemName: string}>> => {
   return dialog<{itemName: string}>(
     (props) => TypeToConfirmDialog({ ...props, itemName }),
-    { important: true }
+    { important: true, ...options }
   );
 }
 
 const countdownDialog = ({
   countdownSeconds,
   autoConfirm,
-  showProgress
+  showProgress,
+  ...options
 }: {
   countdownSeconds: number;
   autoConfirm?: boolean;
   showProgress?: boolean;
-}): Promise<DialogResult<string>> => {
+} & Partial<DialogProps<string>>): Promise<DialogResult<string>> => {
   return dialog<string>(
     (props) => CountdownDialog({
       ...props,
       countdownSeconds,
       autoConfirm,
       showProgress,
-    })
+    }),
+    options
   );
 }
 
@@ -58,13 +64,14 @@ const delayedActionDialog = ({
   delaySeconds,
   warningMessage,
   allowCancel,
-  dangerAction
+  dangerAction,
+  ...options
 }: {
   delaySeconds: number;
   warningMessage?: string;
   allowCancel?: boolean;
   dangerAction?: boolean;
-}): Promise<DialogResult<boolean>> => {
+} & Partial<DialogProps<boolean>>): Promise<DialogResult<boolean>> => {
   return dialog<boolean>(
     (props) => DelayedActionDialog({
       ...props,
@@ -72,21 +79,34 @@ const delayedActionDialog = ({
       warningMessage,
       allowCancel,
       dangerAction,
-    })
+    }),
+    options
   );
 }
 
-const typeToConfirmDialog = ({itemName}:{itemName: string}): Promise<DialogResult<{itemName: string}>> => {
+const typeToConfirmDialog = ({
+  itemName,
+  ...options
+}: {
+  itemName: string;
+} & Partial<DialogProps<{itemName: string}>>): Promise<DialogResult<{itemName: string}>> => {
   return dialog<{itemName: string}>(
     (props) => TypeToConfirmDialog({ ...props, itemName }),
-    { important: true }
+    { important: true, ...options }
   );
 }
 
-const confirm = ({title, description}: {title: string; description: string})=> {
+const confirm = ({
+  title,
+  description,
+  ...options
+}: {
+  title: string;
+  description: string;
+} & Partial<DialogProps<boolean>>)=> {
   return dialog(
     (props) => ConfirmDialog({ ...props, title, description }),
-    { important: true }
+    { important: true, ...options }
   );
 }
 
