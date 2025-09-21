@@ -1,10 +1,10 @@
 import React from 'react';
-import { ConfirmDialog } from './example/Confirm';
-import { CountdownDialog } from './example/CountdownDialog';
-import { DelayedActionDialog } from './example/DelayedActionDialog';
-import { TypeToConfirmDialog } from './example/TypeToConfirm';
-import { dialogObservable } from './state';
-import { DialogProps, DialogResult, DismissReason } from './types';
+import { ConfirmDialog } from '@/registry/new-york/blocks/confirmation-dialog/example/Confirm';
+import { CountdownDialog } from '@/registry/new-york/blocks/confirmation-dialog/example/CountdownDialog';
+import { DelayedActionDialog } from '@/registry/new-york/blocks/confirmation-dialog/example/DelayedActionDialog';
+import { TypeToConfirmDialog } from '@/registry/new-york/blocks/confirmation-dialog/example/TypeToConfirm';
+import { dialogObservable } from '@/registry/new-york/blocks/confirmation-dialog/state';
+import { DialogProps, DialogResult, DismissReason } from '@/registry/new-york/blocks/confirmation-dialog/types';
 
 
 

@@ -12,8 +12,6 @@ export interface ConfirmDialogProps<T> extends DialogProps<T> {
 }
 
 export function ConfirmDialog<T>(props: ConfirmDialogProps<T>) {
-
-
   return (
     <div>
       <DialogHeader>
