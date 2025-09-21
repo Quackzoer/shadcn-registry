@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import type { DialogProps } from '../types';
+import type { DialogProps } from '@/registry/new-york/blocks/confirmation-dialog/types';
 
 export function CountdownDialog(props: DialogProps & {
   countdownSeconds: number;

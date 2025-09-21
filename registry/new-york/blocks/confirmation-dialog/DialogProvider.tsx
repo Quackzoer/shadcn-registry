@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import type { DialogProps } from './types';
-import { dialogObservable } from './state';
-import { DismissReason } from './types';
+import { type DialogProps, DismissReason } from '@/registry/new-york/blocks/confirmation-dialog/types';
+import { dialogObservable } from '@/registry/new-york/blocks/confirmation-dialog/state';
 import { Dialog, DialogContent } from '@/registry/new-york/ui/dialog';
 
 function ConfirmationDialog(props: DialogProps) {

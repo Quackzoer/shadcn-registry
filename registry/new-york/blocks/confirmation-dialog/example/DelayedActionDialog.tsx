@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { DialogProps } from '../types';
+import { DialogProps } from '@/registry/new-york/blocks/confirmation-dialog/types';
 
 interface DelayedActionDialogProps extends DialogProps {
   delaySeconds: number;

@@ -33,6 +33,7 @@ export class DialogObservable {
     const dialog = this.pendingDialogs.get(id);
     if (dialog) {
       dialog.resolve({
+        id,
         isConfirmed: true,
         isDenied: false,
         isDismissed: false,
@@ -47,6 +48,7 @@ export class DialogObservable {
     const dialog = this.pendingDialogs.get(id);
     if (dialog) {
       dialog.resolve({
+        id,
         isConfirmed: false,
         isDenied: true,
         isDismissed: false,
@@ -61,6 +63,7 @@ export class DialogObservable {
     const dialog = this.pendingDialogs.get(id);
     if (dialog) {
       dialog.resolve({
+        id,
         isConfirmed: false,
         isDenied: false,
         isDismissed: true,

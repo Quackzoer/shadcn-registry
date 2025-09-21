@@ -1,8 +1,3 @@
-export interface DialogAction {
-  value: unknown;
-  isConfirmed?: boolean;
-}
-
 export interface DialogProps<T = unknown> {
   id: string;
   open: boolean;
@@ -28,6 +23,7 @@ export enum DismissReason {
 }
 
 export interface DialogResult<T = unknown> {
+  id: string;
   isConfirmed: boolean;
   isDenied: boolean;
   isDismissed: boolean;
