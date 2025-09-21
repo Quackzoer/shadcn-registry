@@ -47,12 +47,27 @@ Registry components follow this pattern:
 - **Path Aliases**: Uses `@/` prefix mapping to root directory via TypeScript paths
 - **Styling**: "new-york" style variant with CSS variables and Lucide icons
 
-### Dialog System Example
-The confirmation dialog system demonstrates the registry pattern:
-- `DialogProvider.tsx`: Context provider for dialog state management
-- `dialog.ts`: API for programmatic dialog creation with observable pattern
-- `observable.ts` & `types.ts`: State management utilities
-- Multiple example dialogs showing different use cases
+### Confirmation Dialog System
+The confirmation dialog system is inspired by [Sonner](https://github.com/emilkowalski/sonner) and follows similar API patterns:
+
+**Sonner-inspired API:**
+- `dialog()` - Create custom dialogs programmatically
+- `dialog.dismiss(id?, reason?, value?)` - Dismiss specific dialog or all dialogs (matches Sonner's `toast.dismiss()`)
+- `dialog.countdown()`, `dialog.typeToConfirm()` - Specialized dialog types
+- Observable pattern for state management similar to Sonner's toast system
+
+**Architecture:**
+- `DialogProvider.tsx`: Context provider for dialog state management (like Sonner's `<Toaster />`)
+- `dialog.ts`: Main API for programmatic dialog creation with Sonner-like interface
+- `state.ts`: Observable-based state management following Sonner patterns
+- `types.ts`: TypeScript interfaces including `DialogResult` with dialog ID tracking
+- Multiple example dialogs demonstrating different use cases
+
+**Key Features:**
+- Support for custom dialog IDs (like Sonner's toast IDs)
+- Programmatic dismissal by ID or dismiss all dialogs
+- Promise-based API returning `DialogResult` with confirmation state
+- Multiple concurrent dialogs support
 
 ## File Organization
 - `app/` - Next.js 15 app router pages

@@ -17,7 +17,7 @@ export class DialogObservable {
   }
 
   async showDialog<T>(props: Partial<DialogProps<T>>): Promise<DialogResult> {
-    const id = `dialog-${++this.dialogId}`;
+    const id = props.id || `dialog-${++this.dialogId}`;
 
     return new Promise((resolve) => {
       this.pendingDialogs.set(id, { resolve });
@@ -73,6 +73,16 @@ export class DialogObservable {
       this.pendingDialogs.delete(id);
       this.notify('HIDE_DIALOG', { id });
     }
+  }
+
+  dismissAllDialogs(reason: DismissReason, value?: unknown) {
+    // Get all current dialog IDs
+    const dialogIds = Array.from(this.pendingDialogs.keys());
+
+    // Dismiss each dialog
+    dialogIds.forEach(id => {
+      this.dismissDialog(id, reason, value);
+    });
   }
 }
 

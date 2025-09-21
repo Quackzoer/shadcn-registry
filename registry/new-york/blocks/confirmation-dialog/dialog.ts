@@ -3,7 +3,7 @@ import { CountdownDialog } from './example/CountdownDialog';
 import { DelayedActionDialog } from './example/DelayedActionDialog';
 import { TypeToConfirmDialog } from './example/TypeToConfirm';
 import { dialogObservable } from './state';
-import type { DialogProps } from './types';
+import type { DialogProps, DismissReason } from './types';
 
 export const deleteConfirm = (itemName: string, options?: Partial<DialogProps>) => {
   return dialogObservable.showDialog({
@@ -56,6 +56,15 @@ export const dialog = (render: (props: any) => React.ReactNode, options?: Partia
     render,
     ...options
   });
+};
+
+dialog.dismiss = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
+  if (id) {
+    dialogObservable.dismissDialog(id, reason, value);
+  } else {
+    // Dismiss all dialogs if no ID provided (Sonner pattern)
+    dialogObservable.dismissAllDialogs(reason, value);
+  }
 };
 
 const typeToConfirmDialog = ({itemName}:{itemName: string}) => {
