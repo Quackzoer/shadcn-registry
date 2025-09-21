@@ -4,7 +4,7 @@ import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { AlertTriangle, Check, Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
-import { DialogProps } from '../types';
+import { DialogProps } from '@/registry/new-york/blocks/confirmation-dialog/types';
 
 interface DelayedActionDialogProps extends DialogProps<boolean> {
   delaySeconds: number;

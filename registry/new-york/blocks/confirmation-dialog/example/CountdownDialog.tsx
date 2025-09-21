@@ -4,7 +4,7 @@ import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
-import type { DialogProps } from '../types';
+import type { DialogProps } from '@/registry/new-york/blocks/confirmation-dialog/types';
 
 export function CountdownDialog(props: DialogProps<string> & {
   countdownSeconds: number;

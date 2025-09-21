@@ -4,7 +4,7 @@ import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { ReactNode } from "react";
-import { DialogProps } from "../types";
+import { DialogProps } from "@/registry/new-york/blocks/confirmation-dialog/types";
 
 export interface ConfirmDialogProps<T> extends DialogProps<T> {
   title: ReactNode;
