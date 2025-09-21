@@ -8,8 +8,8 @@
       "type": "registry:component",
       "title": "Confirmation Dialog",
       "description": "A confirmation dialog component.",
-      "dependencies": ["zod"],
-      "registryDependencies": ["button", "input", "label", "textarea", "card"],
+      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
+      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
           "path": "registry/new-york/blocks/confirmation-dialog/DialogProvider.tsx",
