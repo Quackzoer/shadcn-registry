@@ -1,5 +1,8 @@
 "use client"
 
+import { Button } from "@/registry/new-york/ui/button"
+import Link from "next/link"
+
 
 export default function Home() {
   return (
@@ -11,7 +14,9 @@ export default function Home() {
         </p>
       </header>
       <main className="flex flex-col flex-1 gap-8">
-        
+        <Button asChild>
+          <Link href="/confirmation-dialog">Confirmation Dialog Example</Link>
+        </Button>
       </main>
     </div>
   )
