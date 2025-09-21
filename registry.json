@@ -12,15 +12,31 @@
       "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
+          "path": "registry/new-york/blocks/confirmation-dialog/example/Confirm.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/example/CountdownDialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/example/DelayedActionDialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/new-york/blocks/confirmation-dialog/example/TypeToConfirm.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "registry/new-york/blocks/confirmation-dialog/DialogProvider.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/Dialog.tsx",
-          "type": "registry:component"
+          "path": "registry/new-york/blocks/confirmation-dialog/dialog.ts",
+          "type": "registry:lib"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/observable.ts",
+          "path": "registry/new-york/blocks/confirmation-dialog/state.ts",
           "type": "registry:lib"
         },
         {
