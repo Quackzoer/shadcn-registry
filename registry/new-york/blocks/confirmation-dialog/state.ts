@@ -1,28 +1,27 @@
-import type { DialogProps, DialogResult, DismissReason } from './types';
+import type { DialogProps, DialogResult, DismissReason } from '@/registry/new-york/blocks/confirmation-dialog/types';
 
 export class DialogObservable {
-  private subscribers: Array<(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: DialogProps) => void> = [];
+  private subscribers: Array<(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: Partial<DialogProps>) => void> = [];
   private dialogId = 0;
-  private pendingDialogs = new Map<string, { resolve: (value: DialogResult<any>) => void;  }>();
+  private pendingDialogs = new Map<string, { resolve: (value: DialogResult<unknown>) => void;  }>();
 
-  subscribe(callback: (action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: DialogProps) => void) {
+  subscribe(callback: (action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: Partial<DialogProps>) => void) {
     this.subscribers.push(callback);
     return () => {
       this.subscribers = this.subscribers.filter(sub => sub !== callback);
     };
   }
 
-  private notify(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: DialogProps) {
-    this.subscribers.forEach(callback => callback(action, data));
+  private notify<T = unknown>(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: Partial<DialogProps<T>>) {
+    this.subscribers.forEach(callback => callback(action, data as Partial<DialogProps>));
   }
 
   async showDialog<T>(props: Partial<DialogProps<T>>): Promise<DialogResult<T>> {
     const id = props.id || `dialog-${++this.dialogId}`;
 
     return new Promise((resolve) => {
-      this.pendingDialogs.set(id, { resolve });
-
-      this.notify('SHOW_DIALOG', {
+      this.pendingDialogs.set(id, { resolve: resolve as (value: DialogResult<unknown>) => void });
+      this.notify<T>('SHOW_DIALOG', {
         id,
         ...props,
       });
