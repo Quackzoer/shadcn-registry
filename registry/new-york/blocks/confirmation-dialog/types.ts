@@ -5,11 +5,11 @@ export interface DialogProps<T = unknown> {
   important?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
-  render: (props: DialogProps) => React.ReactNode;
+  render: (props: DialogProps<T>) => React.ReactNode;
   confirm: (value?: T) => void;
   deny: (value?: T) => void;
   cancel: () => void;
-  dismiss: (reason: DismissReason, value?: unknown) => void;
+  dismiss: (reason: DismissReason, value?: T) => void;
   closeDialog: () => void;
 }
 
@@ -28,5 +28,10 @@ export interface DialogResult<T = unknown> {
   isDenied: boolean;
   isDismissed: boolean;
   value?: T;
-  dismiss?: DismissReason;
+  dismissReason?: DismissReason;
+}
+
+export type DismissData<T = unknown> = {
+  reason: DismissReason;
+  value?: T;
 }

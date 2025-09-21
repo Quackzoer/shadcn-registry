@@ -8,9 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { DialogProps } from "@/registry/new-york/blocks/confirmation-dialog/types";
+import { DialogProps } from "../types";
 
-export function TypeToConfirmDialog(props: DialogProps & { itemName: string }) {
+export function TypeToConfirmDialog(props: DialogProps<{itemName: string}> & { itemName: string }) {
   const schema = z.object({
     itemName: z.literal(props.itemName)
   })
