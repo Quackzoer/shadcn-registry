@@ -1,10 +1,5 @@
 "use client"
 
-import * as React from "react"
-import { DialogProvider } from "@/registry/new-york/blocks/confirmation-dialog/DialogProvider"
-import { Button } from "@/registry/new-york/ui/button"
-import { dialog } from "@/registry/new-york/blocks/confirmation-dialog/dialog"
-import { DismissReason } from "@/registry/new-york/blocks/confirmation-dialog/types"
 
 export default function Home() {
   return (
@@ -16,59 +11,8 @@ export default function Home() {
         </p>
       </header>
       <main className="flex flex-col flex-1 gap-8">
-        <Button
-          onClick={() => {
-            dialog.countdown({
-              countdownSeconds: 5,
-            }).then((result) => {
-              console.log(result)
-            })
-          }}
-        >
-          Delayed action dialog
-        </Button>
-        <Button
-          onClick={() => {
-            dialog.typeToConfirm({
-              itemName: 'some-file.txt'
-            }).then((result) => {
-              console.log(result)
-            })
-          }}
-        >
-          Type to confirm dialog
-        </Button>
-        <Button
-          onClick={() => {
-            dialog.typeToConfirm({
-              itemName: 'some-file.txt'
-            }).then((result) => {
-              console.log(result)
-            })
-            dialog.countdown({
-              countdownSeconds: 10,
-            })
-          }}
-        >
-          Two dialogs at once
-        </Button>
-        <Button
-          onClick={() => {
-            dialog.countdown({
-              countdownSeconds: 20,
-              id: 'dismiss-after-5-seconds'
-            }).then((result) => {
-              console.log(result)
-            })
-            setTimeout(() => {
-              dialog.dismiss('dismiss-after-5-seconds', DismissReason.TIMER, 'Dismissed after 5 seconds')
-            }, 5000)
-          }}
-        >
-          Dialog dismissed after 5 seconds
-        </Button>
+        
       </main>
-      <DialogProvider />
     </div>
   )
 }
