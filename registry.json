@@ -12,35 +12,35 @@
       "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/Confirm.tsx",
+          "path": "registry/new-york/ui/confirmation-dialog/dialog/Confirm.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/CountdownDialog.tsx",
+          "path": "registry/new-york/ui/confirmation-dialog/dialog/CountdownDialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/DelayedActionDialog.tsx",
+          "path": "registry/new-york/ui/confirmation-dialog/dialog/DelayedActionDialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/TypeToConfirm.tsx",
+          "path": "registry/new-york/ui/confirmation-dialog/dialog/TypeToConfirm.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/DialogProvider.tsx",
+          "path": "registry/new-york/ui/confirmation-dialog/DialogProvider.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/dialog.ts",
+          "path": "registry/new-york/lib/confirmation-dialog/dialog.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/state.ts",
+          "path": "registry/new-york/lib/confirmation-dialog/state.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/types.ts",
+          "path": "registry/new-york/lib/confirmation-dialog/types.ts",
           "type": "registry:lib"
         }
       ]

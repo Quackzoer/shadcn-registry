@@ -1,4 +1,4 @@
-import type { DialogProps, DialogResult, DismissReason } from '@/registry/new-york/blocks/confirmation-dialog/types';
+import type { DialogProps, DialogResult, DismissReason } from '@/registry/new-york/lib/confirmation-dialog/types';
 
 export class DialogObservable {
   private subscribers: Array<(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: Partial<DialogProps>) => void> = [];
