@@ -1,16 +1,18 @@
 "use client"
 
+import type { DialogRendererProps } from '@/registry/new-york/lib/confirmation-dialog/types';
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
-import type { DialogProps } from '@/registry/new-york/lib/confirmation-dialog/types';
 
-export function CountdownDialog(props: DialogProps<string> & {
+export interface CountdownDialogProps {
   countdownSeconds: number;
   autoConfirm?: boolean;
   showProgress?: boolean;
-}) {
+}
+
+export function CountdownDialog(props: CountdownDialogProps & DialogRendererProps<string>) {
   const [timeRemaining, setTimeRemaining] = useState(props.countdownSeconds);
   const [isActive, setIsActive] = useState(true);
 

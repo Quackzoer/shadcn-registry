@@ -1,15 +1,14 @@
 import React from 'react';
-import { ConfirmDialog } from '@/registry/new-york/ui/confirmation-dialog/dialogs/ConfirmDialog';
-import { CountdownDialog } from '@/registry/new-york/ui/confirmation-dialog/dialogs/CountdownDialog';
+import { ConfirmDialog, ConfirmDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/ConfirmDialog';
+import { CountdownDialog, CountdownDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/CountdownDialog';
 import { DelayedActionDialog } from '@/registry/new-york/ui/confirmation-dialog/dialogs/DelayedActionDialog';
-import { TypeToConfirmDialog } from '@/registry/new-york/ui/confirmation-dialog/dialogs/TypeToConfirmDialog';
+import { TypeToConfirmDialog, TypeToConfirmDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/TypeToConfirmDialog';
 import { dialogObservable } from '@/registry/new-york/lib/confirmation-dialog/state';
-import { DialogProps, DialogResult, DismissReason } from '@/registry/new-york/lib/confirmation-dialog/types';
+import { DialogProps, DialogRendererProps, DialogResult } from '@/registry/new-york/lib/confirmation-dialog/types';
+ 
 
-
-
-export const dialog = <TValue = unknown>(
-  render: (props: DialogProps<TValue>) => React.ReactNode,
+export const renderDialog = <TValue = unknown>(
+  render: (props: DialogRendererProps<TValue>) => React.ReactNode,
   options?: Partial<DialogProps<TValue>>
 ): Promise<DialogResult<TValue>> => {
   return dialogObservable.showDialog({
@@ -18,12 +17,16 @@ export const dialog = <TValue = unknown>(
   });
 };
 
-dialog.dismiss = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
-  if (id) {
-    dialogObservable.dismissDialog(id, reason, value);
-  } else {
-    dialogObservable.dismissAllDialogs(reason, value);
-  }
+export const dialog = <RendererProps = unknown, TValue = unknown>(
+  render: (props: DialogRendererProps<TValue> & RendererProps) => React.ReactNode,
+  options?: Partial<DialogProps<TValue>>
+) => {
+  return (rendererProps: RendererProps & Partial<DialogRendererProps<TValue>>): Promise<DialogResult<TValue>> => {
+    return renderDialog<TValue>((dialogProps: DialogRendererProps<TValue>) =>
+      render({ ...dialogProps, ...rendererProps } as DialogRendererProps<TValue> & RendererProps),
+      options
+    );
+  };
 };
 
 
@@ -32,84 +35,31 @@ const deleteConfirmDialog = ({
   ...options
 }: {
   itemName: string;
-} & Partial<DialogProps<{itemName: string}>>): Promise<DialogResult<{itemName: string}>> => {
+} & Partial<DialogProps<{itemName: string}>>) => {
   return dialog<{itemName: string}>(
     (props) => TypeToConfirmDialog({ ...props, itemName }),
     { important: true, ...options }
   );
 }
 
-const countdownDialog = ({
-  countdownSeconds,
-  autoConfirm,
-  showProgress,
-  ...options
-}: {
-  countdownSeconds: number;
-  autoConfirm?: boolean;
-  showProgress?: boolean;
-} & Partial<DialogProps<string>>): Promise<DialogResult<string>> => {
-  return dialog<string>(
-    (props) => CountdownDialog({
-      ...props,
-      countdownSeconds,
-      autoConfirm,
-      showProgress,
-    }),
-    options
-  );
-}
+const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
 
-const delayedActionDialog = ({
-  delaySeconds,
-  warningMessage,
-  allowCancel,
-  dangerAction,
-  ...options
-}: {
-  delaySeconds: number;
-  warningMessage?: string;
-  allowCancel?: boolean;
-  dangerAction?: boolean;
-} & Partial<DialogProps<boolean>>): Promise<DialogResult<boolean>> => {
-  return dialog<boolean>(
-    (props) => DelayedActionDialog({
-      ...props,
-      delaySeconds,
-      warningMessage,
-      allowCancel,
-      dangerAction,
-    }),
-    options
-  );
-}
+// Example usage:
+await typeToConfirmDialog({ itemName: 'example', onClose: () => console.log('Dialog closed') });
 
-const typeToConfirmDialog = ({
-  itemName,
-  ...options
-}: {
-  itemName: string;
-} & Partial<DialogProps<{itemName: string}>>): Promise<DialogResult<{itemName: string}>> => {
-  return dialog<{itemName: string}>(
-    (props) => TypeToConfirmDialog({ ...props, itemName }),
-    { important: true, ...options }
-  );
-}
+const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
 
-const confirm = ({
-  title,
-  description,
-  ...options
-}: {
-  title: string;
-  description: string;
-} & Partial<DialogProps<boolean>>)=> {
-  return dialog(
-    (props) => ConfirmDialog<boolean>({ ...props, title, description }),
-    { important: true, ...options }
-  );
-}
+const delayedActionDialog = dialog<{delaySeconds: number; warningMessage?: string; allowCancel?: boolean; dangerAction?: boolean}, boolean>(DelayedActionDialog);
 
+const confirm = dialog<ConfirmDialogProps, boolean>(
+  ConfirmDialog,
+  { important: true }
+);
+
+//* Utils
+dialog.render = renderDialog;
+
+//* Predefined dialogs
 dialog.delete = deleteConfirmDialog;
 dialog.countdown = countdownDialog;
 dialog.delayedAction = delayedActionDialog;

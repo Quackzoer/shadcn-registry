@@ -1,17 +1,17 @@
 "use client"
 
+import { DialogRendererProps } from "@/registry/new-york/lib/confirmation-dialog/types";
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { ReactNode } from "react";
-import { DialogProps } from "@/registry/new-york/lib/confirmation-dialog/types";
 
-export interface ConfirmDialogProps<T> extends DialogProps<T> {
+export interface ConfirmDialogProps{
   title: ReactNode;
   description: ReactNode;
 }
 
-export function ConfirmDialog<T>(props: ConfirmDialogProps<T>) {
+export function ConfirmDialog(props: ConfirmDialogProps & DialogRendererProps<boolean>) {
   return (
     <div>
       <DialogHeader>

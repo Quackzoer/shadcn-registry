@@ -1,19 +1,19 @@
 "use client"
 
+import { DialogRendererProps } from '@/registry/new-york/lib/confirmation-dialog/types';
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { AlertTriangle, Check, Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
-import { DialogProps } from '@/registry/new-york/lib/confirmation-dialog/types';
 
-interface DelayedActionDialogProps extends DialogProps<boolean> {
+interface DelayedActionDialogProps {
   delaySeconds: number;
   warningMessage?: string;
   allowCancel?: boolean;
   dangerAction?: boolean;
 }
 
-export function DelayedActionDialog(props: DelayedActionDialogProps) {
+export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRendererProps<boolean>) {
   const [timeRemaining, setTimeRemaining] = useState(props.delaySeconds);
   const [canInteract, setCanInteract] = useState(false);
 

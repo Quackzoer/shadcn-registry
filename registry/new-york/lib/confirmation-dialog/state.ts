@@ -12,16 +12,16 @@ export class DialogObservable {
     };
   }
 
-  private notify<T = unknown>(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: Partial<DialogProps<T>>) {
+  private notify<Props = unknown, ReturnValue = unknown>(action: 'SHOW_DIALOG' | 'HIDE_DIALOG', data: Partial<DialogProps<ReturnValue>> & Props) {
     this.subscribers.forEach(callback => callback(action, data as Partial<DialogProps>));
   }
 
-  async showDialog<T>(props: Partial<DialogProps<T>>): Promise<DialogResult<T>> {
+  async showDialog<Props extends Partial<DialogProps<unknown>>, ReturnValue = unknown>(props: Props): Promise<DialogResult<ReturnValue>> {
     const id = props.id || `dialog-${++this.dialogId}`;
 
     return new Promise((resolve) => {
       this.pendingDialogs.set(id, { resolve: resolve as (value: DialogResult<unknown>) => void });
-      this.notify<T>('SHOW_DIALOG', {
+      this.notify<Props>('SHOW_DIALOG', {
         id,
         ...props,
       });
