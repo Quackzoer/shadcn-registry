@@ -4,7 +4,7 @@ import { CountdownDialog, CountdownDialogProps } from '@/registry/new-york/ui/co
 import { DelayedActionDialog } from '@/registry/new-york/ui/confirmation-dialog/dialogs/DelayedActionDialog';
 import { TypeToConfirmDialog, TypeToConfirmDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/TypeToConfirmDialog';
 import { dialogObservable } from '@/registry/new-york/lib/confirmation-dialog/state';
-import { DialogProps, DialogRendererProps, DialogResult } from '@/registry/new-york/lib/confirmation-dialog/types';
+import { DialogProps, DialogRendererProps, DialogResult, DismissReason } from '@/registry/new-york/lib/confirmation-dialog/types';
  
 
 export const renderDialog = <TValue = unknown>(
@@ -29,6 +29,13 @@ export const dialog = <RendererProps = unknown, TValue = unknown>(
   };
 };
 
+const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
+  if (id) {
+    dialogObservable.dismissDialog(id, reason, value);
+  } else {
+    dialogObservable.dismissAllDialogs(reason, value);
+  }
+}
 
 const deleteConfirmDialog = ({
   itemName,
@@ -44,9 +51,6 @@ const deleteConfirmDialog = ({
 
 const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
 
-// Example usage:
-await typeToConfirmDialog({ itemName: 'example', onClose: () => console.log('Dialog closed') });
-
 const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
 
 const delayedActionDialog = dialog<{delaySeconds: number; warningMessage?: string; allowCancel?: boolean; dangerAction?: boolean}, boolean>(DelayedActionDialog);
@@ -58,6 +62,7 @@ const confirm = dialog<ConfirmDialogProps, boolean>(
 
 //* Utils
 dialog.render = renderDialog;
+dialog.dismiss = dismissDialog;
 
 //* Predefined dialogs
 dialog.delete = deleteConfirmDialog;
