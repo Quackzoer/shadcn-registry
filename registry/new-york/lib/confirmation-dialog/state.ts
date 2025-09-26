@@ -11,7 +11,7 @@ export class DialogObservable {
   private dialogId = 0;
   private pendingDialogs = new Map<
     string,
-    { resolve: (value: DialogResult<unknown>) => void }
+    { resolve: (value: { id: string; isConfirmed: boolean; isDenied: boolean; isDismissed: boolean; value?: unknown; dismissReason?: DismissReason }) => void }
   >();
 
   subscribe(
@@ -52,7 +52,7 @@ export class DialogObservable {
 
     const valuePromise = new Promise<ReturnValue | undefined>((resolve) => {
       this.pendingDialogs.set(id, {
-        resolve: (result: DialogResult<unknown>) => {
+        resolve: (result: { id: string; isConfirmed: boolean; isDenied: boolean; isDismissed: boolean; value?: unknown; dismissReason?: DismissReason }) => {
           resolvedData = {
             isConfirmed: result.isConfirmed,
             isDenied: result.isDenied,
