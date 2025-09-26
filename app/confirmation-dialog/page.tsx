@@ -20,7 +20,7 @@ export default function Home() {
           onClick={() => {
             dialog.countdown({
               countdownSeconds: 5,
-            }).then((result) => {
+            }).async().then((result) => {
               console.log(result)
             })
           }}
@@ -31,7 +31,7 @@ export default function Home() {
           onClick={() => {
             dialog.typeToConfirm({
               itemName: 'some-file.txt'
-            }).then((result) => {
+            }).async().then((result) => {
               console.log(result)
             })
           }}
@@ -40,13 +40,17 @@ export default function Home() {
         </Button>
         <Button
           onClick={() => {
-            dialog.typeToConfirm({
+            const typeToConfirmDialog = dialog.typeToConfirm({
               itemName: 'some-file.txt'
-            }).then((result) => {
-              console.log(result)
             })
-            dialog.countdown({
+            const countDownDialog = dialog.countdown({
               countdownSeconds: 10,
+            })
+            typeToConfirmDialog.value.then((result) => {
+              console.log('Type to confirm result:', result)
+            })
+            countDownDialog.value.then((result) => {
+              console.log('Countdown dialog result:', result)
             })
           }}
         >
@@ -54,14 +58,11 @@ export default function Home() {
         </Button>
         <Button
           onClick={() => {
-            dialog.countdown({
+            const countDownDialog = dialog.countdown({
               countdownSeconds: 20,
-              id: 'dismiss-after-5-seconds'
-            }).then((result) => {
-              console.log(result)
             })
             setTimeout(() => {
-              dialog.dismiss('dismiss-after-5-seconds', DismissReason.TIMER, 'Dismissed after 5 seconds')
+              countDownDialog.dismiss(DismissReason.TIMER, 'Dismissed after 5 seconds')
             }, 5000)
           }}
         >

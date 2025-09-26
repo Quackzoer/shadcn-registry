@@ -30,8 +30,18 @@ export interface DialogResult<T = unknown> {
   isConfirmed: boolean;
   isDenied: boolean;
   isDismissed: boolean;
-  value?: T;
+  open: boolean;
+  value: Promise<T | undefined>;
   dismissReason?: DismissReason;
+  dismiss: (reason?: DismissReason, value?: T) => void;
+  async: () => Promise<{
+    id: string;
+    isConfirmed: boolean;
+    isDenied: boolean;
+    isDismissed: boolean;
+    value?: T;
+    dismissReason?: DismissReason;
+  }>;
 }
 
 export type DismissData<T = unknown> = {

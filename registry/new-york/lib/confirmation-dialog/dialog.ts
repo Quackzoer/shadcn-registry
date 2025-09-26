@@ -10,7 +10,7 @@ import { DialogProps, DialogRendererProps, DialogResult, DismissReason } from '@
 export const renderDialog = <TValue = unknown>(
   render: (props: DialogRendererProps<TValue>) => React.ReactNode,
   options?: Partial<DialogProps<TValue>>
-): Promise<DialogResult<TValue>> => {
+): DialogResult<TValue> => {
   return dialogObservable.showDialog({
     render,
     ...options
@@ -21,7 +21,7 @@ export const dialog = <RendererProps = unknown, TValue = unknown>(
   render: (props: DialogRendererProps<TValue> & RendererProps) => React.ReactNode,
   options?: Partial<DialogProps<TValue>>
 ) => {
-  return (rendererProps: RendererProps & Partial<DialogRendererProps<TValue>>): Promise<DialogResult<TValue>> => {
+  return (rendererProps: RendererProps & Partial<DialogRendererProps<TValue>>): DialogResult<TValue> => {
     return renderDialog<TValue>((dialogProps: DialogRendererProps<TValue>) =>
       render({ ...dialogProps, ...rendererProps } as DialogRendererProps<TValue> & RendererProps),
       options
@@ -50,6 +50,17 @@ const deleteConfirmDialog = ({
 }
 
 const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
+
+// Example usage:
+const exampleDialog = typeToConfirmDialog({ itemName: 'example', onClose: () => console.log('Dialog closed') });
+console.log('Dialog ID:', exampleDialog.id);
+console.log('Is open:', exampleDialog.open);
+exampleDialog.dismiss(); // Dismiss the dialog
+await exampleDialog.value; // Wait for the result value
+
+// Or use async() for chaining with all resolved data:
+const result = await typeToConfirmDialog({ itemName: 'abc' }).async();
+console.log('Result:', result); // { id, isConfirmed, isDenied, isDismissed, value, dismissReason }
 
 const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
 
