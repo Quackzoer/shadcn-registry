@@ -31,8 +31,22 @@ export const renderDialog = <TValue = unknown>(
  * const value = result.value; // Promise<boolean>
  * const awaitedValue = await value; // boolean
  * const isConfirmed = result.isConfirmed; // boolean
- * const asyncResult = await result.async(); // Entire result object
- * const isConfirmedAsync = await asyncResult.isConfirmed; // boolean
+ * ```
+ * @example - Usage of async helper:
+ * ```ts
+ * const asyncDialog = dialog<{}, string>(ExampleComponent);
+ * const result = asyncDialog().async();
+ * const value = result.value; // string
+ * const isConfirmed = result.isConfirmed; // boolean
+ * ```
+ * @example - Dismissing a dialog using dismiss helper:
+ * ```ts
+ * const exampleDialog = dialog<{}, void>(ExampleComponent);
+ * const result = exampleDialog();
+ * // Dismiss the dialog after 2 seconds
+ * setTimeout(() => {
+ *   exampleDialog.dismiss();
+ * }, 2000);
  * ```
  */
 export const dialog = <RendererProps = unknown, TValue = unknown>(
