@@ -6,7 +6,7 @@ import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-yor
 import { AlertTriangle, Check, Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
 
-interface DelayedActionDialogProps {
+export interface DelayedActionDialogProps {
   delaySeconds: number;
   warningMessage?: string;
   allowCancel?: boolean;

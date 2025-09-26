@@ -1,7 +1,7 @@
 import React from 'react';
 import { ConfirmDialog, ConfirmDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/ConfirmDialog';
 import { CountdownDialog, CountdownDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/CountdownDialog';
-import { DelayedActionDialog } from '@/registry/new-york/ui/confirmation-dialog/dialogs/DelayedActionDialog';
+import { DelayedActionDialog, DelayedActionDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/DelayedActionDialog';
 import { TypeToConfirmDialog, TypeToConfirmDialogProps } from '@/registry/new-york/ui/confirmation-dialog/dialogs/TypeToConfirmDialog';
 import { dialogObservable } from '@/registry/new-york/lib/confirmation-dialog/state';
 import { DialogProps, DialogRendererProps, DialogResult, DismissReason } from '@/registry/new-york/lib/confirmation-dialog/types';
@@ -65,12 +65,9 @@ const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>
 
 const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
 
-const delayedActionDialog = dialog<{delaySeconds: number; warningMessage?: string; allowCancel?: boolean; dangerAction?: boolean}, boolean>(DelayedActionDialog);
+const delayedActionDialog = dialog<DelayedActionDialogProps, boolean>(DelayedActionDialog);
 
-const confirm = dialog<ConfirmDialogProps, boolean>(
-  ConfirmDialog,
-  { important: true }
-);
+const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog,{ important: true });
 
 //* Utils
 dialog.render = renderDialog;
