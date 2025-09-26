@@ -47,22 +47,6 @@ export const dialog = <RendererProps = unknown, TValue = unknown>(
   };
 };
 
-
-
-
-
-const deleteConfirmDialog = ({
-  itemName,
-  ...options
-}: {
-  itemName: string;
-} & Partial<DialogProps<{itemName: string}>>) => {
-  return dialog<{itemName: string}>(
-    (props) => TypeToConfirmDialog({ ...props, itemName }),
-    { important: true, ...options }
-  );
-}
-
 const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
 
 const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
@@ -103,7 +87,6 @@ const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE,
 dialog.dismiss = dismissDialog;
 
 //* Predefined dialogs
-dialog.delete = deleteConfirmDialog;
 dialog.countdown = countdownDialog;
 dialog.delayedAction = delayedActionDialog;
 dialog.typeToConfirm = typeToConfirmDialog;
