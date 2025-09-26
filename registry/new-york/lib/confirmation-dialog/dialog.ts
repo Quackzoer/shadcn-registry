@@ -16,7 +16,25 @@ export const renderDialog = <TValue = unknown>(
     ...options
   });
 };
-
+/**
+ * 
+ * @param render - A function that takes dialog properties and returns a React node.
+ * @param options - Optional dialog configuration options.
+ * @typeParam RendererProps - Additional properties to be passed to the React Component. This type is merged with DialogRendererProps.
+ * @typeParam TValue - The type of value that the dialog will return upon resolving.
+ * @returns A DialogResult object containing the dialog ID, metadata, and helper functions like `dismiss` or `async`.
+ * 
+ * @example - Basic usage with a custom renderer:
+ * ```ts
+ * const customDialog = dialog<{ customProp: string }, boolean>(CustomComponent, {important: true});
+ * const result = customDialog({ customProp: 'value' });
+ * const value = result.value; // Promise<boolean>
+ * const awaitedValue = await value; // boolean
+ * const isConfirmed = result.isConfirmed; // boolean
+ * const asyncResult = await result.async(); // Entire result object
+ * const isConfirmedAsync = await asyncResult.isConfirmed; // boolean
+ * ```
+ */
 export const dialog = <RendererProps = unknown, TValue = unknown>(
   render: (props: DialogRendererProps<TValue> & RendererProps) => React.ReactNode,
   options?: Partial<DialogProps<TValue>>
@@ -29,13 +47,9 @@ export const dialog = <RendererProps = unknown, TValue = unknown>(
   };
 };
 
-const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
-  if (id) {
-    dialogObservable.dismissDialog(id, reason, value);
-  } else {
-    dialogObservable.dismissAllDialogs(reason, value);
-  }
-}
+
+
+
 
 const deleteConfirmDialog = ({
   itemName,
@@ -51,17 +65,6 @@ const deleteConfirmDialog = ({
 
 const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
 
-// Example usage:
-const exampleDialog = typeToConfirmDialog({ itemName: 'example', onClose: () => console.log('Dialog closed') });
-console.log('Dialog ID:', exampleDialog.id);
-console.log('Is open:', exampleDialog.open);
-exampleDialog.dismiss(); // Dismiss the dialog
-await exampleDialog.value; // Wait for the result value
-
-// Or use async() for chaining with all resolved data:
-const result = await typeToConfirmDialog({ itemName: 'abc' }).async();
-console.log('Result:', result); // { id, isConfirmed, isDenied, isDismissed, value, dismissReason }
-
 const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
 
 const delayedActionDialog = dialog<{delaySeconds: number; warningMessage?: string; allowCancel?: boolean; dangerAction?: boolean}, boolean>(DelayedActionDialog);
@@ -73,6 +76,30 @@ const confirm = dialog<ConfirmDialogProps, boolean>(
 
 //* Utils
 dialog.render = renderDialog;
+
+
+const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
+  if (id) {
+    dialogObservable.dismissDialog(id, reason, value);
+  } else {
+    dialogObservable.dismissAllDialogs(reason, value);
+  }
+}
+/**
+ * Dismiss a dialog by ID or all dialogs at once.
+ * @param id - Optional dialog ID, if not provided all dialogs will be dismissed.
+ * @param reason - The reason for dismissing the dialog.
+ * @param value - Optional value to pass when dismissing the dialog.
+ * @example - Dismiss a specific dialog by ID:
+ * ```ts
+ * const exampleDialog = exampleDialog();
+ * dialog.dismiss(exampleDialog.id, DismissReason.CANCEL, { some: 'data' });
+ * ```
+ * @example - Dismiss all dialogs at once:
+ * ```ts
+ * dialog.dismiss(undefined, DismissReason.CANCEL, { some: 'data' });
+ * ```
+ */
 dialog.dismiss = dismissDialog;
 
 //* Predefined dialogs
