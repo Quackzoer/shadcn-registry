@@ -61,6 +61,14 @@ export const dialog = <RendererProps = unknown, TValue = unknown>(
   };
 };
 
+const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
+  if (id) {
+    dialogObservable.dismissDialog(id, reason, value);
+  } else {
+    dialogObservable.dismissAllDialogs(reason, value);
+  }
+}
+
 const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
 
 const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
@@ -72,14 +80,6 @@ const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog,{ important: t
 //* Utils
 dialog.render = renderDialog;
 
-
-const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
-  if (id) {
-    dialogObservable.dismissDialog(id, reason, value);
-  } else {
-    dialogObservable.dismissAllDialogs(reason, value);
-  }
-}
 /**
  * Dismiss a dialog by ID or all dialogs at once.
  * @param id - Optional dialog ID, if not provided all dialogs will be dismissed.
