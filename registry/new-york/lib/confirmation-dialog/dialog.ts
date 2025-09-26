@@ -93,6 +93,8 @@ dialog.render = renderDialog;
  * @example - Dismiss all dialogs at once:
  * ```ts
  * dialog.dismiss(undefined, DismissReason.CANCEL, { some: 'data' });
+ * // or simply
+ * dialog.dismiss();
  * ```
  */
 dialog.dismiss = dismissDialog;
