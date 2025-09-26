@@ -12,36 +12,43 @@
       "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/Confirm.tsx",
-          "type": "registry:component"
+          "path": "registry/new-york/ui/confirmation-dialog/dialogs/ConfirmDialog.tsx",
+          "type": "registry:component",
+          "target": "components/confirmation-dialog/dialogs/ConfirmDialog.tsx"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/CountdownDialog.tsx",
-          "type": "registry:component"
+          "path": "registry/new-york/ui/confirmation-dialog/dialogs/CountdownDialog.tsx",
+          "type": "registry:component",
+          "target": "components/confirmation-dialog/dialogs/CountdownDialog.tsx"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/DelayedActionDialog.tsx",
-          "type": "registry:component"
+          "path": "registry/new-york/ui/confirmation-dialog/dialogs/DelayedActionDialog.tsx",
+          "type": "registry:component",
+          "target": "components/confirmation-dialog/dialogs/DelayedActionDialog.tsx"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/example/TypeToConfirm.tsx",
-          "type": "registry:component"
+          "path": "registry/new-york/ui/confirmation-dialog/dialogs/TypeToConfirmDialog.tsx",
+          "type": "registry:component",
+          "target": "components/confirmation-dialog/dialogs/TypeToConfirmDialog.tsx"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/DialogProvider.tsx",
-          "type": "registry:component"
+          "path": "registry/new-york/ui/confirmation-dialog/dialog-provider.tsx",
+          "type": "registry:ui"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/dialog.ts",
-          "type": "registry:lib"
+          "path": "registry/new-york/lib/confirmation-dialog/dialog.ts",
+          "type": "registry:lib",
+          "target": "lib/confirmation-dialog/dialog.ts"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/state.ts",
-          "type": "registry:lib"
+          "path": "registry/new-york/lib/confirmation-dialog/state.ts",
+          "type": "registry:lib",
+          "target": "lib/confirmation-dialog/state.ts"
         },
         {
-          "path": "registry/new-york/blocks/confirmation-dialog/types.ts",
-          "type": "registry:lib"
+          "path": "registry/new-york/lib/confirmation-dialog/types.ts",
+          "type": "registry:lib",
+          "target": "lib/confirmation-dialog/types.ts"
         }
       ]
     },
