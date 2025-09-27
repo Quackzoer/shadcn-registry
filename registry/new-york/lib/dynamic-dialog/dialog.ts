@@ -8,25 +8,15 @@ import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig }
 import { DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
  
 
-export const renderDialog = <TValue = unknown>(
-  render: (props: DialogRendererProps<TValue>) => React.ReactNode,
-  options?: Partial<DialogProps<TValue>> & DialogUserConfig
-): DialogResult<TValue> => {
-  return dialogObservable.showDialog({
-    render,
-    onOpen: () => {},
-    onClose: () => {},
-    ...options
-  });
-};
 /**
- * 
+ * Creates a dialog function that can be called with props to show a dialog.
+ *
  * @param render - A function that takes dialog properties and returns a React node.
- * @param options - Optional dialog configuration options.
+ * @param defaultOptions - Default dialog configuration options.
  * @typeParam RendererProps - Additional properties to be passed to the React Component. This type is merged with DialogRendererProps.
  * @typeParam TValue - The type of value that the dialog will return upon resolving.
- * @returns A DialogResult object containing the dialog ID, metadata, and helper functions like `dismiss` or `async`.
- * 
+ * @returns A function that accepts renderer props and dialog options to show the dialog.
+ *
  * @example - Basic usage with a custom renderer:
  * ```ts
  * const customDialog = dialog<{ customProp: string }, boolean>(CustomComponent, {important: true});
@@ -35,10 +25,10 @@ export const renderDialog = <TValue = unknown>(
  * const awaitedValue = await value; // boolean
  * const isConfirmed = result.isConfirmed; // boolean
  * ```
- * @example - Usage of async helper:
+ * @example - Usage with dialog props for control:
  * ```ts
  * const asyncDialog = dialog<{}, string>(ExampleComponent);
- * const result = asyncDialog().async();
+ * const result = asyncDialog({}, { id: 'my-dialog', important: true });
  * const value = result.value; // string
  * const isConfirmed = result.isConfirmed; // boolean
  * ```
@@ -48,19 +38,27 @@ export const renderDialog = <TValue = unknown>(
  * const result = exampleDialog();
  * // Dismiss the dialog after 2 seconds
  * setTimeout(() => {
- *   exampleDialog.dismiss();
+ *   result.dismiss();
  * }, 2000);
  * ```
  */
 export const dialog = <RendererProps = unknown, TValue = unknown>(
   render: (props: DialogRendererProps<TValue> & RendererProps) => React.ReactNode,
-  options?: Partial<DialogProps<TValue>> & DialogUserConfig
+  defaultOptions?: Partial<DialogProps<TValue>> & DialogUserConfig
 ) => {
-  return (rendererProps: RendererProps): DialogResult<TValue> => {
-    return renderDialog<TValue>((dialogProps: DialogRendererProps<TValue>) =>
-      render({ ...dialogProps, ...rendererProps } as DialogRendererProps<TValue> & RendererProps),
-      options
-    );
+  return (
+    rendererProps: RendererProps,
+    dialogOptions?: Partial<DialogProps<TValue>> & DialogUserConfig
+  ): DialogResult<TValue> => {
+    const mergedOptions = { ...defaultOptions, ...dialogOptions };
+
+    return dialogObservable.showDialog({
+      render: (dialogProps: DialogRendererProps<TValue>) =>
+        render({ ...dialogProps, ...rendererProps } as DialogRendererProps<TValue> & RendererProps),
+      onOpen: () => {},
+      onClose: () => {},
+      ...mergedOptions
+    });
   };
 };
 
@@ -78,10 +76,9 @@ const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
 
 const delayedActionDialog = dialog<DelayedActionDialogProps, boolean>(DelayedActionDialog);
 
-const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog,{ important: true });
+const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog, { important: true });
 
 //* Utils
-dialog.render = renderDialog;
 
 /**
  * Dismiss a dialog by ID or all dialogs at once.
