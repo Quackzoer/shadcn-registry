@@ -4,51 +4,51 @@
   "homepage": "https://acme.com",
   "items": [
     {
-      "name": "confirmation-dialog",
+      "name": "dynamic-dialog",
       "type": "registry:component",
-      "title": "Confirmation Dialog",
-      "description": "A confirmation dialog component.",
+      "title": "Dynamic Dialog",
+      "description": "A dynamic dialog component.",
       "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
       "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
-          "path": "registry/new-york/ui/confirmation-dialog/dialogs/ConfirmDialog.tsx",
+          "path": "registry/new-york/ui/dynamic-dialog/dialogs/ConfirmDialog.tsx",
           "type": "registry:component",
-          "target": "components/confirmation-dialog/dialogs/ConfirmDialog.tsx"
+          "target": "components/dynamic-dialog/dialogs/ConfirmDialog.tsx"
         },
         {
-          "path": "registry/new-york/ui/confirmation-dialog/dialogs/CountdownDialog.tsx",
+          "path": "registry/new-york/ui/dynamic-dialog/dialogs/CountdownDialog.tsx",
           "type": "registry:component",
-          "target": "components/confirmation-dialog/dialogs/CountdownDialog.tsx"
+          "target": "components/dynamic-dialog/dialogs/CountdownDialog.tsx"
         },
         {
-          "path": "registry/new-york/ui/confirmation-dialog/dialogs/DelayedActionDialog.tsx",
+          "path": "registry/new-york/ui/dynamic-dialog/dialogs/DelayedActionDialog.tsx",
           "type": "registry:component",
-          "target": "components/confirmation-dialog/dialogs/DelayedActionDialog.tsx"
+          "target": "components/dynamic-dialog/dialogs/DelayedActionDialog.tsx"
         },
         {
-          "path": "registry/new-york/ui/confirmation-dialog/dialogs/TypeToConfirmDialog.tsx",
+          "path": "registry/new-york/ui/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx",
           "type": "registry:component",
-          "target": "components/confirmation-dialog/dialogs/TypeToConfirmDialog.tsx"
+          "target": "components/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx"
         },
         {
-          "path": "registry/new-york/ui/confirmation-dialog/dialog-provider.tsx",
+          "path": "registry/new-york/ui/dynamic-dialog/dialog-provider.tsx",
           "type": "registry:ui"
         },
         {
-          "path": "registry/new-york/lib/confirmation-dialog/dialog.ts",
+          "path": "registry/new-york/lib/dynamic-dialog/dialog.ts",
           "type": "registry:lib",
-          "target": "lib/confirmation-dialog/dialog.ts"
+          "target": "lib/dynamic-dialog/dialog.ts"
         },
         {
-          "path": "registry/new-york/lib/confirmation-dialog/state.ts",
+          "path": "registry/new-york/lib/dynamic-dialog/state.ts",
           "type": "registry:lib",
-          "target": "lib/confirmation-dialog/state.ts"
+          "target": "lib/dynamic-dialog/state.ts"
         },
         {
-          "path": "registry/new-york/lib/confirmation-dialog/types.ts",
+          "path": "registry/new-york/lib/dynamic-dialog/types.ts",
           "type": "registry:lib",
-          "target": "lib/confirmation-dialog/types.ts"
+          "target": "lib/dynamic-dialog/types.ts"
         }
       ]
     },

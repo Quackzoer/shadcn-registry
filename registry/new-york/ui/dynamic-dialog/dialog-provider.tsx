@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { type DialogProps, DismissReason } from '@/registry/new-york/lib/confirmation-dialog/types';
-import { dialogObservable } from '@/registry/new-york/lib/confirmation-dialog/state';
+import { type DialogProps, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
+import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
 import { Dialog, DialogContent } from '@/registry/new-york/ui/dialog';
 
-function ConfirmationDialog(props: DialogProps) {
+function DynamicDialog(props: DialogProps) {
 
   useEffect(() => {
     props.onOpen?.();
@@ -88,7 +88,7 @@ export function DialogProvider() {
   return (
     <>
       {dialogs.map(dialog => (
-        <ConfirmationDialog
+        <DynamicDialog
           key={dialog.id}
           {...dialog}
         />

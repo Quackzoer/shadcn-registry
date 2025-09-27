@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { DialogProvider } from "@/registry/new-york/ui/confirmation-dialog/dialog-provider"
+import { DialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dialog-provider"
 import { Button } from "@/registry/new-york/ui/button"
-import { dialog } from "@/registry/new-york/lib/confirmation-dialog/dialog"
-import { DismissReason } from "@/registry/new-york/lib/confirmation-dialog/types"
+import { dialog } from "@/registry/new-york/lib/dynamic-dialog/dialog"
+import { DismissReason } from "@/registry/new-york/lib/dynamic-dialog/types"
 
 export default function Home() {
   return (

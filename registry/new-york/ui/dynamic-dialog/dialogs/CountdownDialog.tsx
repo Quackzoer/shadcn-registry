@@ -1,6 +1,6 @@
 "use client"
 
-import type { DialogRendererProps } from '@/registry/new-york/lib/confirmation-dialog/types';
+import { type DialogRendererProps } from '@/registry/new-york/lib/dynamic-dialog/types';
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Clock } from "lucide-react";
@@ -17,7 +17,7 @@ export function CountdownDialog(props: CountdownDialogProps & DialogRendererProp
   const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    if (timeRemaining > 0 && isActive) {
+    if (timeRemaining > -1 && isActive) {
       const timer = setTimeout(() => {
         setTimeRemaining(prev => prev - 1);
       }, 1000);

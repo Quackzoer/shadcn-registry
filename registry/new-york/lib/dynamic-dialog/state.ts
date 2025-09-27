@@ -1,8 +1,8 @@
-import {
-  type DialogProps,
-  type DialogResult,
-  DismissReason,
-} from "@/registry/new-york/lib/confirmation-dialog/types";
+import type {
+  DialogProps,
+  DialogResult,
+} from "@/registry/new-york/lib/dynamic-dialog/types";
+import { DismissReason } from "@/registry/new-york/lib/dynamic-dialog/types";
 
 export class DialogObservable {
   private subscribers: Array<
@@ -11,7 +11,16 @@ export class DialogObservable {
   private dialogId = 0;
   private pendingDialogs = new Map<
     string,
-    { resolve: (value: { id: string; isConfirmed: boolean; isDenied: boolean; isDismissed: boolean; value?: unknown; dismissReason?: DismissReason }) => void }
+    {
+      resolve: (value: {
+        id: string;
+        isConfirmed: boolean;
+        isDenied: boolean;
+        isDismissed: boolean;
+        value?: unknown;
+        dismissReason?: DismissReason;
+      }) => void;
+    }
   >();
 
   subscribe(
@@ -52,7 +61,14 @@ export class DialogObservable {
 
     const valuePromise = new Promise<ReturnValue | undefined>((resolve) => {
       this.pendingDialogs.set(id, {
-        resolve: (result: { id: string; isConfirmed: boolean; isDenied: boolean; isDismissed: boolean; value?: unknown; dismissReason?: DismissReason }) => {
+        resolve: (result: {
+          id: string;
+          isConfirmed: boolean;
+          isDenied: boolean;
+          isDismissed: boolean;
+          value?: unknown;
+          dismissReason?: DismissReason;
+        }) => {
           resolvedData = {
             isConfirmed: result.isConfirmed,
             isDenied: result.isDenied,

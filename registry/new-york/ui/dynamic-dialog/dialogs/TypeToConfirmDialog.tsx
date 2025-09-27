@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { DialogRendererProps } from "@/registry/new-york/lib/confirmation-dialog/types";
+import { type DialogRendererProps } from "@/registry/new-york/lib/dynamic-dialog/types";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;

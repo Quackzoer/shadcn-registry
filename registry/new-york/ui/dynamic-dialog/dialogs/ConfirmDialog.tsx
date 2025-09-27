@@ -1,10 +1,10 @@
 "use client"
 
-import { DialogRendererProps } from "@/registry/new-york/lib/confirmation-dialog/types";
+import { type DialogRendererProps } from "@/registry/new-york/lib/dynamic-dialog/types";
 import { Button } from "@/registry/new-york/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
 import { Trash2 } from "lucide-react";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 export interface ConfirmDialogProps{
   title: ReactNode;
