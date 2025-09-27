@@ -41,7 +41,7 @@ export default function Home() {
         <Button
           onClick={() => {
             const typeToConfirmDialog = dialog.typeToConfirm({
-              itemName: 'some-file.txt'
+              itemName: 'some-file.txt',
             })
             const countDownDialog = dialog.countdown({
               countdownSeconds: 10,

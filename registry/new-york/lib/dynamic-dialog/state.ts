@@ -52,6 +52,10 @@ export class DialogObservable {
   ): DialogResult<ReturnValue> {
     const id = props.id || `dialog-${++this.dialogId}`;
 
+    if (!props.render) {
+      throw new Error('Dialog render function is required');
+    }
+
     let resolvedData: {
       isConfirmed: boolean;
       isDenied: boolean;
@@ -92,8 +96,9 @@ export class DialogObservable {
     };
 
     this.notify("SHOW_DIALOG", {
-      id,
       ...props,
+      id,
+      render: props.render,
     });
 
     const asyncFn = async () => {

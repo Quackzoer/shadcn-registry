@@ -65,17 +65,20 @@ export function DialogProvider() {
     const unsubscribe = dialogObservable.subscribe((action, data) => {
       switch (action) {
         case 'SHOW_DIALOG':
-          setDialogs(current => [...current, {
+          const dialogState: DialogState = {
             ...data,
+            id: data.id!,
+            render: data.render!,
             open: true,
             onOpen: data.onOpen || (() => {}),
             onClose: data.onClose || (() => {}),
             onOpenChange: (open: boolean) => {
-              if (!open && data.id) {
-                dialogObservable.dismissDialog(data.id, DismissReason.CLOSE);
+              if (!open) {
+                dialogObservable.dismissDialog(data.id!, DismissReason.CLOSE);
               }
             }
-          }]);
+          };
+          setDialogs(current => [...current, dialogState]);
           break;
         case 'HIDE_DIALOG':
           setDialogs(current => current.filter(d => d.id !== data.id));
