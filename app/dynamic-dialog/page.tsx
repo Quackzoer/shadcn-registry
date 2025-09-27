@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dialog-provider"
+import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
 import { Button } from "@/registry/new-york/ui/button"
 import { dialog } from "@/registry/new-york/lib/dynamic-dialog/dialog"
 import { DismissReason } from "@/registry/new-york/lib/dynamic-dialog/types"
@@ -69,7 +69,7 @@ export default function Home() {
           Dialog dismissed after 5 seconds
         </Button>
       </main>
-      <DialogProvider />
+      <DynamicDialogProvider />
     </div>
   )
 }

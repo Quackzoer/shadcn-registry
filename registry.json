@@ -32,7 +32,7 @@
           "target": "components/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx"
         },
         {
-          "path": "registry/new-york/ui/dynamic-dialog/dialog-provider.tsx",
+          "path": "registry/new-york/ui/dynamic-dialog/dynamic-dialog.tsx",
           "type": "registry:ui"
         },
         {
