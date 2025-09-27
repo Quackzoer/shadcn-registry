@@ -1,3 +1,20 @@
+export interface DialogActions<T = unknown> {
+  confirm: (value?: T) => void;
+  deny: (value?: T) => void;
+  cancel: () => void;
+  dismiss: (reason: DismissReason, value?: T) => void;
+  closeDialog: () => void;
+}
+
+export interface DialogCallbacks {
+  onOpen: () => void;
+  onClose: () => void;
+}
+
+export interface DialogRendererProps<T = unknown> extends DialogActions<T>, DialogCallbacks {}
+
+export type DialogUserConfig = Partial<DialogCallbacks>;
+
 export interface DialogProps<T = unknown> {
   id: string;
   open: boolean;
@@ -6,15 +23,7 @@ export interface DialogProps<T = unknown> {
   render: (props: DialogRendererProps<T>) => React.ReactNode;
 }
 
-export interface DialogRendererProps<T = unknown> {
-  confirm: (value?: T) => void;
-  deny: (value?: T) => void;
-  cancel: () => void;
-  dismiss: (reason: DismissReason, value?: T) => void;
-  closeDialog: () => void;
-  onOpen?: () => void;
-  onClose?: () => void;
-}
+export interface DialogState<T = unknown> extends DialogProps<T>, DialogCallbacks {}
 
 export enum DismissReason {
   BACKDROP_CLICK = "backdrop",

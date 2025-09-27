@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { type DialogProps, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
+import { type DialogState, DialogRendererProps, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
 import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
 import { Dialog, DialogContent } from '@/registry/new-york/ui/dialog';
 
-function DynamicDialog(props: DialogProps) {
+function DynamicDialog(props: DialogState) {
 
   useEffect(() => {
-    props.onOpen?.();
-    return () => props.onClose?.();
+    props.onOpen();
+    return () => props.onClose();
   }, [props]);
 
   const handleBackdropClick = () => {
@@ -36,7 +36,7 @@ function DynamicDialog(props: DialogProps) {
     dialogObservable.dismissDialog(props.id, DismissReason.CLOSE);
   };
 
-  const renderProps: DialogProps = {
+  const renderProps: DialogRendererProps = {
     ...props,
     confirm,
     deny,
@@ -59,22 +59,23 @@ function DynamicDialog(props: DialogProps) {
 }
 
 export function DialogProvider() {
-  const [dialogs, setDialogs] = useState<DialogProps[]>([]);
+  const [dialogs, setDialogs] = useState<DialogState[]>([]);
 
   useEffect(() => {
     const unsubscribe = dialogObservable.subscribe((action, data) => {
       switch (action) {
         case 'SHOW_DIALOG':
-          const dialogData = data as DialogProps;
           setDialogs(current => [...current, {
-            ...dialogData,
+            ...data,
             open: true,
+            onOpen: data.onOpen || (() => {}),
+            onClose: data.onClose || (() => {}),
             onOpenChange: (open: boolean) => {
-              if (!open) {
-                dialogObservable.dismissDialog(dialogData.id, DismissReason.CLOSE);
+              if (!open && data.id) {
+                dialogObservable.dismissDialog(data.id, DismissReason.CLOSE);
               }
             }
-          } as DialogProps]);
+          }]);
           break;
         case 'HIDE_DIALOG':
           setDialogs(current => current.filter(d => d.id !== data.id));

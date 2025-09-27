@@ -1,12 +1,15 @@
 import type {
   DialogProps,
   DialogResult,
+  DialogUserConfig,
 } from "@/registry/new-york/lib/dynamic-dialog/types";
 import { DismissReason } from "@/registry/new-york/lib/dynamic-dialog/types";
 
+type DialogData = Partial<DialogProps> & DialogUserConfig;
+
 export class DialogObservable {
   private subscribers: Array<
-    (action: "SHOW_DIALOG" | "HIDE_DIALOG", data: Partial<DialogProps>) => void
+    (action: "SHOW_DIALOG" | "HIDE_DIALOG", data: DialogData) => void
   > = [];
   private dialogId = 0;
   private pendingDialogs = new Map<
@@ -26,7 +29,7 @@ export class DialogObservable {
   subscribe(
     callback: (
       action: "SHOW_DIALOG" | "HIDE_DIALOG",
-      data: Partial<DialogProps>
+      data: DialogData
     ) => void
   ) {
     this.subscribers.push(callback);
@@ -35,19 +38,18 @@ export class DialogObservable {
     };
   }
 
-  private notify<Props = unknown, ReturnValue = unknown>(
+  private notify(
     action: "SHOW_DIALOG" | "HIDE_DIALOG",
-    data: Partial<DialogProps<ReturnValue>> & Props
+    data: DialogData
   ) {
     this.subscribers.forEach((callback) =>
-      callback(action, data as Partial<DialogProps>)
+      callback(action, data)
     );
   }
 
-  showDialog<
-    Props extends Partial<DialogProps<unknown>>,
-    ReturnValue = unknown
-  >(props: Props): DialogResult<ReturnValue> {
+  showDialog<ReturnValue = unknown>(
+    props: Partial<DialogProps<ReturnValue>> & DialogUserConfig
+  ): DialogResult<ReturnValue> {
     const id = props.id || `dialog-${++this.dialogId}`;
 
     let resolvedData: {
@@ -89,7 +91,7 @@ export class DialogObservable {
       this.dismissDialog(id, reason, value);
     };
 
-    this.notify<Props>("SHOW_DIALOG", {
+    this.notify("SHOW_DIALOG", {
       id,
       ...props,
     });

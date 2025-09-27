@@ -4,16 +4,18 @@ import { CountdownDialog, type CountdownDialogProps } from '@/registry/new-york/
 import { DelayedActionDialog, type DelayedActionDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/DelayedActionDialog';
 import { TypeToConfirmDialog, type TypeToConfirmDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/TypeToConfirmDialog';
 import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
-import type { DialogProps, DialogRendererProps, DialogResult } from '@/registry/new-york/lib/dynamic-dialog/types';
+import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig } from '@/registry/new-york/lib/dynamic-dialog/types';
 import { DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
  
 
 export const renderDialog = <TValue = unknown>(
   render: (props: DialogRendererProps<TValue>) => React.ReactNode,
-  options?: Partial<DialogProps<TValue>>
+  options?: Partial<DialogProps<TValue>> & DialogUserConfig
 ): DialogResult<TValue> => {
   return dialogObservable.showDialog({
     render,
+    onOpen: () => {},
+    onClose: () => {},
     ...options
   });
 };
@@ -51,10 +53,10 @@ export const renderDialog = <TValue = unknown>(
  * ```
  */
 export const dialog = <RendererProps = unknown, TValue = unknown>(
-  render: (props: Partial<DialogRendererProps<TValue>> & RendererProps) => React.ReactNode,
-  options?: Partial<DialogProps<TValue>>
+  render: (props: DialogRendererProps<TValue> & RendererProps) => React.ReactNode,
+  options?: Partial<DialogProps<TValue>> & DialogUserConfig
 ) => {
-  return (rendererProps: RendererProps & Partial<DialogRendererProps<TValue>>): DialogResult<TValue> => {
+  return (rendererProps: RendererProps): DialogResult<TValue> => {
     return renderDialog<TValue>((dialogProps: DialogRendererProps<TValue>) =>
       render({ ...dialogProps, ...rendererProps } as DialogRendererProps<TValue> & RendererProps),
       options
