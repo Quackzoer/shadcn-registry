@@ -25,14 +25,7 @@ export interface DialogProps<T = unknown> {
 
 export interface DialogState<T = unknown> extends DialogProps<T>, DialogCallbacks {}
 
-export enum DismissReason {
-  BACKDROP_CLICK = "backdrop",
-  CANCEL = "cancel",
-  CLOSE = "close",
-  ESC = "esc",
-  TIMER = "timer",
-  OVERLAY = "overlay",
-}
+export type DismissReason = Autocomplete<"backdrop" | "cancel" | "close" | "esc" | "timer" | "overlay">;
 
 export interface DialogResult<T = unknown> {
   id: string;
@@ -57,3 +50,5 @@ export type DismissData<T = unknown> = {
   reason: DismissReason;
   value?: T;
 };
+
+export type Autocomplete<T extends string> = T | string & {}
