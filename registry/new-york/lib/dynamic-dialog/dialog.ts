@@ -4,8 +4,7 @@ import { CountdownDialog, type CountdownDialogProps } from '@/registry/new-york/
 import { DelayedActionDialog, type DelayedActionDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/DelayedActionDialog';
 import { TypeToConfirmDialog, type TypeToConfirmDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/TypeToConfirmDialog';
 import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
-import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig } from '@/registry/new-york/lib/dynamic-dialog/types';
-import { DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
+import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
  
 
 /**
@@ -62,7 +61,7 @@ export const dialog = <RendererProps = unknown, TValue = unknown>(
   };
 };
 
-const dismissDialog = (id?: string, reason: DismissReason = DismissReason.CLOSE, value?: unknown) => {
+const dismissDialog = (id?: string, reason: DismissReason = "close", value?: unknown) => {
   if (id) {
     dialogObservable.dismissDialog(id, reason, value);
   } else {
@@ -88,11 +87,11 @@ const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog, { important: 
  * @example - Dismiss a specific dialog by ID:
  * ```ts
  * const exampleDialog = exampleDialog();
- * dialog.dismiss(exampleDialog.id, DismissReason.CANCEL, { some: 'data' });
+ * dialog.dismiss(exampleDialog.id, "cancel", { some: 'data' });
  * ```
  * @example - Dismiss all dialogs at once:
  * ```ts
- * dialog.dismiss(undefined, DismissReason.CANCEL, { some: 'data' });
+ * dialog.dismiss(undefined, "cancel", { some: 'data' });
  * // or simply
  * dialog.dismiss();
  * ```

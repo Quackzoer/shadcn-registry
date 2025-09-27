@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import type {  DialogState, DialogRendererProps } from '@/registry/new-york/lib/dynamic-dialog/types';
-import { DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
+import type {  DialogState, DialogRendererProps, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
 import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
 import { Dialog, DialogContent } from '@/registry/new-york/ui/dialog';
 
@@ -14,7 +13,7 @@ function DynamicDialog(props: DialogState) {
   }, [props]);
 
   const handleBackdropClick = () => {
-    dialogObservable.dismissDialog(props.id, DismissReason.BACKDROP_CLICK);
+    dialogObservable.dismissDialog(props.id, "backdrop");
   };
 
   const confirm = (value?: unknown) => {
@@ -26,7 +25,7 @@ function DynamicDialog(props: DialogState) {
   };
 
   const cancel = () => {
-    dialogObservable.dismissDialog(props.id, DismissReason.CANCEL);
+    dialogObservable.dismissDialog(props.id, "cancel");
   };
 
   const dismiss = (reason: DismissReason, value?: unknown) => {
@@ -34,7 +33,7 @@ function DynamicDialog(props: DialogState) {
   };
 
   const closeDialog = () => {
-    dialogObservable.dismissDialog(props.id, DismissReason.CLOSE);
+    dialogObservable.dismissDialog(props.id, "close");
   };
 
   const renderProps: DialogRendererProps = {
@@ -75,7 +74,7 @@ export function DynamicDialogProvider() {
             onClose: data.onClose || (() => {}),
             onOpenChange: (open: boolean) => {
               if (!open) {
-                dialogObservable.dismissDialog(data.id!, DismissReason.CLOSE);
+                dialogObservable.dismissDialog(data.id!, "close");
               }
             }
           };

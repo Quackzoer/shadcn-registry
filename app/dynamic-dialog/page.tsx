@@ -4,7 +4,6 @@ import * as React from "react"
 import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
 import { Button } from "@/registry/new-york/ui/button"
 import { dialog } from "@/registry/new-york/lib/dynamic-dialog/dialog"
-import { DismissReason } from "@/registry/new-york/lib/dynamic-dialog/types"
 
 export default function Home() {
   return (
@@ -62,7 +61,7 @@ export default function Home() {
               countdownSeconds: 20,
             })
             setTimeout(() => {
-              countDownDialog.dismiss(DismissReason.TIMER, 'Dismissed after 5 seconds')
+              countDownDialog.dismiss("timer", 'Dismissed after 5 seconds')
             }, 5000)
           }}
         >

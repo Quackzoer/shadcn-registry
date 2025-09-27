@@ -2,8 +2,8 @@ import type {
   DialogProps,
   DialogResult,
   DialogUserConfig,
+  DismissReason,
 } from "@/registry/new-york/lib/dynamic-dialog/types";
-import { DismissReason } from "@/registry/new-york/lib/dynamic-dialog/types";
 
 type DialogData = Partial<DialogProps> & DialogUserConfig;
 
@@ -89,7 +89,7 @@ export class DialogObservable {
     });
 
     const dismissFn = (
-      reason: DismissReason = DismissReason.CLOSE,
+      reason: DismissReason = "close",
       value?: ReturnValue
     ) => {
       this.dismissDialog(id, reason, value);
