@@ -53,6 +53,14 @@
       ]
     },
     {
+      "name": "react-query",
+      "type": "registry:lib",
+      "title": "React Query helpers and boilerplate",
+      "description": "A set of helpers and boilerplate code to use React Query in your project.",
+      "dependencies": ["@tanstack/react-query","@lukemorales/query-key-factory"],
+      "files": []
+    },
+    {
       "name": "complex-component",
       "type": "registry:component",
       "title": "Complex Component",
