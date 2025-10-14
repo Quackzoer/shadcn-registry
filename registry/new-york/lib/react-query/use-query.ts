@@ -5,17 +5,16 @@ import { useQuery, UseQueryOptions, QueryKey } from "@tanstack/react-query";
  */
 export function createUseQuery<TQueryFnData, TProps = void>(
   queryFn: (props: TProps) => Promise<TQueryFnData>,
-  getQueryKey: (props: TProps) => QueryKey,
   defaultOptions?: (
     props: TProps
   ) =>
     | Omit<
         UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,
-        "queryKey" | "queryFn" | "select"
+        "queryFn" | "select"
       >
     | Omit<
         UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,
-        "queryKey" | "queryFn"
+        "queryFn"
       >
 ) {
   return <TData = TQueryFnData>(
@@ -26,13 +25,12 @@ export function createUseQuery<TQueryFnData, TProps = void>(
     >
   ) => {
     return useQuery<TQueryFnData, Error, TData, QueryKey>({
-      queryKey: getQueryKey(props),
       queryFn: () => queryFn(props),
+      queryKey: [],
       ...[
         typeof defaultOptions === "function"
-          ? defaultOptions(props)
-          : defaultOptions,
-        options,
+          ? ...defaultOptions?.(props)
+          : ...defaultOptions
       ],
       ...options,
     });
@@ -51,13 +49,13 @@ const exampleQueryFn = async ({}: ExampleQueryFnProps) => {
   };
 };
 
-export const useQueryExample = createUseQuery(
-  exampleQueryFn,
-  ({ page }) => ["example", page],
-  ({ page }) => ({
-    enabled: page > 0,
-  })
-);
+export const useQueryExample = createUseQuery(exampleQueryFn, ({ page }) => ({
+//   select: (data) => ({
+//     d: data.a + data.b,
+//   }),
+  queryKey: ["example", page],
+  enabled: page > 0,
+}));
 
 export function useQueryExampleCLengthSelector(props: ExampleQueryFnProps) {
   return useQueryExample(props, {
