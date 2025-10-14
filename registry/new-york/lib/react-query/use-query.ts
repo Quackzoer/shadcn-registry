@@ -44,9 +44,6 @@ const exampleQueryFn = async ({}: ExampleQueryFnProps) => {
 };
 
 export const useQueryExample = createUseQuery(exampleQueryFn, ({ page }) => ({
-//   select: (data) => ({
-//     d: data.a + data.b,
-//   }),
   queryKey: ["example", page],
   enabled: page > 0,
 }));
