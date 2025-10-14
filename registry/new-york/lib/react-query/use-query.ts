@@ -5,14 +5,13 @@ import { useQuery, UseQueryOptions, QueryKey } from "@tanstack/react-query";
  */
 export function createUseQuery<TQueryFnData, TProps = void>(
   queryFn: (props: TProps) => Promise<TQueryFnData>,
-  defaultOptions?: (
+  defaultOptions: ((
     props: TProps
   ) =>
-    | Omit<
+    Omit<
         UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,
         "queryFn" | "select"
-      >
-    | Omit<
+      >) |  Omit<
         UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,
         "queryFn"
       >
@@ -26,12 +25,7 @@ export function createUseQuery<TQueryFnData, TProps = void>(
   ) => {
     return useQuery<TQueryFnData, Error, TData, QueryKey>({
       queryFn: () => queryFn(props),
-      queryKey: [],
-      ...[
-        typeof defaultOptions === "function"
-          ? ...defaultOptions?.(props)
-          : ...defaultOptions
-      ],
+      ...(typeof defaultOptions === "function" ? defaultOptions(props) : defaultOptions),
       ...options,
     });
   };
