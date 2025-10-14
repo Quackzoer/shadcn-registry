@@ -1,4 +1,26 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions, QueryKey } from "@tanstack/react-query";
+
+/**
+ * Factory function to create typed useQuery hooks with automatic type inference
+ */
+export function createUseQuery<TQueryFnData, TProps = void>(
+  queryFn: (props: TProps) => Promise<TQueryFnData>,
+  getQueryKey: (props: TProps) => QueryKey
+) {
+  return <TData = TQueryFnData>(
+    props: TProps,
+    options?: Omit<
+      UseQueryOptions<TQueryFnData, Error, TData, QueryKey>,
+      "queryKey" | "queryFn"
+    >
+  ) => {
+    return useQuery<TQueryFnData, Error, TData, QueryKey>({
+      queryKey: getQueryKey(props),
+      queryFn: () => queryFn(props),
+      ...options,
+    });
+  };
+}
 
 interface ExampleQueryFnProps {
   page: number;
@@ -12,20 +34,10 @@ const exampleQueryFn = async ({ page }: ExampleQueryFnProps) => {
   };
 };
 
-export function useQueryExample<TData = Awaited<ReturnType<typeof exampleQueryFn>>>(
-  { page }: ExampleQueryFnProps,
-  options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof exampleQueryFn>>, Error, TData, string[]>,
-    "queryKey" 
-    | "queryFn"
-  >
-) {
-  return useQuery<Awaited<ReturnType<typeof exampleQueryFn>>, Error, TData, string[]>({
-    queryKey: ["example", page.toString()],
-    queryFn: async () => await exampleQueryFn({ page }),
-    ...options,
-  });
-}
+export const useQueryExample = createUseQuery(
+  exampleQueryFn,
+  ({ page }) => ["example", page]
+);
 
 export function useQueryExampleCLengthSelector(props: ExampleQueryFnProps) {
   return useQueryExample(props, {
