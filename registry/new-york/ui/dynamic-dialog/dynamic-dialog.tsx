@@ -51,6 +51,7 @@ function DynamicDialog(props: DialogState) {
         onInteractOutside={e => {
           if (props.important) { e.preventDefault() } else { handleBackdropClick() }
         }}
+        {...props.dialogContentProps}
       >
         {props.render && props.render(renderProps)}
       </DialogContent>

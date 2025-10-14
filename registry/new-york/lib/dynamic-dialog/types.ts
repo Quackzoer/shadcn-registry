@@ -1,3 +1,5 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+
 export interface DialogActions<T = unknown> {
   confirm: (value?: T) => void;
   deny: (value?: T) => void;
@@ -21,6 +23,7 @@ export interface DialogProps<T = unknown> {
   onOpenChange: (open: boolean) => void;
   important?: boolean;
   render: (props: DialogRendererProps<T>) => React.ReactNode;
+  dialogContentProps?: DialogPrimitive.DialogContentProps;
 }
 
 export interface DialogState<T = unknown> extends DialogProps<T>, DialogCallbacks {}
