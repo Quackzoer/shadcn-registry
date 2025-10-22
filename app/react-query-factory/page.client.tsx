@@ -56,9 +56,7 @@ export default function PageClient() {
     const { data: dataA } = useQueryWithParamsCallBackExample({
         props: { page: 1 }
     });
-    const { data: dataB } = useQueryObjectWithParamsExample({
-        props: undefined
-    });
+    const { data: dataB } = useQueryObjectWithParamsExample();
     const { data: dataC } = useQueryWithParamsExampleCLengthSelector({ page: 2 });
     const { data: dataD } = useQueryWithoutParamsExample();
     return (
