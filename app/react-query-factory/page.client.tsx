@@ -6,7 +6,7 @@ import { Button } from "@/registry/new-york/ui/button"
 import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
 
 interface ExampleQueryFnWithParamsProps {
-    page: number;
+    page?: number;
 }
 
 const exampleQueryFnWithParams = async (props: ExampleQueryFnWithParamsProps) => {
@@ -25,9 +25,9 @@ const exampleQueryFnWithoutParams = async () => {
     };
 };
 
-const useQueryWithParamsCallBackExample = createUseQuery(exampleQueryFnWithParams, ({ page }) => ({
-    queryKey: ["example", page],
-    enabled: page > 0,
+const useQueryWithParamsCallBackExample = createUseQuery(exampleQueryFnWithParams, (props) => ({
+    queryKey: ["example", props.page],
+    enabled: (props?.page || 0) > 0,
 }));
 
 const useQueryObjectWithParamsExample = createUseQuery(exampleQueryFnWithParams, {
@@ -56,7 +56,9 @@ export default function PageClient() {
     const { data: dataA } = useQueryWithParamsCallBackExample({
         props: { page: 1 }
     });
-    const { data: dataB } = useQueryObjectWithParamsExample();
+    const { data: dataB } = useQueryObjectWithParamsExample({
+        props: {}
+    });
     const { data: dataC } = useQueryWithParamsExampleCLengthSelector({ page: 2 });
     const { data: dataD } = useQueryWithoutParamsExample();
     return (
