@@ -5,36 +5,43 @@ import { useQuery, UseQueryOptions, QueryKey } from "@tanstack/react-query";
  */
 export function createUseQuery<TQueryFnData, TProps = void>(
   queryFn: (props: TProps) => Promise<TQueryFnData>,
-  defaultOptions: ((
-    props: TProps
-  ) =>
-    Omit<
+  defaultOptions:
+    | ((
+        props: TProps
+      ) => Omit<
         UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,
         "queryFn" | "select"
-      >) |  Omit<
+      >)
+    | Omit<
         UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,
         "queryFn"
       >
 ) {
-  return <TData = TQueryFnData>(
-    props: TProps,
+  return <TData = TQueryFnData>({
+    props,
+    options = {},
+  }: {
+    props: TProps;
     options?: Omit<
       UseQueryOptions<TQueryFnData, Error, TData, QueryKey>,
       "queryKey" | "queryFn"
     > & {
       queryKey?: QueryKey;
-    }
-  ) => {
-    const defaultQueryKeys = (typeof defaultOptions === "function" ? (defaultOptions(props).queryKey ?? []) : defaultOptions.queryKey ?? []);
+    };
+  }) => {
+    const defaultQueryKeys =
+      typeof defaultOptions === "function"
+        ? defaultOptions(props).queryKey ?? []
+        : defaultOptions.queryKey ?? [];
     const optionsQueryKey = options?.queryKey ?? [];
     const queryKey = [...defaultQueryKeys, ...optionsQueryKey];
     return useQuery<TQueryFnData, Error, TData, QueryKey>({
       queryFn: () => queryFn(props),
-      ...(typeof defaultOptions === "function" ? defaultOptions(props) : defaultOptions),
+      ...(typeof defaultOptions === "function"
+        ? defaultOptions(props)
+        : defaultOptions),
       ...options,
       queryKey: queryKey,
     });
   };
 }
-
-
