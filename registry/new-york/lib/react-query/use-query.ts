@@ -21,35 +21,20 @@ export function createUseQuery<TQueryFnData, TProps = void>(
     options?: Omit<
       UseQueryOptions<TQueryFnData, Error, TData, QueryKey>,
       "queryKey" | "queryFn"
-    >
+    > & {
+      queryKey?: QueryKey;
+    }
   ) => {
+    const defaultQueryKeys = (typeof defaultOptions === "function" ? (defaultOptions(props).queryKey ?? []) : defaultOptions.queryKey ?? []);
+    const optionsQueryKey = options?.queryKey ?? [];
+    const queryKey = [...defaultQueryKeys, ...optionsQueryKey];
     return useQuery<TQueryFnData, Error, TData, QueryKey>({
       queryFn: () => queryFn(props),
       ...(typeof defaultOptions === "function" ? defaultOptions(props) : defaultOptions),
       ...options,
+      queryKey: queryKey,
     });
   };
 }
 
-interface ExampleQueryFnProps {
-  page: number;
-}
 
-const exampleQueryFn = async ({}: ExampleQueryFnProps) => {
-  return {
-    a: 1,
-    b: 2,
-    c: [1, 2, 3],
-  };
-};
-
-export const useQueryExample = createUseQuery(exampleQueryFn, ({ page }) => ({
-  queryKey: ["example", page],
-  enabled: page > 0,
-}));
-
-export function useQueryExampleCLengthSelector(props: ExampleQueryFnProps) {
-  return useQueryExample(props, {
-    select: (data) => data.c.length,
-  });
-}

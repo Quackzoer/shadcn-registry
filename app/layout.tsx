@@ -36,6 +36,9 @@ export default function RootLayout({
             <li>
               <Link href="/confirmation-dialog">Confirmation Dialog Example</Link>
             </li>
+            <li>
+              <Link href="/react-query-factory">React Query Factory Example</Link>
+            </li>
           </ol>
         </nav>
         {children}

@@ -1,13 +1,47 @@
 "use client"
 
-import * as React from "react"
-import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
-import { Button } from "@/registry/new-york/ui/button"
 import { dialog } from "@/registry/new-york/lib/dynamic-dialog/dialog"
+import { createUseQuery } from "@/registry/new-york/lib/react-query/use-query"
+import { Button } from "@/registry/new-york/ui/button"
+import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
 
-export default function Page() {
+interface ExampleQueryFnProps {
+  page: number;
+}
+
+const exampleQueryFn = async (props: ExampleQueryFnProps) => {
+  if(!props.page) return { a: '', b: '', c: [] };
+  return {
+    a: `A${props.page}`,
+    b: `B${props.page}`,
+    c: [`C${props.page}1`, `C${props.page}2`, `C${props.page}3`],
+  };
+};
+
+export const useQueryCallBackExample = createUseQuery(exampleQueryFn, ({ page }) => ({
+  queryKey: ["example", page],
+  enabled: page > 0,
+}));
+
+export const useQueryObjectExample = createUseQuery(exampleQueryFn, {
+  queryKey: ["example", "object"],
+})
+
+export function useQueryExampleCLengthSelector(props: ExampleQueryFnProps) {
+  return useQueryCallBackExample(props, {
+    select: (data) => data.c.length,
+    queryKey: ["length"]
+  });
+}
+
+
+
+export default function PageClient() {
+  const { data: dataA } = useQueryCallBackExample({page: 1});
+  const { data: dataB } = useQueryObjectExample();
+  const { data: dataC } = useQueryExampleCLengthSelector({ page: 2 });
   return (
-    <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
+      <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
       <header className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight">Custom Registry</h1>
         <p className="text-muted-foreground">
