@@ -1,5 +1,6 @@
 "use client"
 
+import { dialog } from "@/registry/lib/dynamic-dialog/dialog";
 import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog/types";
 import { Button } from "@/registry/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
@@ -49,3 +50,5 @@ export function ConfirmDialog(props: ConfirmDialogProps & DialogRendererProps<bo
     </div>
   );
 }
+
+export const confirmDialog = dialog<ConfirmDialogProps, boolean>(ConfirmDialog, { important: true });

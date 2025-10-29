@@ -1,5 +1,6 @@
 "use client"
 
+import { dialog } from '@/registry/lib/dynamic-dialog/dialog';
 import { type DialogRendererProps } from '@/registry/lib/dynamic-dialog/types';
 import { Button } from "@/registry/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
@@ -176,3 +177,6 @@ export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRend
     </div>
   );
 }
+
+export const delayedActionDialog = dialog<DelayedActionDialogProps, boolean>(DelayedActionDialog);
+  

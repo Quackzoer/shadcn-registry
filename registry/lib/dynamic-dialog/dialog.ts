@@ -1,10 +1,6 @@
-import React from 'react';
-import { ConfirmDialog, type ConfirmDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/ConfirmDialog';
-import { CountdownDialog, type CountdownDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/CountdownDialog';
-import { DelayedActionDialog, type DelayedActionDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/DelayedActionDialog';
-import { TypeToConfirmDialog, type TypeToConfirmDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/TypeToConfirmDialog';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog/state';
 import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig, DismissReason } from '@/registry/lib/dynamic-dialog/types';
+import React from 'react';
  
 
 /**
@@ -69,16 +65,6 @@ const dismissDialog = (id?: string, reason: DismissReason = "close", value?: unk
   }
 }
 
-const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
-
-const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
-
-const delayedActionDialog = dialog<DelayedActionDialogProps, boolean>(DelayedActionDialog);
-
-const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog, { important: true });
-
-//* Utils
-
 /**
  * Dismiss a dialog by ID or all dialogs at once.
  * @param id - Optional dialog ID, if not provided all dialogs will be dismissed.
@@ -98,8 +84,4 @@ const confirm = dialog<ConfirmDialogProps, boolean>(ConfirmDialog, { important: 
  */
 dialog.dismiss = dismissDialog;
 
-//* Predefined dialogs
-dialog.countdown = countdownDialog;
-dialog.delayedAction = delayedActionDialog;
-dialog.typeToConfirm = typeToConfirmDialog;
 dialog.confirm = confirm;

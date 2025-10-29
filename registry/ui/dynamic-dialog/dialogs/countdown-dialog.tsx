@@ -1,5 +1,6 @@
 "use client"
 
+import { dialog } from '@/registry/lib/dynamic-dialog/dialog';
 import { type DialogRendererProps } from '@/registry/lib/dynamic-dialog/types';
 import { Button } from "@/registry/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
@@ -133,3 +134,5 @@ export function CountdownDialog(props: CountdownDialogProps & DialogRendererProp
     </div>
   );
 }
+
+export const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);

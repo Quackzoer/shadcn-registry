@@ -9,6 +9,7 @@ import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog/types";
+import { dialog } from "@/registry/lib/dynamic-dialog/dialog";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;
@@ -102,3 +103,5 @@ export function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRend
     </div>
   );
 }
+
+export const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });

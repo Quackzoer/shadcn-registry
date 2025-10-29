@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import type {  DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog/types';
+import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog/types';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog/state';
 import { Dialog, DialogContent } from '@/registry/ui/dialog';
 
@@ -71,8 +71,8 @@ export function DynamicDialogProvider() {
             id: data.id!,
             render: data.render!,
             open: true,
-            onOpen: data.onOpen || (() => {}),
-            onClose: data.onClose || (() => {}),
+            onOpen: data.onOpen || (() => { }),
+            onClose: data.onClose || (() => { }),
             onOpenChange: (open: boolean) => {
               if (!open) {
                 dialogObservable.dismissDialog(data.id!, "close");
