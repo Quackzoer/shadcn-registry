@@ -3,7 +3,7 @@ import type {
   DialogResult,
   DialogUserConfig,
   DismissReason,
-} from "@/registry/new-york/lib/dynamic-dialog/types";
+} from "@/registry/lib/dynamic-dialog/types";
 
 type DialogData = Partial<DialogProps> & DialogUserConfig;
 

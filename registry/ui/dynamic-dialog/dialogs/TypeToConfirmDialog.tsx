@@ -1,14 +1,14 @@
 "use client"
 
-import { Button } from "@/registry/new-york/ui/button";
-import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/registry/new-york/ui/form";
-import { Input } from "@/registry/new-york/ui/input";
+import { Button } from "@/registry/ui/button";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/registry/ui/form";
+import { Input } from "@/registry/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { type DialogRendererProps } from "@/registry/new-york/lib/dynamic-dialog/types";
+import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog/types";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;

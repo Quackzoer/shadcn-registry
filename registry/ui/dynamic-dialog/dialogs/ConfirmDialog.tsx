@@ -1,8 +1,8 @@
 "use client"
 
-import { type DialogRendererProps } from "@/registry/new-york/lib/dynamic-dialog/types";
-import { Button } from "@/registry/new-york/ui/button";
-import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/new-york/ui/dialog";
+import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog/types";
+import { Button } from "@/registry/ui/button";
+import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { type ReactNode } from "react";
 

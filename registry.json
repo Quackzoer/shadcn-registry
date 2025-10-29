@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "acme",
-  "homepage": "https://acme.com",
+  "name": "Kazor ShadCn Registry for Utilities",
+  "homepage": "https://shadcn.kazor.com",
   "items": [
     {
       "name": "dynamic-dialog",
@@ -12,43 +12,83 @@
       "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
       "files": [
         {
-          "path": "registry/new-york/ui/dynamic-dialog/dialogs/ConfirmDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/ConfirmDialog.tsx"
-        },
-        {
-          "path": "registry/new-york/ui/dynamic-dialog/dialogs/CountdownDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/CountdownDialog.tsx"
-        },
-        {
-          "path": "registry/new-york/ui/dynamic-dialog/dialogs/DelayedActionDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/DelayedActionDialog.tsx"
-        },
-        {
-          "path": "registry/new-york/ui/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx"
-        },
-        {
-          "path": "registry/new-york/ui/dynamic-dialog/dynamic-dialog.tsx",
+          "path": "registry/ui/dynamic-dialog/dynamic-dialog.tsx",
           "type": "registry:ui"
         },
         {
-          "path": "registry/new-york/lib/dynamic-dialog/dialog.ts",
+          "path": "registry/lib/dynamic-dialog/dialog.ts",
           "type": "registry:lib",
           "target": "lib/dynamic-dialog/dialog.ts"
         },
         {
-          "path": "registry/new-york/lib/dynamic-dialog/state.ts",
+          "path": "registry/lib/dynamic-dialog/state.ts",
           "type": "registry:lib",
           "target": "lib/dynamic-dialog/state.ts"
         },
         {
-          "path": "registry/new-york/lib/dynamic-dialog/types.ts",
+          "path": "registry/lib/dynamic-dialog/types.ts",
           "type": "registry:lib",
           "target": "lib/dynamic-dialog/types.ts"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:type-to-confirm",
+      "type": "registry:component",
+      "title": "Dynamic type to confirm Dialog",
+      "description": "A dynamic type to confirm dialog component.",
+      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
+      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx",
+          "type": "registry:component",
+          "target": "components/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:delayed-action",
+      "type": "registry:component",
+      "title": "Dynamic Delayed Action Dialog",
+      "description": "A dynamic delayed action dialog component.",
+      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
+      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/DelayedActionDialog.tsx",
+          "type": "registry:component",
+          "target": "components/dynamic-dialog/dialogs/DelayedActionDialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:countdown",
+      "type": "registry:component",
+      "title": "Dynamic Countdown Dialog",
+      "description": "A dynamic countdown dialog component.",
+      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
+      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/CountdownDialog.tsx",
+          "type": "registry:component",
+          "target": "components/dynamic-dialog/dialogs/CountdownDialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:confirmation",
+      "type": "registry:component",
+      "title": "Dynamic Confirmation Dialog",
+      "description": "A dynamic confirmation dialog.",
+      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
+      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/ConfirmDialog.tsx",
+          "type": "registry:component",
+          "target": "components/dynamic-dialog/dialogs/ConfirmDialog.tsx"
         }
       ]
     },
@@ -68,24 +108,24 @@
       "registryDependencies": ["card"],
       "files": [
         {
-          "path": "registry/new-york/blocks/complex-component/page.tsx",
+          "path": "registry/blocks/complex-component/page.tsx",
           "type": "registry:page",
           "target": "app/pokemon/page.tsx"
         },
         {
-          "path": "registry/new-york/blocks/complex-component/components/pokemon-card.tsx",
+          "path": "registry/blocks/complex-component/components/pokemon-card.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/complex-component/components/pokemon-image.tsx",
+          "path": "registry/blocks/complex-component/components/pokemon-image.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/complex-component/lib/pokemon.ts",
+          "path": "registry/blocks/complex-component/lib/pokemon.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/new-york/blocks/complex-component/hooks/use-pokemon.ts",
+          "path": "registry/blocks/complex-component/hooks/use-pokemon.ts",
           "type": "registry:hook"
         }
       ]
@@ -97,11 +137,11 @@
       "description": "A login form with a CSS file.",
       "files": [
         {
-          "path": "registry/new-york/blocks/example-with-css/example-card.tsx",
+          "path": "registry/blocks/example-with-css/example-card.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/new-york/blocks/example-with-css/example-card.css",
+          "path": "registry/blocks/example-with-css/example-card.css",
           "type": "registry:component"
         }
       ]

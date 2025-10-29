@@ -1,10 +1,10 @@
 import React from 'react';
-import { ConfirmDialog, type ConfirmDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/ConfirmDialog';
-import { CountdownDialog, type CountdownDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/CountdownDialog';
-import { DelayedActionDialog, type DelayedActionDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/DelayedActionDialog';
-import { TypeToConfirmDialog, type TypeToConfirmDialogProps } from '@/registry/new-york/ui/dynamic-dialog/dialogs/TypeToConfirmDialog';
-import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
-import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
+import { ConfirmDialog, type ConfirmDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/ConfirmDialog';
+import { CountdownDialog, type CountdownDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/CountdownDialog';
+import { DelayedActionDialog, type DelayedActionDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/DelayedActionDialog';
+import { TypeToConfirmDialog, type TypeToConfirmDialogProps } from '@/registry/ui/dynamic-dialog/dialogs/TypeToConfirmDialog';
+import { dialogObservable } from '@/registry/lib/dynamic-dialog/state';
+import type { DialogProps, DialogRendererProps, DialogResult, DialogUserConfig, DismissReason } from '@/registry/lib/dynamic-dialog/types';
  
 
 /**

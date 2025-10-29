@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import type {  DialogState, DialogRendererProps, DismissReason } from '@/registry/new-york/lib/dynamic-dialog/types';
-import { dialogObservable } from '@/registry/new-york/lib/dynamic-dialog/state';
-import { Dialog, DialogContent } from '@/registry/new-york/ui/dialog';
+import type {  DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog/types';
+import { dialogObservable } from '@/registry/lib/dynamic-dialog/state';
+import { Dialog, DialogContent } from '@/registry/ui/dialog';
 
 function DynamicDialog(props: DialogState) {
 
