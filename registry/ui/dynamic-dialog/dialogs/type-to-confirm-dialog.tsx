@@ -8,8 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog/types";
-import { dialog } from "@/registry/lib/dynamic-dialog/dialog";
+import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog-state";
+import { dialog } from "@/registry/lib/dynamic-dialog-state";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;

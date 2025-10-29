@@ -1,7 +1,7 @@
 "use client"
 
-import { dialog } from "@/registry/lib/dynamic-dialog/dialog";
-import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog/types";
+import { dialog } from "@/registry/lib/dynamic-dialog-state";
+import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog-state";
 import { Button } from "@/registry/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
 import { Trash2 } from "lucide-react";

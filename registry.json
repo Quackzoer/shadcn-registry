@@ -20,19 +20,8 @@
           "type": "registry:ui"
         },
         {
-          "path": "registry/lib/dynamic-dialog/dialog.ts",
-          "type": "registry:lib",
-          "target": "lib/dynamic-dialog/dialog.ts"
-        },
-        {
-          "path": "registry/lib/dynamic-dialog/state.ts",
-          "type": "registry:lib",
-          "target": "lib/dynamic-dialog/state.ts"
-        },
-        {
-          "path": "registry/lib/dynamic-dialog/types.ts",
-          "type": "registry:lib",
-          "target": "lib/dynamic-dialog/types.ts"
+          "path": "registry/lib/dynamic-dialog-state.ts",
+          "type": "registry:lib"
         }
       ]
     },
