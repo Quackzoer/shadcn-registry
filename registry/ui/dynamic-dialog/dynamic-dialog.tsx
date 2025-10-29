@@ -65,7 +65,7 @@ export function DynamicDialogProvider() {
   useEffect(() => {
     const unsubscribe = dialogObservable.subscribe((action, data) => {
       switch (action) {
-        case 'SHOW_DIALOG':
+        case 'SHOW_DIALOG': {
           const dialogState: DialogState = {
             ...data,
             id: data.id!,
@@ -81,9 +81,11 @@ export function DynamicDialogProvider() {
           };
           setDialogs(current => [...current, dialogState]);
           break;
-        case 'HIDE_DIALOG':
+        }
+        case 'HIDE_DIALOG': {
           setDialogs(current => current.filter(d => d.id !== data.id));
           break;
+        }
       }
     });
 
