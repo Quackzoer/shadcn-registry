@@ -45,8 +45,7 @@
       "files": [
         {
           "path": "registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx"
+          "type": "registry:component"
         }
       ]
     },
@@ -63,8 +62,7 @@
       "files": [
         {
           "path": "registry/ui/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/delayed-action-dialog.tsx"
+          "type": "registry:component"
         }
       ]
     },
@@ -81,8 +79,7 @@
       "files": [
         {
           "path": "registry/ui/dynamic-dialog/dialogs/countdown-dialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/countdown-dialog.tsx"
+          "type": "registry:component"
         }
       ]
     },
@@ -104,8 +101,7 @@
       "files": [
         {
           "path": "registry/ui/dynamic-dialog/dialogs/confirm-dialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/confirm-dialog.tsx"
+          "type": "registry:component"
         }
       ]
     },

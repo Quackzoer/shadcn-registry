@@ -1,63 +1,129 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "acme",
-  "homepage": "https://acme.com",
+  "name": "ShadCn Registry for Utilities by Krzysztof Kazor",
+  "homepage": "https://shadcn.krzysztof.kazor.com",
   "items": [
     {
       "name": "dynamic-dialog",
       "type": "registry:component",
       "title": "Dynamic Dialog",
       "description": "A dynamic dialog component.",
-      "dependencies": ["zod","@hookform/resolvers","react-hook-form"],
-      "registryDependencies": ["button", "input", "label", "textarea", "card","dialog","form"],
+      "dependencies": [
+        "zod"
+      ],
+      "registryDependencies": [
+        "dialog"
+      ],
       "files": [
-        {
-          "path": "registry/ui/dynamic-dialog/dialogs/ConfirmDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/ConfirmDialog.tsx"
-        },
-        {
-          "path": "registry/ui/dynamic-dialog/dialogs/CountdownDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/CountdownDialog.tsx"
-        },
-        {
-          "path": "registry/ui/dynamic-dialog/dialogs/DelayedActionDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/DelayedActionDialog.tsx"
-        },
-        {
-          "path": "registry/ui/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx",
-          "type": "registry:component",
-          "target": "components/dynamic-dialog/dialogs/TypeToConfirmDialog.tsx"
-        },
         {
           "path": "registry/ui/dynamic-dialog/dynamic-dialog.tsx",
           "type": "registry:ui"
         },
         {
-          "path": "registry/lib/dynamic-dialog/dialog.ts",
-          "type": "registry:lib",
-          "target": "lib/dynamic-dialog/dialog.ts"
-        },
-        {
-          "path": "registry/lib/dynamic-dialog/state.ts",
-          "type": "registry:lib",
-          "target": "lib/dynamic-dialog/state.ts"
-        },
-        {
-          "path": "registry/lib/dynamic-dialog/types.ts",
-          "type": "registry:lib",
-          "target": "lib/dynamic-dialog/types.ts"
+          "path": "registry/lib/dynamic-dialog-state.ts",
+          "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "dynamic-dialog:type-to-confirm",
+      "type": "registry:component",
+      "title": "Dynamic type to confirm Dialog",
+      "description": "A dynamic type to confirm dialog component.",
+      "dependencies": [
+        "zod",
+        "@hookform/resolvers",
+        "react-hook-form"
+      ],
+      "registryDependencies": [
+        "dialog",
+        "button",
+        "input",
+        "form",
+        "@kazor/dynamic-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:delayed-action",
+      "type": "registry:component",
+      "title": "Dynamic Delayed Action Dialog",
+      "description": "A dynamic delayed action dialog component.",
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "@kazor/dynamic-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:countdown",
+      "type": "registry:component",
+      "title": "Dynamic Countdown Dialog",
+      "description": "A dynamic countdown dialog component.",
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "@kazor/dynamic-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/countdown-dialog.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog:confirmation",
+      "type": "registry:component",
+      "title": "Dynamic Confirmation Dialog",
+      "description": "A dynamic confirmation dialog.",
+      "dependencies": [
+        "zod",
+        "@hookform/resolvers",
+        "react-hook-form"
+      ],
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "@kazor/dynamic-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/dynamic-dialog/dialogs/confirm-dialog.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "react-query",
+      "type": "registry:lib",
+      "title": "React Query helpers and boilerplate",
+      "description": "A set of helpers and boilerplate code to use React Query in your project.",
+      "dependencies": [
+        "@tanstack/react-query",
+        "@lukemorales/query-key-factory"
+      ],
+      "files": []
     },
     {
       "name": "complex-component",
       "type": "registry:component",
       "title": "Complex Component",
       "description": "A complex component showing hooks, libs and components.",
-      "registryDependencies": ["card"],
+      "registryDependencies": [
+        "card"
+      ],
       "files": [
         {
           "path": "registry/blocks/complex-component/page.tsx",
