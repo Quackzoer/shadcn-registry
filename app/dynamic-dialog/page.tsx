@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
-import { Button } from "@/registry/new-york/ui/button"
-import { dialog } from "@/registry/new-york/lib/dynamic-dialog/dialog"
+import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
+import { Button } from "@/registry/ui/button"
+import { dialog } from "@/registry/lib/dynamic-dialog/dialog"
 
 export default function Page() {
   return (
