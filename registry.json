@@ -26,7 +26,7 @@
       ]
     },
     {
-      "name": "dynamic-dialog:type-to-confirm",
+      "name": "dynamic-dialog-type-to-confirm",
       "type": "registry:component",
       "title": "Dynamic type to confirm Dialog",
       "description": "A dynamic type to confirm dialog component.",
@@ -50,7 +50,7 @@
       ]
     },
     {
-      "name": "dynamic-dialog:delayed-action",
+      "name": "dynamic-dialog-delayed-action",
       "type": "registry:component",
       "title": "Dynamic Delayed Action Dialog",
       "description": "A dynamic delayed action dialog component.",
@@ -67,7 +67,7 @@
       ]
     },
     {
-      "name": "dynamic-dialog:countdown",
+      "name": "dynamic-dialog-countdown",
       "type": "registry:component",
       "title": "Dynamic Countdown Dialog",
       "description": "A dynamic countdown dialog component.",
@@ -84,7 +84,7 @@
       ]
     },
     {
-      "name": "dynamic-dialog:confirmation",
+      "name": "dynamic-dialog-confirmation",
       "type": "registry:component",
       "title": "Dynamic Confirmation Dialog",
       "description": "A dynamic confirmation dialog.",

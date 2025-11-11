@@ -1,0 +1,26 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dynamic-dialog-type-to-confirm",
+  "type": "registry:component",
+  "title": "Dynamic type to confirm Dialog",
+  "description": "A dynamic type to confirm dialog component.",
+  "dependencies": [
+    "zod",
+    "@hookform/resolvers",
+    "react-hook-form"
+  ],
+  "registryDependencies": [
+    "dialog",
+    "button",
+    "input",
+    "form",
+    "@kazor/dynamic-dialog"
+  ],
+  "files": [
+    {
+      "path": "registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
+      "content": "\"use client\"\r\n\r\nimport { Button } from \"@/registry/ui/button\";\r\nimport { DialogDescription, DialogHeader, DialogTitle } from \"@/registry/ui/dialog\";\r\nimport { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from \"@/registry/ui/form\";\r\nimport { Input } from \"@/registry/ui/input\";\r\nimport { zodResolver } from \"@hookform/resolvers/zod\";\r\nimport { Trash2 } from \"lucide-react\";\r\nimport { useForm } from \"react-hook-form\";\r\nimport { z } from \"zod\";\r\nimport { type DialogRendererProps } from \"@/registry/lib/dynamic-dialog-state\";\r\nimport { dialog } from \"@/registry/lib/dynamic-dialog-state\";\r\n\r\nexport interface TypeToConfirmDialogProps {\r\n  itemName: string;\r\n}\r\n\r\nexport function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRendererProps<{itemName: string}>) {\r\n  const schema = z.object({\r\n    itemName: z.literal(props.itemName)\r\n  })\r\n  const form = useForm({\r\n    resolver: zodResolver(schema),\r\n    defaultValues: {\r\n      itemName: ''\r\n    }\r\n  })\r\n\r\n  const handleSubmit = (data: z.infer<typeof schema>) => {\r\n    props.confirm(data);\r\n  }\r\n\r\n  const isFormValid = form.formState.isValid && form.watch('itemName') === props.itemName;\r\n\r\n  return (\r\n    <div>\r\n      <DialogHeader>\r\n        <div className=\"flex items-center gap-3 mb-4\">\r\n          <div className=\"flex-shrink-0 w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center\">\r\n            <Trash2 className=\"w-5 h-5 text-destructive\" />\r\n          </div>\r\n          <div>\r\n            <DialogTitle className=\"text-lg font-semibold text-foreground\">\r\n              Delete Confirmation\r\n            </DialogTitle>\r\n            <DialogDescription className=\"text-sm text-muted-foreground\">\r\n              This action cannot be undone\r\n            </DialogDescription>\r\n          </div>\r\n        </div>\r\n      </DialogHeader>\r\n      <Form {...form}>\r\n        <form onSubmit={form.handleSubmit(handleSubmit)} className=\"space-y-4\">\r\n          <div>\r\n            <div className=\"mb-4\">\r\n              <p className=\"text-foreground mb-3\">\r\n                To confirm deletion of <code className=\"bg-muted px-2 py-1 rounded text-sm font-mono\">{props.itemName}</code>, please type the exact name below:\r\n              </p>\r\n              <FormField\r\n                control={form.control}\r\n                name=\"itemName\"\r\n                render={({ field }) => (\r\n                  <FormItem>\r\n                    <FormLabel className=\"text-sm font-medium\">Type to confirm</FormLabel>\r\n                    <FormControl>\r\n                      <Input\r\n                        placeholder={`Type: ${props.itemName}`}\r\n                        {...field}\r\n                        className=\"font-mono\"\r\n                        autoComplete=\"off\"\r\n                        autoFocus\r\n                      />\r\n                    </FormControl>\r\n                    <FormMessage />\r\n                  </FormItem>\r\n                )}\r\n              />\r\n              {form.watch('itemName') && form.watch('itemName') !== props.itemName && (\r\n                <p className=\"text-sm text-muted-foreground mt-2\">\r\n                  Text must match exactly: <span className=\"font-mono\">{props.itemName}</span>\r\n                </p>\r\n              )}\r\n            </div>\r\n          </div>\r\n          <div className=\"flex justify-end space-x-3 pt-2\">\r\n            <Button\r\n              type=\"button\"\r\n              onClick={() => props.cancel()}\r\n              variant={\"outline\"}\r\n            >\r\n              Cancel\r\n            </Button>\r\n            <Button\r\n              variant={\"destructive\"}\r\n              type=\"submit\"\r\n              disabled={!isFormValid}\r\n            >\r\n              Delete Forever\r\n            </Button>\r\n          </div>\r\n        </form>\r\n      </Form>\r\n    </div>\r\n  );\r\n}\r\n\r\nexport const typeToConfirmDialog = dialog(TypeToConfirmDialog, { important: true });",
+      "type": "registry:component"
+    }
+  ]
+}
