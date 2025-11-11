@@ -250,6 +250,8 @@ export const dialogObservable = new DialogObservable();
 
 type ExtractRendererProps<TProps, TValue> = Omit<TProps, keyof DialogRendererProps<TValue>>;
 
+type IsEmptyObject<T> = keyof T extends never ? true : false;
+
 /**
  * Creates a dialog function that can be called with props to show a dialog.
  *
@@ -266,11 +268,11 @@ type ExtractRendererProps<TProps, TValue> = Omit<TProps, keyof DialogRendererPro
  * const awaitedValue = await value; // boolean
  * const isConfirmed = result.isConfirmed; // boolean
  * ```
- * @example - Usage with dialog props for control:
+ * @example - Usage with no custom props (first argument is optional):
  * ```ts
  * const ExampleComponent = (props: DialogRendererProps<string>) => <div>...</div>;
  * const asyncDialog = dialog(ExampleComponent);
- * const result = asyncDialog({}, { id: 'my-dialog', important: true });
+ * const result = asyncDialog({ id: 'my-dialog', important: true }); // No need to pass {}!
  * const value = result.value; // string
  * const isConfirmed = result.isConfirmed; // boolean
  * ```
@@ -288,13 +290,20 @@ type ExtractRendererProps<TProps, TValue> = Omit<TProps, keyof DialogRendererPro
 export function dialog<TProps extends DialogRendererProps<TValue>, TValue = TProps extends DialogRendererProps<infer V> ? V : unknown>(
   render: (props: TProps) => React.ReactNode,
   defaultOptions?: Partial<DialogProps<TValue>> & DialogUserConfig
-) {
+): IsEmptyObject<ExtractRendererProps<TProps, TValue>> extends true
+  ? (dialogOptions?: Partial<DialogProps<TValue>> & DialogUserConfig) => DialogResult<TValue>
+  : (rendererProps: ExtractRendererProps<TProps, TValue>, dialogOptions?: Partial<DialogProps<TValue>> & DialogUserConfig) => DialogResult<TValue> {
   type RendererProps = ExtractRendererProps<TProps, TValue>;
-  return (
-    rendererProps: RendererProps,
+  return ((
+    rendererPropsOrOptions?: RendererProps | (Partial<DialogProps<TValue>> & DialogUserConfig),
     dialogOptions?: Partial<DialogProps<TValue>> & DialogUserConfig
   ): DialogResult<TValue> => {
-    const mergedOptions = { ...defaultOptions, ...dialogOptions };
+    // If RendererProps is empty, first arg is dialogOptions
+    const isEmpty = Object.keys({} as RendererProps).length === 0;
+    const rendererProps = (isEmpty ? {} : rendererPropsOrOptions) as RendererProps;
+    const finalDialogOptions = isEmpty ? (rendererPropsOrOptions as Partial<DialogProps<TValue>> & DialogUserConfig) : dialogOptions;
+
+    const mergedOptions = { ...defaultOptions, ...finalDialogOptions };
 
     return dialogObservable.showDialog({
       render: (dialogProps: DialogRendererProps<TValue>) =>
@@ -303,7 +312,7 @@ export function dialog<TProps extends DialogRendererProps<TValue>, TValue = TPro
       onClose: () => {},
       ...mergedOptions
     });
-  };
+  });
 }
 
 const dismissDialog = (id?: string, reason: DismissReason = "close", value?: unknown) => {
