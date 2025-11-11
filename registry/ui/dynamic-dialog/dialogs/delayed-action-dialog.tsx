@@ -178,5 +178,5 @@ export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRend
   );
 }
 
-export const delayedActionDialog = dialog<DelayedActionDialogProps, boolean>(DelayedActionDialog);
+export const delayedActionDialog = dialog(DelayedActionDialog);
   

@@ -104,4 +104,4 @@ export function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRend
   );
 }
 
-export const typeToConfirmDialog = dialog<TypeToConfirmDialogProps, {itemName: string}>(TypeToConfirmDialog, { important: true });
+export const typeToConfirmDialog = dialog(TypeToConfirmDialog, { important: true });

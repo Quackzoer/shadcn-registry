@@ -135,4 +135,4 @@ export function CountdownDialog(props: CountdownDialogProps & DialogRendererProp
   );
 }
 
-export const countdownDialog = dialog<CountdownDialogProps, string>(CountdownDialog);
+export const countDownDialog = dialog(CountdownDialog);

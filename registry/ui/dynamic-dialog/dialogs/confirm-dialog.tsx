@@ -51,4 +51,4 @@ export function ConfirmDialog(props: ConfirmDialogProps & DialogRendererProps<bo
   );
 }
 
-export const confirmDialog = dialog<ConfirmDialogProps, boolean>(ConfirmDialog, { important: true });
+export const confirmDialog = dialog(ConfirmDialog, { important: true });
