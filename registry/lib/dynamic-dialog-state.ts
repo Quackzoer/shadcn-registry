@@ -6,6 +6,7 @@ export interface DialogActions<T = unknown> {
   cancel: () => void;
   dismiss: (reason: DismissReason, value?: T) => void;
   closeDialog: () => void;
+  setDialogContentProps: (props: DialogPrimitive.DialogContentProps|undefined) => void;
 }
 
 export interface DialogCallbacks {

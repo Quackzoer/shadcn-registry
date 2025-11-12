@@ -1,11 +1,12 @@
 "use client"
 
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { useState, useEffect } from 'react';
 import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog-state';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
 import { Dialog, DialogContent } from '@/registry/ui/dialog';
 
-function DynamicDialog(props: DialogState) {
+function DynamicDialog(props: Readonly<DialogState>) {
 
   useEffect(() => {
     props.onOpen();
@@ -35,7 +36,7 @@ function DynamicDialog(props: DialogState) {
   const closeDialog = () => {
     dialogObservable.dismissDialog(props.id, "close");
   };
-
+  const [dialogContentProps, setDialogContentProps] = useState<DialogPrimitive.DialogContentProps|undefined>(props.dialogContentProps);
   const renderProps: DialogRendererProps = {
     ...props,
     confirm,
@@ -43,6 +44,7 @@ function DynamicDialog(props: DialogState) {
     cancel,
     dismiss,
     closeDialog,
+    setDialogContentProps
   };
 
   return (
@@ -51,9 +53,9 @@ function DynamicDialog(props: DialogState) {
         onInteractOutside={e => {
           if (props.important) { e.preventDefault() } else { handleBackdropClick() }
         }}
-        {...props.dialogContentProps}
+        {...dialogContentProps}
       >
-        {props.render && props.render(renderProps)}
+        {props.render?.(renderProps)}
       </DialogContent>
     </Dialog>
   );
