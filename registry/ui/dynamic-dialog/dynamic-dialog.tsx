@@ -49,6 +49,7 @@ function DynamicDialog(props: Readonly<DialogState>) {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      {/* TODO Instead of using DialogContent directly, make user use it internally and add onInteractionOutside and other dialog related props to another prop passed to render function so that we don't have to do setDialogContentProps */}
       <DialogContent
         onInteractOutside={e => {
           if (props.important) { e.preventDefault() } else { handleBackdropClick() }
