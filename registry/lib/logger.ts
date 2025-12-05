@@ -45,7 +45,7 @@ function styleObjectToString(style: ConsoleStyle | string): string {
   }
 
   const kebabCase = (str: string) =>
-    str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+    str.replaceAll(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
   return Object.entries(style)
     .map(([key, value]) => `${kebabCase(key)}: ${value}`)
@@ -117,7 +117,7 @@ export function createLogger(options: LoggerOptions = {}): LoggerFunction {
       if (typeof lastValue === "string") {
         const styleString = styleObjectToString(style);
         const newValues = [
-          ...values.slice(0, values.length - 1),
+          ...values.slice(0, - 1),
           `%c${lastValue}`,
           { __style: styleString },
           `${STYLE_RESET}`,
@@ -133,7 +133,7 @@ export function createLogger(options: LoggerOptions = {}): LoggerFunction {
       if (typeof lastValue === "string") {
         const styleString = styleObjectToString(style);
         const newValues = [
-          ...values.slice(0, values.length - 1),
+          ...values.slice(0, - 1),
           `${lastValue}%c`,
           { __style: styleString },
         ];
@@ -147,7 +147,7 @@ export function createLogger(options: LoggerOptions = {}): LoggerFunction {
       const lastValue = values.at(-1);
       if (typeof lastValue === "string") {
         const newValues = [
-          ...values.slice(0, values.length - 1),
+          ...values.slice(0, - 1),
           `${lastValue}%c`,
           { __style: STYLE_RESET },
         ];
@@ -159,7 +159,7 @@ export function createLogger(options: LoggerOptions = {}): LoggerFunction {
         Object.hasOwn(lastValue, "__style")
       ) {
         const newValues = [
-          ...values.slice(0, values.length - 1),
+          ...values.slice(0, - 1),
           { __style: STYLE_RESET },
         ];
         return customLogger(newValues);
