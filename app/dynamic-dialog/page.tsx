@@ -4,6 +4,8 @@ import { Button } from "@/registry/ui/button"
 import { countDownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
 import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
+import '@/registry/lib/logger.ts'
+
 
 export default function Page() {
   return (
