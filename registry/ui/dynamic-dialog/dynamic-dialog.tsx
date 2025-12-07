@@ -1,10 +1,9 @@
 "use client"
 
-import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { useState, useEffect } from 'react';
 import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog-state';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
-import { Dialog, DialogContent } from '@/registry/ui/dialog';
+import { Dialog } from '@/registry/ui/dialog';
 
 function DynamicDialog(props: Readonly<DialogState>) {
 
@@ -12,10 +11,6 @@ function DynamicDialog(props: Readonly<DialogState>) {
     props.onOpen();
     return () => props.onClose();
   }, [props]);
-
-  const handleBackdropClick = () => {
-    dialogObservable.dismissDialog(props.id, "backdrop");
-  };
 
   const confirm = (value?: unknown) => {
     dialogObservable.confirmDialog(props.id, value);
@@ -36,28 +31,19 @@ function DynamicDialog(props: Readonly<DialogState>) {
   const closeDialog = () => {
     dialogObservable.dismissDialog(props.id, "close");
   };
-  const [dialogContentProps, setDialogContentProps] = useState<DialogPrimitive.DialogContentProps|undefined>(props.dialogContentProps);
+
   const renderProps: DialogRendererProps = {
     ...props,
     confirm,
     deny,
     cancel,
     dismiss,
-    closeDialog,
-    setDialogContentProps
+    closeDialog
   };
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      {/* TODO Instead of using DialogContent directly, make user use it internally and add onInteractionOutside and other dialog related props to another prop passed to render function so that we don't have to do setDialogContentProps */}
-      <DialogContent
-        onInteractOutside={e => {
-          if (props.important) { e.preventDefault() } else { handleBackdropClick() }
-        }}
-        {...dialogContentProps}
-      >
-        {props.render?.(renderProps)}
-      </DialogContent>
+      {props.render?.(renderProps)}
     </Dialog>
   );
 }

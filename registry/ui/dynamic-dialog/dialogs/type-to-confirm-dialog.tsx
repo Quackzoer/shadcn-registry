@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/registry/ui/button";
-import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
+import { AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/registry/ui/form";
 import { Input } from "@/registry/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,22 +33,22 @@ export function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRend
   const isFormValid = form.formState.isValid && form.watch('itemName') === props.itemName;
 
   return (
-    <div>
-      <DialogHeader>
+    <AlertDialogContent>
+      <AlertDialogHeader>
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-shrink-0 w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
             <Trash2 className="w-5 h-5 text-destructive" />
           </div>
           <div>
-            <DialogTitle className="text-lg font-semibold text-foreground">
+            <AlertDialogTitle className="text-lg font-semibold text-foreground">
               Delete Confirmation
-            </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
               This action cannot be undone
-            </DialogDescription>
+            </AlertDialogDescription>
           </div>
         </div>
-      </DialogHeader>
+      </AlertDialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div>
@@ -100,8 +100,8 @@ export function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRend
           </div>
         </form>
       </Form>
-    </div>
+    </AlertDialogContent>
   );
 }
 
-export const typeToConfirmDialog = dialog(TypeToConfirmDialog, { important: true });
+export const typeToConfirmDialog = dialog(TypeToConfirmDialog);

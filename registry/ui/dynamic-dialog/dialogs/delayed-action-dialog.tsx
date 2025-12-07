@@ -3,7 +3,7 @@
 import { dialog } from '@/registry/lib/dynamic-dialog-state';
 import { type DialogRendererProps } from '@/registry/lib/dynamic-dialog-state';
 import { Button } from "@/registry/ui/button";
-import { DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
 import { AlertTriangle, Check, Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
 
@@ -44,7 +44,7 @@ export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRend
   };
 
   return (
-    <div>
+    <DialogContent>
       <DialogHeader>
         <div className="flex items-center gap-3 mb-4">
           <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
@@ -174,7 +174,7 @@ export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRend
           </Button>
         </div>
       </div>
-    </div>
+    </DialogContent>
   );
 }
 

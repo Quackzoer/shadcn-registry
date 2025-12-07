@@ -1,12 +1,11 @@
-import * as DialogPrimitive from "@radix-ui/react-dialog"
 import React from 'react';
+
 export interface DialogActions<T = unknown> {
   confirm: (value?: T) => void;
   deny: (value?: T) => void;
   cancel: () => void;
   dismiss: (reason: DismissReason, value?: T) => void;
   closeDialog: () => void;
-  setDialogContentProps: (props: DialogPrimitive.DialogContentProps|undefined) => void;
 }
 
 export interface DialogCallbacks {
@@ -22,9 +21,7 @@ export interface DialogProps<T = unknown> {
   id: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  important?: boolean;
   render: (props: DialogRendererProps<T>) => React.ReactNode;
-  dialogContentProps?: DialogPrimitive.DialogContentProps;
 }
 
 export interface DialogState<T = unknown> extends DialogProps<T>, DialogCallbacks {}
@@ -263,7 +260,7 @@ type IsEmptyObject<T> = keyof T extends never ? true : false;
  * @example - Basic usage with a custom renderer:
  * ```ts
  * const CustomComponent = (props: DialogRendererProps<boolean> & { customProp: string }) => <div>...</div>;
- * const customDialog = dialog(CustomComponent, {important: true});
+ * const customDialog = dialog(CustomComponent);
  * const result = customDialog({ customProp: 'value' }); // TypeScript knows customProp is required!
  * const value = result.value; // Promise<boolean>
  * const awaitedValue = await value; // boolean
@@ -273,7 +270,7 @@ type IsEmptyObject<T> = keyof T extends never ? true : false;
  * ```ts
  * const ExampleComponent = (props: DialogRendererProps<string>) => <div>...</div>;
  * const asyncDialog = dialog(ExampleComponent);
- * const result = asyncDialog({ id: 'my-dialog', important: true }); // No need to pass {}!
+ * const result = asyncDialog({ id: 'my-dialog' }); // No need to pass {}!
  * const value = result.value; // string
  * const isConfirmed = result.isConfirmed; // boolean
  * ```
