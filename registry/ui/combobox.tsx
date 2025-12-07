@@ -278,12 +278,28 @@ export function ComboboxValue({
 export function ComboboxContent({
     search = true,
     children,
+    onCreate,
+    onCreateLabel = "Create",
+    className,
     ...props
 }: {
     search?: boolean | { placeholder?: string; emptyMessage?: string }
     children: ReactNode
+    onCreate?: (value: string) => void
+    onCreateLabel?: string
+    className?: string
 } & Omit<ComponentPropsWithoutRef<typeof Command>, "children">) {
     const canSearch = typeof search === "object" ? true : search
+    const { setOpen } = useComboboxContext()
+    const [query, setQuery] = useState("")
+
+    const handleCreate = () => {
+        if (onCreate && query.trim()) {
+            onCreate(query.trim())
+            setQuery("")
+            setOpen(false)
+        }
+    }
 
     return (
         <>
@@ -292,21 +308,35 @@ export function ComboboxContent({
                     <CommandList>{children}</CommandList>
                 </Command>
             </div>
-            <PopoverContent className="min-w-[var(--radix-popover-trigger-width)] p-0">
+            <PopoverContent className={cn("min-w-[var(--radix-popover-trigger-width)] p-0", className)}>
                 <Command {...props}>
                     {canSearch ? (
                         <CommandInput
                             placeholder={
                                 typeof search === "object" ? search.placeholder : undefined
                             }
+                            value={query}
+                            onValueChange={setQuery}
                         />
                     ) : (
                         <button autoFocus className="sr-only" />
                     )}
                     <CommandList>
                         {canSearch && (
-                            <CommandEmpty>
-                                {typeof search === "object" ? search.emptyMessage : undefined}
+                            <CommandEmpty
+                                className={onCreate ? "cursor-pointer" : undefined}
+                                onClick={onCreate ? handleCreate : undefined}
+                            >
+                                {onCreate && query.trim() ? (
+                                    <div className="flex items-center gap-2 px-2">
+                                        <span className="text-muted-foreground">{onCreateLabel}:</span>
+                                        <span className="font-semibold text-primary truncate">
+                                            {query.trim()}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    typeof search === "object" ? search.emptyMessage : "No results found."
+                                )}
                             </CommandEmpty>
                         )}
                         {children}
