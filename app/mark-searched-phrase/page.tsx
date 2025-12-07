@@ -94,7 +94,7 @@ export default function Page() {
                 text={sampleTexts.short}
                 searchTerm="quick"
                 className="text-base"
-                markClassName="before:bg-yellow-300 dark:before:bg-yellow-600/50"
+                markClassName="bg-yellow-200/70 dark:bg-yellow-600/50"
               />
             </div>
 
@@ -104,7 +104,7 @@ export default function Page() {
                 text={sampleTexts.short}
                 searchTerm="brown"
                 className="text-base"
-                markClassName="before:bg-green-300 dark:before:bg-green-600/50 font-semibold"
+                markClassName="bg-green-200/70 dark:bg-green-600/50 font-semibold"
               />
             </div>
 
@@ -114,7 +114,7 @@ export default function Page() {
                 text={sampleTexts.short}
                 searchTerm="lazy"
                 className="text-base"
-                markClassName="before:bg-transparent border-b-2 border-blue-500"
+                markClassName="bg-transparent border-b-2 border-blue-500"
               />
             </div>
           </div>
@@ -231,7 +231,7 @@ export default function Page() {
                 text="The useState hook allows you to add state to functional components. It returns an array with the current state value and a function to update it."
                 searchTerm="state"
                 className="text-sm leading-relaxed"
-                markClassName="before:bg-blue-200/50 dark:before:bg-blue-800/50"
+                markClassName="bg-blue-200/70 dark:bg-blue-800/50"
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ export default function Page() {
                 searchTerm="React"
                 caseSensitive
                 className="text-base"
-                markClassName="before:bg-orange-300 dark:before:bg-orange-600/50"
+                markClassName="bg-orange-200/70 dark:bg-orange-600/50"
               />
             </div>
           </div>
@@ -337,7 +337,7 @@ export default function Page() {
                 text="TypeScript adds static typing to JavaScript. This helps catch errors early and improves code quality."
                 searchTerm={["TypeScript", "JavaScript", "errors", "code"]}
                 className="text-base leading-relaxed"
-                markClassName="before:bg-purple-300 dark:before:bg-purple-600/50"
+                markClassName="bg-purple-200/70 dark:bg-purple-600/50"
               />
             </div>
           </div>

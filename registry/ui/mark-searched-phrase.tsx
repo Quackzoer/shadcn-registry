@@ -78,7 +78,7 @@ export function MarkSearchedPhrase<T extends ElementType = 'p'>({
                         <mark
                             key={index}
                             className={cn(
-                                'relative before:absolute before:rounded-md before:-left-[2px] before:-right-[2px] before:inset-y-0 before:bg-primary/30',
+                                'bg-primary/30 px-0.5 rounded-sm',
                                 markClassName
                             )}
                             aria-label="Search result match"
