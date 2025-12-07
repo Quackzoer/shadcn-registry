@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/registry/new-york/ui/button"
+import { Button } from "@/registry/ui/button"
 import Link from "next/link"
 
 

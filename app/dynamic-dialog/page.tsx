@@ -1,9 +1,9 @@
 "use client"
 
-import * as React from "react"
-import { DynamicDialogProvider } from "@/registry/new-york/ui/dynamic-dialog/dynamic-dialog"
-import { Button } from "@/registry/new-york/ui/button"
-import { dialog } from "@/registry/new-york/lib/dynamic-dialog/dialog"
+import { Button } from "@/registry/ui/button"
+import { countDownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
+import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
+import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
 
 export default function Page() {
   return (
@@ -17,7 +17,7 @@ export default function Page() {
       <main className="flex flex-col flex-1 gap-8">
         <Button
           onClick={() => {
-            dialog.countdown({
+            countDownDialog({
               countdownSeconds: 5,
             }).async().then((result) => {
               console.log(result)
@@ -28,7 +28,7 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            dialog.typeToConfirm({
+            typeToConfirmDialog({
               itemName: 'some-file.txt'
             }).async().then((result) => {
               console.log(result)
@@ -39,16 +39,16 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const typeToConfirmDialog = dialog.typeToConfirm({
+            const typeToConfirmDialogRes = typeToConfirmDialog({
               itemName: 'some-file.txt',
             })
-            const countDownDialog = dialog.countdown({
+            const countDownDialogRes = countDownDialog({
               countdownSeconds: 10,
             })
-            typeToConfirmDialog.value.then((result) => {
+            typeToConfirmDialogRes.value.then((result) => {
               console.log('Type to confirm result:', result)
             })
-            countDownDialog.value.then((result) => {
+            countDownDialogRes.value.then((result) => {
               console.log('Countdown dialog result:', result)
             })
           }}
@@ -57,11 +57,11 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const countDownDialog = dialog.countdown({
+            const countDownDialogRes = countDownDialog({
               countdownSeconds: 20,
             })
             setTimeout(() => {
-              countDownDialog.dismiss("timer", 'Dismissed after 5 seconds')
+              countDownDialogRes.dismiss("timer", 'Dismissed after 5 seconds')
             }, 5000)
           }}
         >

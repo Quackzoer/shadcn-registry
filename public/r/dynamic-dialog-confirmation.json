@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dynamic-dialog-confirmation",
+  "type": "registry:component",
+  "title": "Dynamic Confirmation Dialog",
+  "description": "A dynamic confirmation dialog.",
+  "dependencies": [
+    "zod",
+    "@hookform/resolvers",
+    "react-hook-form"
+  ],
+  "registryDependencies": [
+    "button",
+    "dialog",
+    "@kazor/dynamic-dialog"
+  ],
+  "files": [
+    {
+      "path": "registry/ui/dynamic-dialog/dialogs/confirm-dialog.tsx",
+      "content": "\"use client\"\r\n\r\nimport { dialog } from \"@/registry/lib/dynamic-dialog-state\";\r\nimport { type DialogRendererProps } from \"@/registry/lib/dynamic-dialog-state\";\r\nimport { Button } from \"@/registry/ui/button\";\r\nimport { DialogDescription, DialogHeader, DialogTitle } from \"@/registry/ui/dialog\";\r\nimport { Trash2 } from \"lucide-react\";\r\nimport { type ReactNode } from \"react\";\r\n\r\nexport interface ConfirmDialogProps{\r\n  title: ReactNode;\r\n  description: ReactNode;\r\n}\r\n\r\nexport function ConfirmDialog(props: ConfirmDialogProps & DialogRendererProps<boolean>) {\r\n  return (\r\n    <div>\r\n      <DialogHeader>\r\n        <div className=\"flex items-center gap-3 mb-4\">\r\n          <div className=\"flex-shrink-0 w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center\">\r\n            <Trash2 className=\"w-5 h-5 text-destructive\" />\r\n          </div>\r\n          <div>\r\n            <DialogTitle className=\"text-lg font-semibold text-foreground\">\r\n              {props.title}\r\n            </DialogTitle>\r\n            <DialogDescription className=\"text-sm text-muted-foreground\">\r\n              {props.description}\r\n            </DialogDescription>\r\n          </div>\r\n        </div>\r\n      </DialogHeader>\r\n\r\n      <div className=\"flex justify-end space-x-3 pt-2\">\r\n        <Button\r\n          type=\"button\"\r\n          onClick={() => props.cancel()}\r\n          variant={\"outline\"}\r\n        >\r\n          Cancel\r\n        </Button>\r\n        <Button\r\n          variant={\"destructive\"}\r\n          type=\"submit\"\r\n          onClick={() => props.confirm()}\r\n        >\r\n          Confirm\r\n        </Button>\r\n      </div>\r\n    </div>\r\n  );\r\n}\r\n\r\nexport const confirmDialog = dialog(ConfirmDialog, { important: true });\r\n",
+      "type": "registry:component"
+    }
+  ]
+}

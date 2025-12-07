@@ -25,7 +25,7 @@ This is a custom shadcn/ui component registry built with Next.js 15, allowing di
 The core architecture revolves around the registry system defined in `registry.json`:
 
 - **Registry Definition**: `registry.json` contains component metadata including dependencies, file paths, and types
-- **File Organization**: Registry items are organized under `registry/new-york/blocks/` with component-specific subdirectories
+- **File Organization**: Registry items are organized under `registry/blocks/` with component-specific subdirectories
 - **Build Output**: `shadcn build` generates static JSON files in `public/r/` that are consumable by the shadcn CLI
 - **Route Handler**: The app serves registry items via both static files and API routes
 
@@ -71,7 +71,7 @@ The confirmation dialog system is inspired by [Sonner](https://github.com/emilko
 
 ## File Organization
 - `app/` - Next.js 15 app router pages
-- `registry/new-york/blocks/` - Registry component definitions
+- `registry/blocks/` - Registry component definitions
 - `components/` - Shared application components
 - `lib/` - Utility functions (including standard `cn` helper)
 - `public/r/` - Generated registry JSON files (build output)
