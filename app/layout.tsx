@@ -42,6 +42,9 @@ export default function RootLayout({
             <li>
               <Link href="/combobox">Combobox Example</Link>
             </li>
+            <li>
+              <Link href="/mark-searched-phrase">Mark Searched Phrase Example</Link>
+            </li>
           </ol>
         </nav>
         {children}

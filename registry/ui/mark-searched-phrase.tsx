@@ -21,20 +21,20 @@ export function MarkSearchedPhrase({
 
 
     return (
-        <p className={cn('',className)} key={text}>
-            {parts.map((part) => {
+        <p className={cn(className)} key={text}>
+            {parts.map((part, index) => {
                 // Check if this part matches the search term (case-insensitive)
                 const isMatch = part.toLowerCase() === searchTerm.toLowerCase();
 
                 if (isMatch) {
                     return (
-                        <span key={part} className={cn('relative before:absolute before:rounded-md  before:-left-[2px] before:-right-[2px] before:inset-y-0 before:bg-primary/30', markClassName)}>
+                        <span key={index} className={cn('relative before:absolute before:rounded-md  before:-left-[2px] before:-right-[2px] before:inset-y-0 before:bg-primary/30', markClassName)}>
                             {part}
                         </span>
                     );
                 }
 
-                return <span key={part}>{part}</span>;
+                return <span key={index}>{part}</span>;
             })}
         </p>
     )
