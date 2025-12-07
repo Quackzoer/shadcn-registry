@@ -236,6 +236,200 @@ export default function Page() {
             </div>
           </div>
         </section>
+
+        {/* As Prop - Flexible Element */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">Flexible Element Rendering</h2>
+            <p className="text-sm text-muted-foreground">
+              Use the `as` prop to render as different HTML elements
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">As span (inline)</p>
+              <div>
+                This is a sentence with{" "}
+                <MarkSearchedPhrase
+                  as="span"
+                  text="highlighted text"
+                  searchTerm="highlighted"
+                  className="inline"
+                />
+                {" "}in the middle.
+              </div>
+            </div>
+
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">As div (block)</p>
+              <MarkSearchedPhrase
+                as="div"
+                text="This renders as a div element instead of a paragraph."
+                searchTerm="div"
+                className="text-base p-2 bg-muted rounded"
+              />
+            </div>
+
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">As h3 (heading)</p>
+              <MarkSearchedPhrase
+                as="h3"
+                text="Search Results for React"
+                searchTerm="React"
+                className="text-lg font-semibold"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Case Sensitivity */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">Case Sensitive Matching</h2>
+            <p className="text-sm text-muted-foreground">
+              Enable case-sensitive search for exact matches
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">Case Insensitive (default)</p>
+              <MarkSearchedPhrase
+                text="React, react, REACT - all match"
+                searchTerm="react"
+                className="text-base"
+              />
+            </div>
+
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">Case Sensitive</p>
+              <MarkSearchedPhrase
+                text="React, react, REACT - only exact case matches"
+                searchTerm="React"
+                caseSensitive
+                className="text-base"
+                markClassName="before:bg-orange-300 dark:before:bg-orange-600/50"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Multiple Search Terms */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">Multiple Search Terms</h2>
+            <p className="text-sm text-muted-foreground">
+              Highlight multiple different terms at once
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">Highlight React and Vue</p>
+              <MarkSearchedPhrase
+                text="React and Vue are both popular JavaScript frameworks for building user interfaces."
+                searchTerm={["React", "Vue"]}
+                className="text-base"
+              />
+            </div>
+
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">Highlight multiple keywords</p>
+              <MarkSearchedPhrase
+                text="TypeScript adds static typing to JavaScript. This helps catch errors early and improves code quality."
+                searchTerm={["TypeScript", "JavaScript", "errors", "code"]}
+                className="text-base leading-relaxed"
+                markClassName="before:bg-purple-300 dark:before:bg-purple-600/50"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Custom Render Function */}
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">Custom Render Function</h2>
+            <p className="text-sm text-muted-foreground">
+              Provide a custom render function for complete control over matched text
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">With badge styling</p>
+              <MarkSearchedPhrase
+                text="React is a JavaScript library for building user interfaces"
+                searchTerm="React"
+                className="text-base"
+                renderMatch={(text) => (
+                  <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:text-blue-100">
+                    {text}
+                  </span>
+                )}
+              />
+            </div>
+
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">With custom icon</p>
+              <MarkSearchedPhrase
+                text="Search for important keywords in your documentation"
+                searchTerm="important"
+                className="text-base"
+                renderMatch={(text) => (
+                  <span className="inline-flex items-center gap-1 rounded bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 font-semibold text-amber-900 dark:text-amber-100">
+                    ⭐ {text}
+                  </span>
+                )}
+              />
+            </div>
+
+            <div className="p-4 border rounded-lg bg-card">
+              <p className="text-xs text-muted-foreground mb-2">With index counter</p>
+              <MarkSearchedPhrase
+                text="The word test appears multiple times. This is a test. Another test here."
+                searchTerm="test"
+                className="text-base"
+                renderMatch={(text, index) => (
+                  <span className="relative inline-flex items-baseline">
+                    <span className="rounded bg-green-200 dark:bg-green-800 px-1.5 py-0.5 font-semibold">
+                      {text}
+                    </span>
+                    <sup className="ml-0.5 text-xs text-green-600 dark:text-green-400">
+                      {Math.floor(index / 2) + 1}
+                    </sup>
+                  </span>
+                )}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Performance Note */}
+        <section className="flex flex-col gap-4 pb-8">
+          <div>
+            <h2 className="text-xl font-semibold">Performance Optimizations</h2>
+            <p className="text-sm text-muted-foreground">
+              Component features built-in performance optimizations
+            </p>
+          </div>
+          <div className="p-4 border rounded-lg bg-card">
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 dark:text-green-400">✓</span>
+                <span>Regex is memoized and only recreated when search terms change</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 dark:text-green-400">✓</span>
+                <span>Early returns for empty search or no matches</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 dark:text-green-400">✓</span>
+                <span>Uses semantic &lt;mark&gt; element for better accessibility</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 dark:text-green-400">✓</span>
+                <span>Proper React keys using index to avoid reconciliation bugs</span>
+              </li>
+            </ul>
+          </div>
+        </section>
       </main>
     </div>
   )
