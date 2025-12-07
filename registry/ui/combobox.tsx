@@ -1,259 +1,244 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, XIcon } from "lucide-react";
-import React, { Dispatch, ReactNode, SetStateAction, useCallback, useState } from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+    type ComponentPropsWithoutRef,
+    type ReactNode
+} from "react";
 
-
-type Item = {
-    value: string;
-    label: React.ReactNode;
-}
-
-interface ComboboxContextValue {
+type ComboboxContextValue = {
     open: boolean
     setOpen: (open: boolean) => void
     selectedValues: Set<string>
     toggleValue: (value: string) => void
     items: Map<string, ReactNode>
     onItemAdded: (value: string, label: ReactNode) => void
-    handleClose: () => void
-    mode: 'single' | 'multiple';
+    mode: 'single' | 'multiple'
 }
 
-const comboboxContext = React.createContext<ComboboxContextValue | undefined>(undefined);
+const ComboboxContext = createContext<ComboboxContextValue | null>(null);
 
-const useComboboxContext = () => {
-    const context = React.useContext(comboboxContext)
-    if (context === undefined) {
+function useComboboxContext() {
+    const context = useContext(ComboboxContext)
+    if (context == null) {
         throw new Error('Combobox components must be used within a <Combobox />')
     }
     return context
-};
-
-
-
-export type ComboboxProps = {
-    disabled?: boolean;
-    inDialog?: boolean;
-    triggerLabel: string | React.ReactNode;
-    onCreate?: (value: string) => void;
-    open?: boolean;
-    setOpen?: (open: boolean) => void;
-    // mode?: 'single' | 'multiple';
-    closeOnSelect?: boolean;
-    onValuesChange?: (values: string[]) => void;
-    renderSelectedValue?: (selectedValue: string | string[], items: { label: string, value: string }[]) => React.ReactNode;
-    children?: React.ReactNode;
-    values?: string[];
-    defaultValues?: string[];
 }
-    & ({
-        mode: 'single'
-        selectedValue: string | null;
-        setSelectedValue: Dispatch<SetStateAction<string | null>> | ((value: string | null) => void);
 
-    } | {
-        mode: 'multiple';
-        selectedValue: string | string[] | null;
-        setSelectedValue: Dispatch<SetStateAction<string | string[] | null>> | ((value: string | string[] | null) => void) | ((value: string | null) => void);
-    })
 
-export default function Combobox({
-    disabled = false,
-    triggerLabel,
-    mode = 'single',
-    onValuesChange,
-    open,
-    setOpen,
-    inDialog = false,
-    onCreate,
-    closeOnSelect = true,
-    renderSelectedValue,
+
+export function Combobox({
+    children,
     values,
     defaultValues,
-    children
-}: Readonly<ComboboxProps>) {
-    const [query, setQuery] = useState<string>('');
-    const [internalOpen, setInternalOpen] = useState<boolean>(false);
+    onValuesChange,
+    mode = 'single',
+    open,
+    onOpenChange
+}: Readonly<{
+    children: ReactNode
+    values?: string[]
+    defaultValues?: string[]
+    onValuesChange?: (values: string[]) => void
+    mode?: 'single' | 'multiple'
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+}>) {
+    const [internalOpen, setInternalOpen] = useState(false)
     const [internalValues, setInternalValues] = useState(
-        new Set<string>(values ?? defaultValues),
+        new Set<string>(values ?? defaultValues)
     )
     const selectedValues = values ? new Set(values) : internalValues
-    const isControlled = open !== undefined && setOpen !== undefined;
-    const isOpen = isControlled ? open : internalOpen;
+    const [items, setItems] = useState<Map<string, ReactNode>>(new Map())
 
-    const [items, setItems] = useState<Map<string, ReactNode>>(new Map());
+    const isControlled = open !== undefined && onOpenChange !== undefined
+    const isOpen = isControlled ? open : internalOpen
+
+    const handleOpenChange = (newOpen: boolean) => {
+        if (isControlled) {
+            onOpenChange(newOpen)
+        } else {
+            setInternalOpen(newOpen)
+        }
+    }
 
     function toggleValue(value: string) {
         const getNewSet = (prev: Set<string>) => {
             const newSet = new Set(prev)
-            if (newSet.has(value)) {
-                newSet.delete(value)
-            } else {
+            if (mode === 'single') {
+                newSet.clear()
                 newSet.add(value)
+            } else {
+                if (newSet.has(value)) {
+                    newSet.delete(value)
+                } else {
+                    newSet.add(value)
+                }
             }
             return newSet
         }
         setInternalValues(getNewSet)
         onValuesChange?.([...getNewSet(selectedValues)])
+
+        if (mode === 'single') {
+            handleOpenChange(false)
+        }
     }
+
     const onItemAdded = useCallback((value: string, label: ReactNode) => {
         setItems(prev => {
-            if (prev?.get(value) === label) return prev
+            if (prev.get(value) === label) return prev
             return new Map(prev).set(value, label)
         })
     }, [])
-    const handleOpenChange = (newOpen: boolean) => {
-        if (isControlled) {
-            setOpen(newOpen);
-        } else {
-            setInternalOpen(newOpen);
-        }
-    };
-
-    const handleClose = () => {
-        if (closeOnSelect && mode === 'single') {
-            handleOpenChange(false);
-        }
-    };
 
     return (
-        <comboboxContext.Provider
-            value={{ // NOSONAR
+        <ComboboxContext
+            value={{
                 open: isOpen,
                 setOpen: handleOpenChange,
                 selectedValues,
                 toggleValue,
                 items,
                 onItemAdded,
-                handleClose,
                 mode
             }}
         >
-            <Popover open={isOpen} onOpenChange={handleOpenChange} modal={!inDialog}>
-                <PopoverTrigger asChild>
-                    <Button disabled={disabled} className="justify-between w-full px-3 font-normal text-start " variant="outline">
-                        {selectedValues && selectedValues.size > 0 ? (
-                            <div className='relative flex flex-wrap items-center flex-grow mr-auto overflow-hidden'>
-                                <span>
-                                    {renderSelectedValue
-                                        ? renderSelectedValue(selectedValues, items)
-                                        : mode === 'multiple' && Array.isArray(selectedValues)
-                                            ? Array.from(selectedValues)
-                                                .map(
-                                                    (selectedValue: string) =>
-                                                        items.find((item) => item.value === selectedValue)
-                                                            ?.label
-                                                )
-                                                .join(', ')
-                                            : items.find((item) => item.value === selectedValue)?.label}
-                                </span>
-                            </div>
-                        ) : (
-                            triggerLabel ?? 'Select Item...'
-                        )}
-                        <ChevronsUpDown className='w-4 h-4 ml-2 opacity-50 shrink-0' />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-1 PopoverContent">
-                    <Command
-                        filter={(value, search) => {
-                            if (value.toLocaleLowerCase().includes(search.toLocaleLowerCase())) return 1;
-                            return 0;
-                        }}
-                    >
-                        <CommandInput placeholder="Search..." value={query} onValueChange={(value: string) => setQuery(value)} />
-                        <CommandList >
-                            <CommandEmpty
-                                onClick={() => {
-                                    if (onCreate) {
-                                        onCreate(query);
-                                        setQuery('');
-                                        handleClose();
-                                    }
-                                }}
-                            >
-                                {onCreate ? (
-                                    <div className="flex gap-2 px-2">
-                                        <p>Create: </p>
-                                        <p className='block font-semibold truncate max-w-48 text-primary'>
-                                            {query}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    'Not found'
-                                )}
-                            </CommandEmpty>
-                            <CommandGroup >
-                                <ScrollArea className="h-[280px]" type="always">
-                                    {children}
-                                </ScrollArea>
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
+            <Popover open={isOpen} onOpenChange={handleOpenChange} modal={true}>
+                {children}
             </Popover>
-        </comboboxContext.Provider>
+        </ComboboxContext>
     )
 }
 
-
-export function ComboboxItem({
-    value,
+export function ComboboxTrigger({
+    className,
     children,
-    onSelect
-}: Readonly<{
-    value: string,
-    children: React.ReactNode
-    onSelect?: (value: string) => void
-}>) {
-    const { onItemAdded, selectedValues, toggleValue, handleClose, mode } = useComboboxContext();
-    const isSelected = selectedValues.has(value)
-    React.useEffect(() => {
-        onItemAdded(value, children);
-    }, [value, children, onItemAdded]);
+    ...props
+}: {
+    className?: string
+    children?: ReactNode
+} & ComponentPropsWithoutRef<typeof Button>) {
+    const { open } = useComboboxContext()
 
     return (
-        <CommandItem
-            value={value}
-            onSelect={(value) => {
-                toggleValue(value);
-                onSelect?.(value);
-                handleClose();
-            }}
-        >
-            {mode === 'multiple' && (
-                <div className={cn(
-                    "flex items-center justify-center w-4 h-4 mr-2 border border-gray-300 rounded-sm shrink-0",
-                    isSelected ? "bg-primary" : "bg-lighter-gray"
-                )}>
-                    <Check className={cn(
-                        "text-white",
-                        isSelected ? "opacity-100" : "opacity-0"
-                    )} />
-                </div>
-            )}
-            {children}
-        </CommandItem>
+        <PopoverTrigger asChild>
+            <Button
+                {...props}
+                variant={props.variant ?? "outline"}
+                role={props.role ?? "combobox"}
+                aria-expanded={props["aria-expanded"] ?? open}
+                className={cn(
+                    "flex h-auto min-h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 py-1.5 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[placeholder]:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+                    className,
+                )}
+            >
+                {children}
+                <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
+            </Button>
+        </PopoverTrigger>
     )
 }
 
-interface ComboboxSelectedValueProps {
-    placeholder?: string | React.ReactNode;
-    clickToRemove?: boolean;
-}
+export function ComboboxValue({
+    placeholder,
+    clickToRemove = true,
+    className,
+    overflowBehavior = "wrap-when-open",
+    ...props
+}: {
+    placeholder?: string
+    clickToRemove?: boolean
+    overflowBehavior?: "wrap" | "wrap-when-open" | "cutoff"
+} & Omit<ComponentPropsWithoutRef<"div">, "children">) {
+    const { selectedValues, toggleValue, items, open, mode } = useComboboxContext()
+    const [overflowAmount, setOverflowAmount] = useState(0)
+    const valueRef = useRef<HTMLDivElement>(null)
+    const overflowRef = useRef<HTMLDivElement>(null)
 
-export function ComboboxSelectedValue({ placeholder = 'Select Item...', clickToRemove = false }: Readonly<ComboboxSelectedValueProps>) {
-    const { selectedValues, items, toggleValue } = useComboboxContext();
-    if (selectedValues.size === 0) {
-        return <span>{placeholder}</span>
+    const shouldWrap =
+        overflowBehavior === "wrap" ||
+        (overflowBehavior === "wrap-when-open" && open)
+
+    const checkOverflow = useCallback(() => {
+        if (valueRef.current == null) return
+
+        const containerElement = valueRef.current
+        const overflowElement = overflowRef.current
+        const items = containerElement.querySelectorAll<HTMLElement>(
+            "[data-selected-item]",
+        )
+
+        if (overflowElement != null) overflowElement.style.display = "none"
+        items.forEach(child => child.style.removeProperty("display"))
+        let amount = 0
+        for (let i = items.length - 1; i >= 0; i--) {
+            const child = items[i]!
+            if (containerElement.scrollWidth <= containerElement.clientWidth) {
+                break
+            }
+            amount = items.length - i
+            child.style.display = "none"
+            overflowElement?.style.removeProperty("display")
+        }
+        setOverflowAmount(amount)
+    }, [])
+
+    const handleResize = useCallback(
+        (node: HTMLDivElement | null) => {
+            if (node == null) return
+
+            valueRef.current = node
+
+            const mutationObserver = new MutationObserver(checkOverflow)
+            const observer = new ResizeObserver(debounce(checkOverflow, 100))
+
+            mutationObserver.observe(node, {
+                childList: true,
+                attributes: true,
+                attributeFilter: ["class", "style"],
+            })
+            observer.observe(node)
+
+            return () => {
+                observer.disconnect()
+                mutationObserver.disconnect()
+                valueRef.current = null
+            }
+        },
+        [checkOverflow],
+    )
+
+    if (selectedValues.size === 0 && placeholder) {
+        return (
+            <span className="min-w-0 overflow-hidden font-normal text-muted-foreground">
+                {placeholder}
+            </span>
+        )
     }
+
     return (
-        <Button className="justify-between w-full px-3 font-normal text-start " variant="outline">
+        <div
+            {...props}
+            ref={handleResize}
+            className={cn(
+                "flex w-full gap-1.5 overflow-hidden",
+                shouldWrap && "h-full flex-wrap",
+                className,
+            )}
+        >
             {[...selectedValues]
                 .filter(value => items.has(value))
                 .map(value => (
@@ -263,7 +248,7 @@ export function ComboboxSelectedValue({ placeholder = 'Select Item...', clickToR
                         className="group flex items-center gap-1"
                         key={value}
                         onClick={
-                            clickToRemove
+                            clickToRemove && mode === 'multiple'
                                 ? e => {
                                     e.stopPropagation()
                                     toggleValue(value)
@@ -272,11 +257,118 @@ export function ComboboxSelectedValue({ placeholder = 'Select Item...', clickToR
                         }
                     >
                         {items.get(value)}
-                        {clickToRemove && (
+                        {clickToRemove && mode === 'multiple' && (
                             <XIcon className="size-2 text-muted-foreground group-hover:text-destructive" />
                         )}
                     </Badge>
                 ))}
-        </Button>
+            <Badge
+                style={{
+                    display: overflowAmount > 0 && !shouldWrap ? "block" : "none",
+                }}
+                variant="outline"
+                ref={overflowRef}
+            >
+                +{overflowAmount}
+            </Badge>
+        </div>
     )
+}
+
+export function ComboboxContent({
+    search = true,
+    children,
+    ...props
+}: {
+    search?: boolean | { placeholder?: string; emptyMessage?: string }
+    children: ReactNode
+} & Omit<ComponentPropsWithoutRef<typeof Command>, "children">) {
+    const canSearch = typeof search === "object" ? true : search
+
+    return (
+        <>
+            <div style={{ display: "none" }}>
+                <Command>
+                    <CommandList>{children}</CommandList>
+                </Command>
+            </div>
+            <PopoverContent className="min-w-[var(--radix-popover-trigger-width)] p-0">
+                <Command {...props}>
+                    {canSearch ? (
+                        <CommandInput
+                            placeholder={
+                                typeof search === "object" ? search.placeholder : undefined
+                            }
+                        />
+                    ) : (
+                        <button autoFocus className="sr-only" />
+                    )}
+                    <CommandList>
+                        {canSearch && (
+                            <CommandEmpty>
+                                {typeof search === "object" ? search.emptyMessage : undefined}
+                            </CommandEmpty>
+                        )}
+                        {children}
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </>
+    )
+}
+
+export function ComboboxItem({
+    value,
+    children,
+    badgeLabel,
+    onSelect,
+    ...props
+}: {
+    badgeLabel?: ReactNode
+    value: string
+} & Omit<ComponentPropsWithoutRef<typeof CommandItem>, "value">) {
+    const { toggleValue, selectedValues, onItemAdded } = useComboboxContext()
+    const isSelected = selectedValues.has(value)
+
+    useEffect(() => {
+        onItemAdded(value, badgeLabel ?? children)
+    }, [value, children, onItemAdded, badgeLabel])
+
+    return (
+        <CommandItem
+            {...props}
+            onSelect={() => {
+                toggleValue(value)
+                onSelect?.(value)
+            }}
+        >
+            <Check
+                className={cn("mr-2 size-4", isSelected ? "opacity-100" : "opacity-0")}
+            />
+            {children}
+        </CommandItem>
+    )
+}
+
+export function ComboboxGroup(
+    props: ComponentPropsWithoutRef<typeof CommandGroup>,
+) {
+    return <CommandGroup {...props} />
+}
+
+export function ComboboxSeparator(
+    props: ComponentPropsWithoutRef<typeof CommandSeparator>,
+) {
+    return <CommandSeparator {...props} />
+}
+
+function debounce<T extends (...args: never[]) => void>(
+    func: T,
+    wait: number,
+): (...args: Parameters<T>) => void {
+    let timeout: ReturnType<typeof setTimeout> | null = null
+    return function (this: unknown, ...args: Parameters<T>) {
+        if (timeout) clearTimeout(timeout)
+        timeout = setTimeout(() => func.apply(this, args), wait)
+    }
 }
