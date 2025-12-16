@@ -5,6 +5,8 @@ import { countDownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-
 import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
 
+import { testDialog } from "./test-dialog"
+
 export default function Page() {
   return (
     <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
@@ -66,6 +68,15 @@ export default function Page() {
           }}
         >
           Dialog dismissed after 5 seconds
+        </Button>
+        <Button
+          onClick={() => {
+            testDialog().async().then((result) => {
+              console.log(result)
+            })
+          }}
+        >
+          Test Dialog
         </Button>
       </main>
       <DynamicDialogProvider />

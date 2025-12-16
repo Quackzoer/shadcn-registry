@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog-state';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
 import { Dialog } from '@/registry/ui/dialog';
+import { AlertDialog } from '../alert-dialog';
 
 function DynamicDialog(props: Readonly<DialogState>) {
 
@@ -43,7 +44,9 @@ function DynamicDialog(props: Readonly<DialogState>) {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      {props.render?.(renderProps)}
+      <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+        {props.render?.(renderProps)}
+      </AlertDialog>
     </Dialog>
   );
 }
