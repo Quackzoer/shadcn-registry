@@ -25,8 +25,6 @@ function DynamicDialog(props: Readonly<DialogState>) {
     confirm,
     deny,
     dismiss,
-    onOpen: props.onOpen,
-    onClose: props.onClose,
   };
 
   return (

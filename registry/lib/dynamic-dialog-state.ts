@@ -11,7 +11,10 @@ export interface DialogCallbacks {
   onClose: () => void;
 }
 
-export interface DialogRendererProps<T = unknown> extends DialogActions<T>, DialogCallbacks {}
+export interface DialogRendererProps<T = unknown> extends DialogActions<T> {}
+
+/** Combine custom component props with the dialog action injections. TValue is what confirm(value) returns. */
+export type DialogComponentProps<TProps, TValue = void> = TProps & DialogRendererProps<TValue>;
 
 export type DialogUserConfig = Partial<DialogCallbacks> & {
   singleton?: boolean;

@@ -8,14 +8,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog-state";
-import { dialog } from "@/registry/lib/dynamic-dialog-state";
+import { dialog, type DialogComponentProps } from "@/registry/lib/dynamic-dialog-state";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;
 }
 
-export function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRendererProps<{itemName: string}>) {
+export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDialogProps, {itemName: string}>) {
   const schema = z.object({
     itemName: z.literal(props.itemName)
   })

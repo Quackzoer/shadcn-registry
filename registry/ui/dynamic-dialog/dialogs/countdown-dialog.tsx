@@ -1,7 +1,6 @@
 "use client"
 
-import { dialog } from '@/registry/lib/dynamic-dialog-state';
-import { type DialogRendererProps } from '@/registry/lib/dynamic-dialog-state';
+import { dialog, type DialogComponentProps } from '@/registry/lib/dynamic-dialog-state';
 import { Button } from "@/registry/ui/button";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
 import { Clock } from "lucide-react";
@@ -13,7 +12,7 @@ export interface CountdownDialogProps {
   showProgress?: boolean;
 }
 
-export function CountdownDialog(props: CountdownDialogProps & DialogRendererProps<string>) {
+export function CountdownDialog(props: DialogComponentProps<CountdownDialogProps, string>) {
   const [timeRemaining, setTimeRemaining] = useState(props.countdownSeconds);
   const [isActive, setIsActive] = useState(true);
 

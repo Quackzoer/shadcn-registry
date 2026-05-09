@@ -1,7 +1,6 @@
 "use client"
 
-import { dialog } from "@/registry/lib/dynamic-dialog-state";
-import { type DialogRendererProps } from "@/registry/lib/dynamic-dialog-state";
+import { dialog, type DialogComponentProps } from "@/registry/lib/dynamic-dialog-state";
 import { Button } from "@/registry/ui/button";
 import { AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
@@ -12,7 +11,7 @@ export interface ConfirmDialogProps{
   description: ReactNode;
 }
 
-export function ConfirmDialog(props: ConfirmDialogProps & DialogRendererProps<boolean>) {
+export function ConfirmDialog(props: DialogComponentProps<ConfirmDialogProps, boolean>) {
   return (
     <AlertDialogContent>
       <AlertDialogHeader>

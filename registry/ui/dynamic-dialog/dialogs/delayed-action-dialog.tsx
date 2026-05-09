@@ -1,7 +1,6 @@
 "use client"
 
-import { dialog } from '@/registry/lib/dynamic-dialog-state';
-import { type DialogRendererProps } from '@/registry/lib/dynamic-dialog-state';
+import { dialog, type DialogComponentProps } from '@/registry/lib/dynamic-dialog-state';
 import { Button } from "@/registry/ui/button";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
 import { AlertTriangle, Check, Clock } from "lucide-react";
@@ -14,7 +13,7 @@ export interface DelayedActionDialogProps {
   dangerAction?: boolean;
 }
 
-export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRendererProps<boolean>) {
+export function DelayedActionDialog(props: DialogComponentProps<DelayedActionDialogProps, boolean>) {
   const [timeRemaining, setTimeRemaining] = useState(props.delaySeconds);
   const [canInteract, setCanInteract] = useState(false);
 
