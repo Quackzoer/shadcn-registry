@@ -15,7 +15,7 @@ export default function Home() {
       </header>
       <main className="flex flex-col flex-1 gap-8">
         <Button asChild>
-          <Link href="/confirmation-dialog">Confirmation Dialog Example</Link>
+          <Link href="/dynamic-dialog">Confirmation Dialog Example</Link>
         </Button>
       </main>
     </div>
