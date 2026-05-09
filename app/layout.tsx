@@ -39,6 +39,12 @@ export default function RootLayout({
             <li>
               <Link href="/react-query-factory">React Query Factory Example</Link>
             </li>
+            <li>
+              <Link href="/combobox">Combobox Example</Link>
+            </li>
+            <li>
+              <Link href="/mark-searched-phrase">Mark Searched Phrase Example</Link>
+            </li>
           </ol>
         </nav>
         {children}
