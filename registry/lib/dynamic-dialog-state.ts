@@ -30,26 +30,29 @@ export interface DialogState<T = unknown> extends DialogProps<T>, DialogCallback
 
 export type DismissReason = Autocomplete<"backdrop" | "cancel" | "close" | "esc" | "timer">;
 
-export interface DialogResult<T = unknown> {
+export interface DialogResultData<T = unknown> {
   id: string;
   isConfirmed: boolean;
   isDenied: boolean;
   isDismissed: boolean;
-  open: boolean;
-  /** Resolved value — undefined until the dialog closes. Use `.async()` to await. */
-  value: T | undefined;
+  value?: T;
   dismissReason?: DismissReason;
+}
+
+/**
+ * Returned immediately when a dialog is shown. Await it to get the result once the user acts.
+ *
+ * @example
+ * ```ts
+ * const { isConfirmed, value } = await confirmDialog({ title: 'Delete?' });
+ * if (isConfirmed) deleteItem();
+ * ```
+ */
+export interface DialogResult<T = unknown> extends PromiseLike<DialogResultData<T>> {
+  id: string;
+  open: boolean;
   dismiss: (reason?: DismissReason, value?: T) => void;
-  /** Update renderer props on an open dialog, triggering a re-render. */
   update: (newProps: Record<string, unknown>) => void;
-  async: () => Promise<{
-    id: string;
-    isConfirmed: boolean;
-    isDenied: boolean;
-    isDismissed: boolean;
-    value?: T;
-    dismissReason?: DismissReason;
-  }>;
 }
 
 export type DismissData<T = unknown> = {
@@ -70,16 +73,7 @@ class DialogObservable {
   private dialogId = 0;
   private pendingDialogs = new Map<
     string,
-    {
-      resolve: (value: {
-        id: string;
-        isConfirmed: boolean;
-        isDenied: boolean;
-        isDismissed: boolean;
-        value?: unknown;
-        dismissReason?: DismissReason;
-      }) => void;
-    }
+    { resolve: (value: DialogResultData) => void }
   >();
 
   subscribe(
@@ -101,9 +95,9 @@ class DialogObservable {
     this.subscribers.forEach((callback) => callback(action, data));
   }
 
-  showDialog<ReturnValue = unknown>(
-    props: Partial<DialogProps<ReturnValue>> & DialogUserConfig
-  ): BaseDialogResult<ReturnValue> {
+  showDialog<T = unknown>(
+    props: Partial<DialogProps<T>> & DialogUserConfig
+  ): BaseDialogResult<T> {
     const id = props.id || `dialog-${++this.dialogId}`;
 
     if (!props.render) {
@@ -114,59 +108,29 @@ class DialogObservable {
       this.dismissDialog(id, 'close');
     }
 
-    let resolvedData: {
-      isConfirmed: boolean;
-      isDenied: boolean;
-      isDismissed: boolean;
-      value?: ReturnValue;
-      dismissReason?: DismissReason;
-    } | null = null;
     let isDialogOpen = true;
 
-    const valuePromise = new Promise<ReturnValue | undefined>((resolve) => {
+    const resultPromise = new Promise<DialogResultData<T>>((resolve) => {
       this.pendingDialogs.set(id, {
-        resolve: (result) => {
-          resolvedData = {
-            isConfirmed: result.isConfirmed,
-            isDenied: result.isDenied,
-            isDismissed: result.isDismissed,
-            value: result.value as ReturnValue,
-            dismissReason: result.dismissReason,
-          };
+        resolve: (data) => {
           isDialogOpen = false;
-          resolve(result.value as ReturnValue);
+          resolve(data as DialogResultData<T>);
         },
       });
     });
 
-    const dismissFn = (reason: DismissReason = "close", value?: ReturnValue) => {
-      this.dismissDialog(id, reason, value);
-    };
-
     this.notify("SHOW_DIALOG", { ...props, id });
-
-    const asyncFn = async () => {
-      await valuePromise;
-      return {
-        id,
-        isConfirmed: resolvedData?.isConfirmed ?? false,
-        isDenied: resolvedData?.isDenied ?? false,
-        isDismissed: resolvedData?.isDismissed ?? false,
-        value: resolvedData?.value,
-        dismissReason: resolvedData?.dismissReason,
-      };
-    };
 
     return {
       id,
-      get isConfirmed() { return resolvedData?.isConfirmed ?? false; },
-      get isDenied() { return resolvedData?.isDenied ?? false; },
-      get isDismissed() { return resolvedData?.isDismissed ?? false; },
       get open() { return isDialogOpen; },
-      get value() { return resolvedData?.value; },
-      get dismissReason() { return resolvedData?.dismissReason; },
-      dismiss: dismissFn,
-      async: asyncFn,
+      dismiss: (reason: DismissReason = "close", value?: T) => {
+        this.dismissDialog(id, reason, value);
+      },
+      then: <TResult1 = DialogResultData<T>, TResult2 = never>(
+        onFulfilled?: ((value: DialogResultData<T>) => TResult1 | PromiseLike<TResult1>) | null,
+        onRejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
+      ) => resultPromise.then(onFulfilled, onRejected),
     };
   }
 
@@ -223,24 +187,17 @@ function isDialogOptions(arg: unknown): arg is Partial<DialogProps> & DialogUser
 
 /**
  * Creates a dialog function that can be called with props to show a dialog.
+ * The returned result is awaitable — `await` it to get the user's response.
  *
- * @param render - A function that takes dialog properties and returns a React node.
- * @param defaultOptions - Default dialog configuration options.
- * @returns A function that accepts renderer props and dialog options to show the dialog.
- *
- * @example - Basic usage with a custom renderer:
+ * @example - Basic usage:
  * ```ts
- * const CustomComponent = (props: DialogRendererProps<boolean> & { customProp: string }) => <div>...</div>;
- * const customDialog = dialog(CustomComponent);
- * const result = customDialog({ customProp: 'value' }); // TypeScript knows customProp is required!
- * const { isConfirmed, value } = await result.async();
+ * const { isConfirmed } = await confirmDialog({ title: 'Delete?' });
  * ```
- * @example - Usage with no custom props:
+ * @example - With custom props:
  * ```ts
- * const ExampleComponent = (props: DialogRendererProps<string>) => <div>...</div>;
- * const asyncDialog = dialog(ExampleComponent);
- * const result = asyncDialog({ id: 'my-dialog' });
- * const { isConfirmed } = await result.async();
+ * const CustomComponent = (props: DialogRendererProps<boolean> & { label: string }) => <div>...</div>;
+ * const customDialog = dialog(CustomComponent);
+ * const { isConfirmed } = await customDialog({ label: 'Confirm' });
  * ```
  * @example - Updating a dialog after showing it:
  * ```ts
@@ -249,7 +206,7 @@ function isDialogOptions(arg: unknown): arg is Partial<DialogProps> & DialogUser
  * ```
  * @example - Singleton — replaces any existing dialog with the same ID:
  * ```ts
- * const result = myDialog({ id: 'confirm' }, { singleton: true });
+ * await myDialog({ id: 'confirm' }, { singleton: true });
  * ```
  */
 export function dialog<TProps extends DialogRendererProps<TValue>, TValue = TProps extends DialogRendererProps<infer V> ? V : unknown>(
@@ -290,14 +247,9 @@ export function dialog<TProps extends DialogRendererProps<TValue>, TValue = TPro
 
     return {
       get id() { return baseResult.id; },
-      get isConfirmed() { return baseResult.isConfirmed; },
-      get isDenied() { return baseResult.isDenied; },
-      get isDismissed() { return baseResult.isDismissed; },
       get open() { return baseResult.open; },
-      get value() { return baseResult.value; },
-      get dismissReason() { return baseResult.dismissReason; },
       dismiss: baseResult.dismiss,
-      async: baseResult.async,
+      then: baseResult.then,
       update: (newProps: Record<string, unknown>) => {
         rendererPropsRef.current = { ...rendererPropsRef.current, ...newProps } as RendererProps;
         dialogObservable.updateDialog(baseResult.id);

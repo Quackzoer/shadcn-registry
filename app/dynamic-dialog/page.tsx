@@ -21,7 +21,7 @@ export default function Page() {
           onClick={() => {
             countdownDialog({
               countdownSeconds: 5,
-            }).async().then((result) => {
+            }).then((result) => {
               console.log(result)
             })
           }}
@@ -32,7 +32,7 @@ export default function Page() {
           onClick={() => {
             typeToConfirmDialog({
               itemName: 'some-file.txt'
-            }).async().then((result) => {
+            }).then((result) => {
               console.log(result)
             })
           }}
@@ -47,10 +47,10 @@ export default function Page() {
             const countdownDialogRes = countdownDialog({
               countdownSeconds: 10,
             })
-            typeToConfirmDialogRes.async().then(({ value }) => {
+            typeToConfirmDialogRes.then(({ value }) => {
               console.log('Type to confirm result:', value)
             })
-            countdownDialogRes.async().then(({ value }) => {
+            countdownDialogRes.then(({ value }) => {
               console.log('Countdown dialog result:', value)
             })
           }}
@@ -71,7 +71,7 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            testDialog().async().then((result) => {
+            testDialog().then((result) => {
               console.log(result)
             })
           }}
