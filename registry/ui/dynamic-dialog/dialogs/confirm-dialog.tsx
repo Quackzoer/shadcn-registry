@@ -34,7 +34,7 @@ export function ConfirmDialog(props: ConfirmDialogProps & DialogRendererProps<bo
       <div className="flex justify-end space-x-3 pt-2">
         <Button
           type="button"
-          onClick={() => props.cancel()}
+          onClick={() => props.dismiss("cancel")}
           variant={"outline"}
         >
           Cancel

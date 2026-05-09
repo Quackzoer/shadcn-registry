@@ -85,7 +85,7 @@ export function TypeToConfirmDialog(props: TypeToConfirmDialogProps & DialogRend
           <div className="flex justify-end space-x-3 pt-2">
             <Button
               type="button"
-              onClick={() => props.cancel()}
+              onClick={() => props.dismiss("cancel")}
               variant={"outline"}
             >
               Cancel

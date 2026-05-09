@@ -32,7 +32,7 @@ export function CountdownDialog(props: CountdownDialogProps & DialogRendererProp
 
   const handleCancel = () => {
     setIsActive(false);
-    props.cancel();
+    props.dismiss("cancel");
   };
 
   const handleConfirm = () => {
@@ -135,4 +135,4 @@ export function CountdownDialog(props: CountdownDialogProps & DialogRendererProp
   );
 }
 
-export const countDownDialog = dialog(CountdownDialog);
+export const countdownDialog = dialog(CountdownDialog);

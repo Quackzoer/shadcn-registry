@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/registry/ui/button"
-import { countDownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
+import { countdownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
 import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
 
@@ -19,7 +19,7 @@ export default function Page() {
       <main className="flex flex-col flex-1 gap-8">
         <Button
           onClick={() => {
-            countDownDialog({
+            countdownDialog({
               countdownSeconds: 5,
             }).async().then((result) => {
               console.log(result)
@@ -44,14 +44,14 @@ export default function Page() {
             const typeToConfirmDialogRes = typeToConfirmDialog({
               itemName: 'some-file.txt',
             })
-            const countDownDialogRes = countDownDialog({
+            const countdownDialogRes = countdownDialog({
               countdownSeconds: 10,
             })
-            typeToConfirmDialogRes.value.then((result) => {
-              console.log('Type to confirm result:', result)
+            typeToConfirmDialogRes.async().then(({ value }) => {
+              console.log('Type to confirm result:', value)
             })
-            countDownDialogRes.value.then((result) => {
-              console.log('Countdown dialog result:', result)
+            countdownDialogRes.async().then(({ value }) => {
+              console.log('Countdown dialog result:', value)
             })
           }}
         >
@@ -59,11 +59,11 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const countDownDialogRes = countDownDialog({
+            const countdownDialogRes = countdownDialog({
               countdownSeconds: 20,
             })
             setTimeout(() => {
-              countDownDialogRes.dismiss("timer", 'Dismissed after 5 seconds')
+              countdownDialogRes.dismiss("timer", 'Dismissed after 5 seconds')
             }, 5000)
           }}
         >

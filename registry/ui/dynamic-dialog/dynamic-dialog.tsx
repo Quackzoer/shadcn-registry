@@ -1,45 +1,32 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog-state';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
 import { Dialog } from '@/registry/ui/dialog';
 import { AlertDialog } from '../alert-dialog';
 
 function DynamicDialog(props: Readonly<DialogState>) {
+  const onOpenRef = useRef(props.onOpen);
+  const onCloseRef = useRef(props.onClose);
+  onOpenRef.current = props.onOpen;
+  onCloseRef.current = props.onClose;
 
   useEffect(() => {
-    props.onOpen();
-    return () => props.onClose();
-  }, [props]);
+    onOpenRef.current();
+    return () => { onCloseRef.current(); };
+  }, []);
 
-  const confirm = (value?: unknown) => {
-    dialogObservable.confirmDialog(props.id, value);
-  };
-
-  const deny = (value?: unknown) => {
-    dialogObservable.denyDialog(props.id, value);
-  };
-
-  const cancel = () => {
-    dialogObservable.dismissDialog(props.id, "cancel");
-  };
-
-  const dismiss = (reason: DismissReason, value?: unknown) => {
-    dialogObservable.dismissDialog(props.id, reason, value);
-  };
-
-  const closeDialog = () => {
-    dialogObservable.dismissDialog(props.id, "close");
-  };
+  const confirm = (value?: unknown) => dialogObservable.confirmDialog(props.id, value);
+  const deny = (value?: unknown) => dialogObservable.denyDialog(props.id, value);
+  const dismiss = (reason: DismissReason, value?: unknown) => dialogObservable.dismissDialog(props.id, reason, value);
 
   const renderProps: DialogRendererProps = {
-    ...props,
     confirm,
     deny,
-    cancel,
     dismiss,
-    closeDialog
+    onOpen: props.onOpen,
+    onClose: props.onClose,
   };
 
   return (
@@ -63,8 +50,9 @@ export function DynamicDialogProvider() {
             id: data.id!,
             render: data.render!,
             open: true,
-            onOpen: data.onOpen || (() => { }),
-            onClose: data.onClose || (() => { }),
+            _version: 0,
+            onOpen: data.onOpen || (() => {}),
+            onClose: data.onClose || (() => {}),
             onOpenChange: (open: boolean) => {
               if (!open) {
                 dialogObservable.dismissDialog(data.id!, "close");
@@ -78,6 +66,12 @@ export function DynamicDialogProvider() {
           setDialogs(current => current.filter(d => d.id !== data.id));
           break;
         }
+        case 'UPDATE_DIALOG': {
+          setDialogs(current =>
+            current.map(d => d.id === data.id ? { ...d, _version: d._version + 1 } : d)
+          );
+          break;
+        }
       }
     });
 
@@ -87,10 +81,7 @@ export function DynamicDialogProvider() {
   return (
     <>
       {dialogs.map(dialog => (
-        <DynamicDialog
-          key={dialog.id}
-          {...dialog}
-        />
+        <DynamicDialog key={dialog.id} {...dialog} />
       ))}
     </>
   );

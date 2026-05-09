@@ -39,7 +39,7 @@ export function DelayedActionDialog(props: DelayedActionDialogProps & DialogRend
 
   const handleCancel = () => {
     if (props.allowCancel !== false) {
-      props.cancel();
+      props.dismiss("cancel");
     }
   };
 
