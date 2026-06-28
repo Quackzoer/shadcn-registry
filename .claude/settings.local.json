@@ -5,7 +5,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(gh api *)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(node_modules/.bin/tsc --noEmit)"
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

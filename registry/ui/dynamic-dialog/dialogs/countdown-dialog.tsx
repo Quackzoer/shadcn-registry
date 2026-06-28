@@ -12,36 +12,38 @@ export interface CountdownDialogProps {
   showProgress?: boolean;
 }
 
+const circumference = 2 * Math.PI * 28;
+
 export function CountdownDialog(props: DialogComponentProps<CountdownDialogProps, string>) {
   const [timeRemaining, setTimeRemaining] = useState(props.countdownSeconds);
-  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    if (timeRemaining > -1 && isActive) {
-      const timer = setTimeout(() => {
-        setTimeRemaining(prev => prev - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeRemaining === 0 && props.autoConfirm) {
-      props.confirm('auto-confirmed');
-    }
-  }, [timeRemaining, isActive, props]);
+    const countdownInterval = setInterval(() => {
+      setTimeRemaining(prev => Math.max(0, prev - 1));
+    }, 1000);
 
-  const progressPercentage = ((props.countdownSeconds - timeRemaining) / props.countdownSeconds) * 100;
+    const doneTimer = setTimeout(() => {
+      clearInterval(countdownInterval);
+      if (props.autoConfirm) props.confirm('auto-confirmed');
+    }, props.countdownSeconds * 1000);
 
-  const handleCancel = () => {
-    setIsActive(false);
-    props.dismiss("cancel");
-  };
+    return () => {
+      clearInterval(countdownInterval);
+      clearTimeout(doneTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleConfirm = () => {
-    setIsActive(false);
-    props.confirm('confirm pressed');
-  };
+  const handleCancel = () => props.dismiss("cancel");
+  const handleConfirm = () => props.confirm('confirm pressed');
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent>
+        <style>{`
+          @keyframes __cd-bar { from { width: 0% } to { width: 100% } }
+          @keyframes __cd-circle { from { stroke-dashoffset: ${circumference} } to { stroke-dashoffset: 0 } }
+        `}</style>
         <DialogHeader>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -69,8 +71,8 @@ export function CountdownDialog(props: DialogComponentProps<CountdownDialogProps
               </div>
               <div className="w-full bg-muted rounded-full h-2">
                 <div
-                  className="bg-primary h-2 rounded-full transition-all duration-1000 ease-linear"
-                  style={{ width: `${progressPercentage}%` }}
+                  className="bg-primary h-2 rounded-full"
+                  style={{ animation: `__cd-bar ${props.countdownSeconds}s linear forwards` }}
                 />
               </div>
             </div>
@@ -95,9 +97,9 @@ export function CountdownDialog(props: DialogComponentProps<CountdownDialogProps
                   stroke="currentColor"
                   strokeWidth="4"
                   fill="none"
-                  strokeDasharray={`${2 * Math.PI * 28}`}
-                  strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
-                  className="text-primary transition-all duration-1000 ease-linear"
+                  strokeDasharray={circumference}
+                  className="text-primary"
+                  style={{ animation: `__cd-circle ${props.countdownSeconds}s linear forwards` }}
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">

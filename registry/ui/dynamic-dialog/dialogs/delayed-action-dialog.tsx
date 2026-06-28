@@ -13,22 +13,28 @@ export interface DelayedActionDialogProps {
   dangerAction?: boolean;
 }
 
+const circumference = 2 * Math.PI * 20;
+
 export function DelayedActionDialog(props: DialogComponentProps<DelayedActionDialogProps, boolean>) {
   const [timeRemaining, setTimeRemaining] = useState(props.delaySeconds);
   const [canInteract, setCanInteract] = useState(false);
 
   useEffect(() => {
-    if (timeRemaining > 0) {
-      const timer = setTimeout(() => {
-        setTimeRemaining(prev => prev - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setCanInteract(true);
-    }
-  }, [timeRemaining]);
+    const countdownInterval = setInterval(() => {
+      setTimeRemaining(prev => Math.max(0, prev - 1));
+    }, 1000);
 
-  const progressPercentage = ((props.delaySeconds - timeRemaining) / props.delaySeconds) * 100;
+    const enableTimer = setTimeout(() => {
+      setCanInteract(true);
+      clearInterval(countdownInterval);
+    }, props.delaySeconds * 1000);
+
+    return () => {
+      clearInterval(countdownInterval);
+      clearTimeout(enableTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleConfirm = () => {
     if (canInteract) props.confirm(true);
@@ -41,6 +47,10 @@ export function DelayedActionDialog(props: DialogComponentProps<DelayedActionDia
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent>
+        <style>{`
+          @keyframes __dal-bar { from { width: 0% } to { width: 100% } }
+          @keyframes __dal-circle { from { stroke-dashoffset: ${circumference} } to { stroke-dashoffset: 0 } }
+        `}</style>
         <DialogHeader>
           <div className="flex items-center gap-3 mb-4">
             <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
@@ -85,10 +95,10 @@ export function DelayedActionDialog(props: DialogComponentProps<DelayedActionDia
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full transition-all duration-1000 ease-linear ${
+                    className={`h-2 rounded-full ${
                       props.dangerAction ? 'bg-destructive' : 'bg-orange-500'
                     }`}
-                    style={{ width: `${progressPercentage}%` }}
+                    style={{ animation: `__dal-bar ${props.delaySeconds}s linear forwards` }}
                   />
                 </div>
               </div>
@@ -104,11 +114,9 @@ export function DelayedActionDialog(props: DialogComponentProps<DelayedActionDia
                       stroke="currentColor"
                       strokeWidth="3"
                       fill="none"
-                      strokeDasharray={`${2 * Math.PI * 20}`}
-                      strokeDashoffset={`${2 * Math.PI * 20 * (1 - progressPercentage / 100)}`}
-                      className={`transition-all duration-1000 ease-linear ${
-                        props.dangerAction ? 'text-destructive' : 'text-orange-500'
-                      }`}
+                      strokeDasharray={circumference}
+                      className={props.dangerAction ? 'text-destructive' : 'text-orange-500'}
+                      style={{ animation: `__dal-circle ${props.delaySeconds}s linear forwards` }}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
