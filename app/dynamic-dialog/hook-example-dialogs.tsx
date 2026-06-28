@@ -1,6 +1,6 @@
 "use client"
 
-import { dialog, type DialogComponentProps } from "@/registry/lib/dynamic-dialog-state";
+import { dialog } from "@/registry/lib/dynamic-dialog-state";
 import { useDynamicDialog } from "@/registry/ui/dynamic-dialog/dynamic-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/registry/ui/dialog";
 import { Button } from "@/registry/ui/button";
@@ -14,7 +14,7 @@ interface AutoCloseProps {
   closeAfterMs: number;
 }
 
-function AutoCloseDialog(_props: DialogComponentProps<AutoCloseProps>) {
+function AutoCloseDialog() {
   const { open, onOpenChange, dismiss, props } = useDynamicDialog<AutoCloseProps>();
   const [remaining, setRemaining] = useState(Math.ceil(props.closeAfterMs / 1000));
 
@@ -58,7 +58,7 @@ interface MessageProps {
   message: string;
 }
 
-function MessageDialog(_props: DialogComponentProps<MessageProps, string>) {
+function MessageDialog() {
   const { open, onOpenChange, confirm, dismiss, props } = useDynamicDialog<MessageProps, string>();
 
   return (
