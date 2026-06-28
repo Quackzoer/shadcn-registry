@@ -23,7 +23,6 @@ export function CountdownDialog(props: DialogComponentProps<CountdownDialogProps
     }, 1000);
 
     const doneTimer = setTimeout(() => {
-      clearInterval(countdownInterval);
       if (props.autoConfirm) props.confirm('auto-confirmed');
     }, props.countdownSeconds * 1000);
 

@@ -26,7 +26,6 @@ export function DelayedActionDialog(props: DialogComponentProps<DelayedActionDia
 
     const enableTimer = setTimeout(() => {
       setCanInteract(true);
-      clearInterval(countdownInterval);
     }, props.delaySeconds * 1000);
 
     return () => {
