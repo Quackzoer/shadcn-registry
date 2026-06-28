@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import React, { useState, useEffect, useContext, createContext, useRef } from 'react';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
 import type { DialogActions, DismissReason } from '@/registry/lib/dynamic-dialog-state';
 
@@ -24,12 +24,26 @@ interface DialogStateItem {
   open: boolean;
   Component: React.ComponentType<Record<string, unknown>>;
   componentProps: Record<string, unknown>;
+  beforeClose?: () => boolean | Promise<boolean>;
 }
 
-function DynamicDialogItem({ id, open, Component, componentProps }: DialogStateItem) {
+export interface DynamicDialogProviderProps {
+  /** Milliseconds to wait after close animation before unmounting the dialog. Must match the CSS exit animation duration. */
+  removeDelay?: number;
+}
+
+function DynamicDialogItem({ id, open, Component, componentProps, beforeClose }: DialogStateItem) {
   const confirm = (value?: unknown) => dialogObservable.confirmDialog(id, value);
   const dismiss = (reason?: DismissReason, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
-  const onOpenChange = (isOpen: boolean) => { if (!isOpen) dismiss('close'); };
+  const onOpenChange = async (isOpen: boolean) => {
+    if (!isOpen) {
+      if (beforeClose) {
+        const canClose = await beforeClose();
+        if (!canClose) return;
+      }
+      dismiss('close');
+    }
+  };
 
   const actions: DialogActions<unknown> = { confirm, dismiss, open, onOpenChange };
 
@@ -40,11 +54,13 @@ function DynamicDialogItem({ id, open, Component, componentProps }: DialogStateI
   );
 }
 
-export function DynamicDialogProvider() {
+export function DynamicDialogProvider({ removeDelay = 300 }: DynamicDialogProviderProps) {
   const [dialogs, setDialogs] = useState<DialogStateItem[]>([]);
+  const removeDelayRef = useRef(removeDelay);
+  removeDelayRef.current = removeDelay;
 
   useEffect(() => {
-    return dialogObservable.subscribe((event) => {
+    const unsubscribe = dialogObservable.subscribe((event) => {
       switch (event.action) {
         case 'SHOW_DIALOG':
           setDialogs(prev => [...prev, {
@@ -52,6 +68,7 @@ export function DynamicDialogProvider() {
             open: true,
             Component: event.Component,
             componentProps: event.componentProps,
+            beforeClose: event.beforeClose,
           }]);
           break;
         case 'UPDATE_DIALOG':
@@ -65,10 +82,15 @@ export function DynamicDialogProvider() {
           );
           setTimeout(() => {
             setDialogs(prev => prev.filter(d => d.id !== event.id));
-          }, 300);
+          }, removeDelayRef.current);
           break;
       }
     });
+
+    return () => {
+      unsubscribe();
+      dialogObservable.dismissAllDialogs('close');
+    };
   }, []);
 
   return (

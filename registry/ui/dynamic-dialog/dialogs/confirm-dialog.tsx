@@ -6,6 +6,8 @@ import { Button } from "@/registry/ui/button";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 
+type ResolveValue = boolean | undefined
+
 export interface ConfirmDialogHeader {
   title?: ReactNode;
   description?: ReactNode;
@@ -23,8 +25,8 @@ export interface ConfirmDialogActions<T> {
 }
 
 export interface ConfirmDialogProps {
-  header?: ReactNode | ((props: DialogActions<boolean>) => ReactNode) | ConfirmDialogHeader;
-  actions?: ConfirmDialogActions<boolean>
+  header?: ReactNode | ((props: DialogActions<ResolveValue>) => ReactNode) | ConfirmDialogHeader;
+  actions?: ConfirmDialogActions<ResolveValue>
 }
 
 function isConfirmDialogHeader(value: unknown): value is ConfirmDialogHeader {
@@ -36,7 +38,7 @@ function isConfirmDialogHeader(value: unknown): value is ConfirmDialogHeader {
   );
 }
 
-type ButtonDescriptor = { label: string; onClick: (props: DialogActions<boolean>) => void };
+type ButtonDescriptor = { label: string; onClick: (props: DialogActions<ResolveValue>) => void };
 
 function isButtonDescriptor(value: unknown): value is ButtonDescriptor {
   return (
@@ -49,8 +51,8 @@ function isButtonDescriptor(value: unknown): value is ButtonDescriptor {
 }
 
 function renderAction(
-  action: ConfirmDialogAction<boolean>,
-  dialogProps: DialogActions<boolean>,
+  action: ConfirmDialogAction<ResolveValue>,
+  dialogProps: DialogActions<ResolveValue>,
   defaultOnClick: () => void,
   variant: React.ComponentProps<typeof Button>["variant"]
 ): ReactNode {
@@ -64,7 +66,7 @@ function renderAction(
   return action as ReactNode;
 }
 
-export const confirmDialog = dialog(function (props: DialogComponentProps<ConfirmDialogProps, boolean>) {
+export const confirmDialog = dialog(function (props: DialogComponentProps<ConfirmDialogProps, ResolveValue>) {
   const renderHeader = () => {
     if (typeof props.header === "function") {
       return props.header(props);
@@ -102,8 +104,8 @@ export const confirmDialog = dialog(function (props: DialogComponentProps<Confir
 
     const confirmNode = showConfirm
       ? actions?.confirmButton !== undefined
-        ? renderAction(actions.confirmButton, props, () => props.confirm(), "destructive")
-        : <Button type="submit" variant="destructive" onClick={() => props.confirm()}>Confirm</Button>
+        ? renderAction(actions.confirmButton, props, () => props.confirm(true), "destructive")
+        : <Button type="submit" variant="destructive" onClick={() => props.confirm(true)}>Confirm</Button>
       : null;
 
     const customNodes = actions?.customButtons?.map((btn, i) => (

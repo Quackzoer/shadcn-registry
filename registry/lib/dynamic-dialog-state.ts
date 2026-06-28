@@ -11,8 +11,14 @@ export interface DismissReasonRegistry {}
 
 export type DismissReason = BuiltInDismissReason | keyof DismissReasonRegistry;
 
+// When T is a concrete type, confirm requires a value. When T is void or unknown (unspecified), value is optional.
+type ConfirmFn<T> =
+  [T] extends [void] ? () => void :
+  unknown extends T ? (value?: T) => void :
+  (value: T) => void;
+
 export interface DialogActions<T = unknown> {
-  confirm: (value?: T) => void;
+  confirm: ConfirmFn<T>;
   dismiss: (reason?: DismissReason, value?: T) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,6 +30,8 @@ export type DialogComponentProps<TProps, TValue = void> = TProps &
 export type DialogOptions = {
   id?: string;
   singleton?: boolean;
+  /** Return false (or Promise<false>) to prevent the dialog from closing when the user triggers a close gesture. Does not block programmatic dismiss(). */
+  beforeClose?: () => boolean | Promise<boolean>;
 };
 
 export interface DialogResultData<T = unknown> {
@@ -49,7 +57,7 @@ type PendingDialog = {
 type AnyComponentType = React.ComponentType<Record<string, unknown>>;
 
 type DialogEvent =
-  | { action: "SHOW_DIALOG"; id: string; Component: AnyComponentType; componentProps: Record<string, unknown> }
+  | { action: "SHOW_DIALOG"; id: string; Component: AnyComponentType; componentProps: Record<string, unknown>; beforeClose?: () => boolean | Promise<boolean> }
   | { action: "UPDATE_DIALOG"; id: string; componentProps: Record<string, unknown> }
   | { action: "HIDE_DIALOG"; id: string };
 
@@ -71,11 +79,19 @@ class DialogObservable {
     this.subscribers.forEach((cb) => cb(event));
   }
 
+  getPendingIds(): string[] {
+    return Array.from(this.pendingDialogs.keys());
+  }
+
+  hasPending(id: string): boolean {
+    return this.pendingDialogs.has(id);
+  }
+
   showDialog<T>(
     Component: AnyComponentType,
     componentProps: Record<string, unknown>,
     options: DialogOptions,
-  ): Omit<DialogResult<T>, "update"> {
+  ): DialogResult<T, Record<string, unknown>> {
     const id = options.id ?? `dialog-${++this.dialogId}`;
 
     if (options.singleton && this.pendingDialogs.has(id)) {
@@ -89,7 +105,7 @@ class DialogObservable {
       });
     });
 
-    this.notify({ action: "SHOW_DIALOG", id, Component, componentProps });
+    this.notify({ action: "SHOW_DIALOG", id, Component, componentProps, beforeClose: options.beforeClose });
 
     return {
       id,
@@ -97,6 +113,8 @@ class DialogObservable {
         this.dismissDialog(id, reason, value),
       then: (onFulfilled, onRejected) =>
         resultPromise.then(onFulfilled, onRejected),
+      update: (newProps: Partial<Record<string, unknown>>) =>
+        this.updateDialog(id, newProps),
     };
   }
 
