@@ -19,7 +19,7 @@ function AutoCloseDialog() {
   const [remaining, setRemaining] = useState(Math.ceil(props.closeAfterMs / 1000));
 
   useEffect(() => {
-    const timer = setTimeout(() => dismiss("timer"), props.closeAfterMs);
+    const timer = setTimeout(() => dismiss("time-out"), props.closeAfterMs);
     return () => clearTimeout(timer);
     // props.closeAfterMs and dismiss are stable for the lifetime of this dialog instance
     // eslint-disable-next-line react-hooks/exhaustive-deps

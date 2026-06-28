@@ -53,7 +53,7 @@ export default function Page() {
           onClick={() => {
             const countdownDialogRes = countdownDialog({ props: { countdownSeconds: 20 } })
             setTimeout(() => {
-              countdownDialogRes.dismiss("timer", 'Dismissed after 5 seconds')
+              countdownDialogRes.dismiss("time-out", 'Dismissed after 5 seconds')
             }, 5000)
           }}
         >
