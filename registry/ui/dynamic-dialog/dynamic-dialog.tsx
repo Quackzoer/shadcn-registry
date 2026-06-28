@@ -1,8 +1,23 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
 import type { DialogActions } from '@/registry/lib/dynamic-dialog-state';
+
+interface DynamicDialogContextValue {
+  actions: DialogActions<unknown>;
+  componentProps: Record<string, unknown>;
+}
+
+const DynamicDialogContext = createContext<DynamicDialogContextValue | null>(null);
+
+export function useDynamicDialog(): DialogActions<unknown>;
+export function useDynamicDialog<TProps extends object, TValue = unknown>(): DialogActions<TValue> & { props: TProps };
+export function useDynamicDialog() {
+  const ctx = useContext(DynamicDialogContext);
+  if (!ctx) throw new Error('useDynamicDialog must be used within a dialog rendered by DynamicDialogProvider');
+  return { ...ctx.actions, props: ctx.componentProps };
+}
 
 interface DialogStateItem {
   id: string;
@@ -17,9 +32,13 @@ function DynamicDialogItem({ id, open, Component, componentProps }: DialogStateI
   const dismiss = (reason?: string, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
   const onOpenChange = (isOpen: boolean) => { if (!isOpen) dismiss('close'); };
 
-  const actions: DialogActions = { confirm, dismiss, open, onOpenChange };
+  const actions: DialogActions<unknown> = { confirm, dismiss, open, onOpenChange };
 
-  return <Component {...componentProps} {...actions} />;
+  return (
+    <DynamicDialogContext.Provider value={{ actions, componentProps }}>
+      <Component {...componentProps} {...actions} />
+    </DynamicDialogContext.Provider>
+  );
 }
 
 export function DynamicDialogProvider() {

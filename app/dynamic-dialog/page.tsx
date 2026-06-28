@@ -5,6 +5,7 @@ import { countdownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-
 import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
 import { testDialog } from "./test-dialog"
+import { openHookExampleDialogs } from "./hook-example-dialogs"
 
 export default function Page() {
   return (
@@ -66,6 +67,15 @@ export default function Page() {
           }}
         >
           Test Dialog
+        </Button>
+        <Button
+          onClick={() => {
+            openHookExampleDialogs().then((result) => {
+              console.log("Hook example result:", result)
+            })
+          }}
+        >
+          Hook example (two dialogs, isolated contexts)
         </Button>
       </main>
       <DynamicDialogProvider />
