@@ -22,8 +22,7 @@ export function useDynamicDialog() {
 interface DialogStateItem {
   id: string;
   open: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Component: React.ComponentType<any>;
+  Component: React.ComponentType<Record<string, unknown>>;
   componentProps: Record<string, unknown>;
 }
 
@@ -45,27 +44,27 @@ export function DynamicDialogProvider() {
   const [dialogs, setDialogs] = useState<DialogStateItem[]>([]);
 
   useEffect(() => {
-    return dialogObservable.subscribe((action, data) => {
-      switch (action) {
+    return dialogObservable.subscribe((event) => {
+      switch (event.action) {
         case 'SHOW_DIALOG':
           setDialogs(prev => [...prev, {
-            id: data.id,
+            id: event.id,
             open: true,
-            Component: data.Component,
-            componentProps: data.componentProps,
+            Component: event.Component,
+            componentProps: event.componentProps,
           }]);
           break;
         case 'UPDATE_DIALOG':
           setDialogs(prev =>
-            prev.map(d => d.id === data.id ? { ...d, componentProps: data.componentProps } : d)
+            prev.map(d => d.id === event.id ? { ...d, componentProps: event.componentProps } : d)
           );
           break;
         case 'HIDE_DIALOG':
           setDialogs(prev =>
-            prev.map(d => d.id === data.id ? { ...d, open: false } : d)
+            prev.map(d => d.id === event.id ? { ...d, open: false } : d)
           );
           setTimeout(() => {
-            setDialogs(prev => prev.filter(d => d.id !== data.id));
+            setDialogs(prev => prev.filter(d => d.id !== event.id));
           }, 300);
           break;
       }
