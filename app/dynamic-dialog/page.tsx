@@ -4,7 +4,6 @@ import { Button } from "@/registry/ui/button"
 import { countdownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
 import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
-
 import { testDialog } from "./test-dialog"
 
 export default function Page() {
@@ -19,9 +18,7 @@ export default function Page() {
       <main className="flex flex-col flex-1 gap-8">
         <Button
           onClick={() => {
-            countdownDialog({
-              countdownSeconds: 5,
-            }).then((result) => {
+            countdownDialog({ props: { countdownSeconds: 5 } }).then((result) => {
               console.log(result)
             })
           }}
@@ -30,9 +27,7 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            typeToConfirmDialog({
-              itemName: 'some-file.txt'
-            }).then((result) => {
+            typeToConfirmDialog({ props: { itemName: 'some-file.txt' } }).then((result) => {
               console.log(result)
             })
           }}
@@ -41,12 +36,8 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const typeToConfirmDialogRes = typeToConfirmDialog({
-              itemName: 'some-file.txt',
-            })
-            const countdownDialogRes = countdownDialog({
-              countdownSeconds: 10,
-            })
+            const typeToConfirmDialogRes = typeToConfirmDialog({ props: { itemName: 'some-file.txt' } })
+            const countdownDialogRes = countdownDialog({ props: { countdownSeconds: 10 } })
             typeToConfirmDialogRes.then(({ value }) => {
               console.log('Type to confirm result:', value)
             })
@@ -59,9 +50,7 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const countdownDialogRes = countdownDialog({
-              countdownSeconds: 20,
-            })
+            const countdownDialogRes = countdownDialog({ props: { countdownSeconds: 20 } })
             setTimeout(() => {
               countdownDialogRes.dismiss("timer", 'Dismissed after 5 seconds')
             }, 5000)

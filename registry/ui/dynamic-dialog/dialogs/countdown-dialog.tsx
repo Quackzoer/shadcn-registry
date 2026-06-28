@@ -2,7 +2,7 @@
 
 import { dialog, type DialogComponentProps } from '@/registry/lib/dynamic-dialog-state';
 import { Button } from "@/registry/ui/button";
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/registry/ui/dialog";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from 'react';
 
@@ -40,97 +40,94 @@ export function CountdownDialog(props: DialogComponentProps<CountdownDialogProps
   };
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <Clock className="w-5 h-5 text-primary" />
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Clock className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-semibold text-foreground">
+                Timed Action
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                {props.autoConfirm
+                  ? `Auto-confirming in ${timeRemaining}s`
+                  : `Action available in ${timeRemaining}s`
+                }
+              </DialogDescription>
+            </div>
           </div>
-          <div>
-            <DialogTitle className="text-lg font-semibold text-foreground">
-              Timed Action
-            </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              {props.autoConfirm
-                ? `Auto-confirming in ${timeRemaining}s`
-                : `Action available in ${timeRemaining}s`
+        </DialogHeader>
+        <div className="space-y-4">
+          {props.showProgress !== false && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Time remaining</span>
+                <span>{timeRemaining}s</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2">
+                <div
+                  className="bg-primary h-2 rounded-full transition-all duration-1000 ease-linear"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-center py-4">
+            <div className="relative w-16 h-16">
+              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                  className="text-muted"
+                />
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 28}`}
+                  strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
+                  className="text-primary transition-all duration-1000 ease-linear"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-bold text-foreground">{timeRemaining}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-2">
+            <Button
+              type="button"
+              onClick={handleCancel}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              disabled={timeRemaining > 0 && !props.autoConfirm}
+              variant="default"
+            >
+              {timeRemaining > 0 && !props.autoConfirm
+                ? `Confirm (${timeRemaining}s)`
+                : 'Confirm'
               }
-            </DialogDescription>
+            </Button>
           </div>
         </div>
-      </DialogHeader>
-      <div className="space-y-4">
-
-
-        {/* Progress Bar */}
-        {props.showProgress !== false && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Time remaining</span>
-              <span>{timeRemaining}s</span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-1000 ease-linear"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Countdown Circle */}
-        <div className="flex justify-center py-4">
-          <div className="relative w-16 h-16">
-            <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
-              <circle
-                cx="32"
-                cy="32"
-                r="28"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-                className="text-muted"
-              />
-              <circle
-                cx="32"
-                cy="32"
-                r="28"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-                strokeDasharray={`${2 * Math.PI * 28}`}
-                strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
-                className="text-primary transition-all duration-1000 ease-linear"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-bold text-foreground">{timeRemaining}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-2">
-          <Button
-            type="button"
-            onClick={handleCancel}
-            variant="outline"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={timeRemaining > 0 && !props.autoConfirm}
-            variant="default"
-          >
-            {timeRemaining > 0 && !props.autoConfirm
-              ? `Confirm (${timeRemaining}s)`
-              : 'Confirm'
-            }
-          </Button>
-        </div>
-      </div>
-    </DialogContent>
+      </DialogContent>
+    </Dialog>
   );
 }
 

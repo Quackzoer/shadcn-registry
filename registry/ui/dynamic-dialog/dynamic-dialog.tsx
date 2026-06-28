@@ -1,85 +1,62 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react';
-import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog-state';
+import React, { useState, useEffect } from 'react';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
-import { Dialog } from '@/registry/ui/dialog';
-import { AlertDialog } from '../alert-dialog';
+import type { DialogActions } from '@/registry/lib/dynamic-dialog-state';
 
-function DynamicDialog(props: Readonly<DialogState>) {
-  const onOpenRef = useRef(props.onOpen);
-  const onCloseRef = useRef(props.onClose);
-  onOpenRef.current = props.onOpen;
-  onCloseRef.current = props.onClose;
+interface DialogStateItem {
+  id: string;
+  open: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Component: React.ComponentType<any>;
+  componentProps: Record<string, unknown>;
+}
 
-  useEffect(() => {
-    onOpenRef.current();
-    return () => { onCloseRef.current(); };
-  }, []);
+function DynamicDialogItem({ id, open, Component, componentProps }: DialogStateItem) {
+  const confirm = (value?: unknown) => dialogObservable.confirmDialog(id, value);
+  const dismiss = (reason?: string, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
+  const onOpenChange = (isOpen: boolean) => { if (!isOpen) dismiss('close'); };
 
-  const confirm = (value?: unknown) => dialogObservable.confirmDialog(props.id, value);
-  const deny = (value?: unknown) => dialogObservable.denyDialog(props.id, value);
-  const dismiss = (reason: DismissReason, value?: unknown) => dialogObservable.dismissDialog(props.id, reason, value);
+  const actions: DialogActions = { confirm, dismiss, open, onOpenChange };
 
-  const renderProps: DialogRendererProps = {
-    confirm,
-    deny,
-    dismiss,
-  };
-
-  return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
-        {props.render?.(renderProps)}
-      </AlertDialog>
-    </Dialog>
-  );
+  return <Component {...componentProps} {...actions} />;
 }
 
 export function DynamicDialogProvider() {
-  const [dialogs, setDialogs] = useState<DialogState[]>([]);
+  const [dialogs, setDialogs] = useState<DialogStateItem[]>([]);
 
   useEffect(() => {
-    const unsubscribe = dialogObservable.subscribe((action, data) => {
+    return dialogObservable.subscribe((action, data) => {
       switch (action) {
-        case 'SHOW_DIALOG': {
-          const dialogState: DialogState = {
-            ...data,
-            id: data.id!,
-            render: data.render!,
+        case 'SHOW_DIALOG':
+          setDialogs(prev => [...prev, {
+            id: data.id,
             open: true,
-            _version: 0,
-            onOpen: data.onOpen || (() => {}),
-            onClose: data.onClose || (() => {}),
-            onOpenChange: (open: boolean) => {
-              if (!open) {
-                dialogObservable.dismissDialog(data.id!, "close");
-              }
-            }
-          };
-          setDialogs(current => [...current, dialogState]);
+            Component: data.Component,
+            componentProps: data.componentProps,
+          }]);
           break;
-        }
-        case 'HIDE_DIALOG': {
-          setDialogs(current => current.filter(d => d.id !== data.id));
-          break;
-        }
-        case 'UPDATE_DIALOG': {
-          setDialogs(current =>
-            current.map(d => d.id === data.id ? { ...d, _version: d._version + 1 } : d)
+        case 'UPDATE_DIALOG':
+          setDialogs(prev =>
+            prev.map(d => d.id === data.id ? { ...d, componentProps: data.componentProps } : d)
           );
           break;
-        }
+        case 'HIDE_DIALOG':
+          setDialogs(prev =>
+            prev.map(d => d.id === data.id ? { ...d, open: false } : d)
+          );
+          setTimeout(() => {
+            setDialogs(prev => prev.filter(d => d.id !== data.id));
+          }, 300);
+          break;
       }
     });
-
-    return unsubscribe;
   }, []);
 
   return (
     <>
-      {dialogs.map(dialog => (
-        <DynamicDialog key={dialog.id} {...dialog} />
+      {dialogs.map(d => (
+        <DynamicDialogItem key={d.id} {...d} />
       ))}
     </>
   );

@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/registry/ui/button";
-import { AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/registry/ui/form";
 import { Input } from "@/registry/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,43 +14,41 @@ export interface TypeToConfirmDialogProps {
   itemName: string;
 }
 
-export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDialogProps, {itemName: string}>) {
+export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDialogProps, { itemName: string }>) {
   const schema = z.object({
     itemName: z.literal(props.itemName)
-  })
+  });
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: {
-      itemName: ''
-    }
-  })
+    defaultValues: { itemName: '' }
+  });
 
   const handleSubmit = (data: z.infer<typeof schema>) => {
     props.confirm(data);
-  }
+  };
 
   const isFormValid = form.formState.isValid && form.watch('itemName') === props.itemName;
 
   return (
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-shrink-0 w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
-            <Trash2 className="w-5 h-5 text-destructive" />
+    <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <AlertDialogTitle className="text-lg font-semibold text-foreground">
+                Delete Confirmation
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm text-muted-foreground">
+                This action cannot be undone
+              </AlertDialogDescription>
+            </div>
           </div>
-          <div>
-            <AlertDialogTitle className="text-lg font-semibold text-foreground">
-              Delete Confirmation
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-muted-foreground">
-              This action cannot be undone
-            </AlertDialogDescription>
-          </div>
-        </div>
-      </AlertDialogHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div>
+        </AlertDialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="mb-4">
               <p className="text-foreground mb-3">
                 To confirm deletion of <code className="bg-muted px-2 py-1 rounded text-sm font-mono">{props.itemName}</code>, please type the exact name below:
@@ -80,26 +78,26 @@ export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDia
                 </p>
               )}
             </div>
-          </div>
-          <div className="flex justify-end space-x-3 pt-2">
-            <Button
-              type="button"
-              onClick={() => props.dismiss("cancel")}
-              variant={"outline"}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant={"destructive"}
-              type="submit"
-              disabled={!isFormValid}
-            >
-              Delete Forever
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </AlertDialogContent>
+            <div className="flex justify-end space-x-3 pt-2">
+              <Button
+                type="button"
+                onClick={() => props.dismiss("cancel")}
+                variant={"outline"}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant={"destructive"}
+                type="submit"
+                disabled={!isFormValid}
+              >
+                Delete Forever
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
