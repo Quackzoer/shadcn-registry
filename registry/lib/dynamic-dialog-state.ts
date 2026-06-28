@@ -1,8 +1,18 @@
 import React from 'react';
 
+type BuiltInDismissReason = 'cancel' | 'close';
+
+// Extension point — users augment this interface to add custom dismiss reasons:
+// declare module '@/lib/dynamic-dialog-state' {
+//   interface DismissReasonRegistry { 'my-reason': true }
+// }
+export interface DismissReasonRegistry {}
+
+export type DismissReason = BuiltInDismissReason | keyof DismissReasonRegistry;
+
 export interface DialogActions<T = unknown> {
   confirm: (value?: T) => void;
-  dismiss: (reason?: string, value?: T) => void;
+  dismiss: (reason?: DismissReason, value?: T) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -18,12 +28,12 @@ export interface DialogResultData<T = unknown> {
   id: string;
   confirmed: boolean;
   value?: T;
-  reason?: string;
+  reason?: DismissReason;
 }
 
 export interface DialogResult<T = unknown> extends PromiseLike<DialogResultData<T>> {
   id: string;
-  dismiss: (reason?: string, value?: T) => void;
+  dismiss: (reason?: DismissReason, value?: T) => void;
   update: (newProps: Record<string, unknown>) => void;
 }
 
@@ -73,7 +83,7 @@ class DialogObservable {
 
     return {
       id,
-      dismiss: (reason = 'close', value?: T) => this.dismissDialog(id, reason, value),
+      dismiss: (reason: DismissReason = 'close', value?: T) => this.dismissDialog(id, reason, value),
       then: (onFulfilled, onRejected) => resultPromise.then(onFulfilled, onRejected),
     };
   }
@@ -93,7 +103,7 @@ class DialogObservable {
     this.notify('HIDE_DIALOG', { id });
   }
 
-  dismissDialog(id: string, reason = 'close', value?: unknown) {
+  dismissDialog(id: string, reason: DismissReason = 'close', value?: unknown) {
     const dialog = this.pendingDialogs.get(id);
     if (!dialog) return;
     dialog.resolve({ id, confirmed: false, value, reason });
@@ -101,7 +111,7 @@ class DialogObservable {
     this.notify('HIDE_DIALOG', { id });
   }
 
-  dismissAllDialogs(reason = 'close', value?: unknown) {
+  dismissAllDialogs(reason: DismissReason = 'close', value?: unknown) {
     Array.from(this.pendingDialogs.keys()).forEach(id => this.dismissDialog(id, reason, value));
   }
 }
@@ -127,7 +137,7 @@ export function dialog<TProps extends DialogActions<TValue>, TValue = TProps ext
   };
 }
 
-dialog.dismiss = (id?: string, reason = 'close', value?: unknown) => {
+dialog.dismiss = (id?: string, reason: DismissReason = 'close', value?: unknown) => {
   if (id) dialogObservable.dismissDialog(id, reason, value);
   else dialogObservable.dismissAllDialogs(reason, value);
 };
