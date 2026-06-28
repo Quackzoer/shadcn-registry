@@ -11,7 +11,7 @@ export interface ConfirmDialogProps {
   description: ReactNode;
 }
 
-export function ConfirmDialog(props: DialogComponentProps<ConfirmDialogProps, boolean>) {
+export const confirmDialog = dialog(function (props: DialogComponentProps<ConfirmDialogProps, boolean>) {
   return (
     <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
       <AlertDialogContent>
@@ -50,6 +50,4 @@ export function ConfirmDialog(props: DialogComponentProps<ConfirmDialogProps, bo
       </AlertDialogContent>
     </AlertDialog>
   );
-}
-
-export const confirmDialog = dialog(ConfirmDialog);
+});
