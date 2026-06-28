@@ -14,19 +14,24 @@ export interface ConfirmDialogHeader {
   icon?: ReactNode;
 }
 
-type ConfirmDialogAction<T> = string | {label: string, onClick: (props: DialogActions<T>) => void} | ((props: DialogActions<T>)=> ReactNode) | ReactNode 
+interface DialogActionButton<T>{
+  show?: boolean;
+  button?: DialogActionButtonRenderer<T>
+}
 
-export interface ConfirmDialogActions<T> {
+type DialogActionButtonRenderer<T> = string | {label: string, onClick: (props: DialogActions<T>) => void} | ((props: DialogActions<T>)=> ReactNode) | ReactNode 
+
+export interface DialogActionButtons<T> {
   showCancel?: boolean;
   showConfirm?: boolean;
-  cancelButton?: ConfirmDialogAction<T>
-  confirmButton?: ConfirmDialogAction<T>
-  customButtons?: Array<ConfirmDialogAction<T>>
+  cancelButton?: DialogActionButtonRenderer<T>
+  confirmButton?: DialogActionButtonRenderer<T>
+  customButtons?: Array<DialogActionButtonRenderer<T>>
 }
 
 export interface ConfirmDialogProps {
   header?: ReactNode | ((props: DialogActions<ResolveValue>) => ReactNode) | ConfirmDialogHeader;
-  actions?: ConfirmDialogActions<ResolveValue>
+  actions?: DialogActionButtons<ResolveValue>
 }
 
 function isConfirmDialogHeader(value: unknown): value is ConfirmDialogHeader {
@@ -51,7 +56,7 @@ function isButtonDescriptor(value: unknown): value is ButtonDescriptor {
 }
 
 function renderAction(
-  action: ConfirmDialogAction<ResolveValue>,
+  action: DialogActionButtonRenderer<ResolveValue>,
   dialogProps: DialogActions<ResolveValue>,
   defaultOnClick: () => void,
   variant: React.ComponentProps<typeof Button>["variant"]
