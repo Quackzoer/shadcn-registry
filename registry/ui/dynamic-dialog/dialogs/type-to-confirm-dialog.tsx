@@ -1,7 +1,13 @@
 "use client"
 
-import { Button } from "@/registry/ui/button";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
+import React, { useId } from "react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/registry/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/registry/ui/form";
 import { Input } from "@/registry/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,25 +15,41 @@ import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { dialog, type DialogComponentProps } from "@/registry/lib/dynamic-dialog-state";
+import {
+  type DialogActionButton,
+  type DialogActionsContainer,
+  renderStandardDialogActions,
+} from "@/registry/lib/dialog-actions";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;
+  actions?: TypeToConfirmActionsConfig;
 }
 
-export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDialogProps, { itemName: string }>) {
-  const schema = z.object({
-    itemName: z.literal(props.itemName)
-  });
-  const form = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: { itemName: '' }
-  });
+type ResolveValue = { itemName: string };
+type TCtx = { isValid: boolean };
+
+// The confirm slot's disabled state comes from form validity — passed as context.
+// Users who override confirmButton with a callback receive (actions, ctx) where
+// ctx.isValid reflects the current input state.
+export interface TypeToConfirmActionsConfig {
+  cancelButton?: DialogActionButton<ResolveValue, TCtx>;
+  confirmButton?: DialogActionButton<ResolveValue, TCtx>;
+  container?: DialogActionsContainer<ResolveValue, TCtx>;
+}
+
+export function TypeToConfirmDialog(
+  props: DialogComponentProps<TypeToConfirmDialogProps, ResolveValue>,
+) {
+  const formId = useId();
+  const schema = z.object({ itemName: z.literal(props.itemName) });
+  const form = useForm({ resolver: zodResolver(schema), defaultValues: { itemName: "" } });
 
   const handleSubmit = (data: z.infer<typeof schema>) => {
     props.confirm(data);
   };
 
-  const isFormValid = form.formState.isValid && form.watch('itemName') === props.itemName;
+  const ctx: TCtx = { isValid: form.formState.isValid };
 
   return (
     <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -47,11 +69,16 @@ export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDia
             </div>
           </div>
         </AlertDialogHeader>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="mb-4">
               <p className="text-foreground mb-3">
-                To confirm deletion of <code className="bg-muted px-2 py-1 rounded text-sm font-mono">{props.itemName}</code>, please type the exact name below:
+                To confirm deletion of{" "}
+                <code className="bg-muted px-2 py-1 rounded text-sm font-mono">
+                  {props.itemName}
+                </code>
+                , please type the exact name below:
               </p>
               <FormField
                 control={form.control}
@@ -72,30 +99,38 @@ export function TypeToConfirmDialog(props: DialogComponentProps<TypeToConfirmDia
                   </FormItem>
                 )}
               />
-              {form.watch('itemName') && form.watch('itemName') !== props.itemName && (
+              {form.watch("itemName") && form.watch("itemName") !== props.itemName && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Text must match exactly: <span className="font-mono">{props.itemName}</span>
+                  Text must match exactly:{" "}
+                  <span className="font-mono">{props.itemName}</span>
                 </p>
               )}
             </div>
-            <div className="flex justify-end space-x-3 pt-2">
-              <Button
-                type="button"
-                onClick={() => props.dismiss("cancel")}
-                variant={"outline"}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant={"destructive"}
-                type="submit"
-                disabled={!isFormValid}
-              >
-                Delete Forever
-              </Button>
-            </div>
           </form>
         </Form>
+
+        {renderStandardDialogActions(
+          props.actions ?? {},
+          props,
+          ctx,
+          {
+            cancel: {
+              label: "Cancel",
+              variant: "outline",
+              type: "button",
+              onClick: (a) => a.dismiss("cancel"),
+            },
+            confirm: {
+              label: "Delete Forever",
+              variant: "destructive",
+              type: "submit",
+              form: formId,
+              // Disabled state comes from context so users who override this slot
+              // via the callback form also receive ctx.isValid.
+              disabled: !ctx.isValid,
+            },
+          },
+        )}
       </AlertDialogContent>
     </AlertDialog>
   );

@@ -2,11 +2,15 @@
 
 import React, { type ReactNode } from "react";
 import { dialog, type DialogActions, type DialogComponentProps } from "@/registry/lib/dynamic-dialog-state";
-import { Button } from "@/registry/ui/button";
+import {
+  type DialogActionButton,
+  type DialogActionsContainer,
+  renderStandardDialogActions,
+} from "@/registry/lib/dialog-actions";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 
-type ResolveValue = boolean | undefined
+type ResolveValue = boolean | undefined;
 
 export interface ConfirmDialogHeader {
   title?: ReactNode;
@@ -14,24 +18,20 @@ export interface ConfirmDialogHeader {
   icon?: ReactNode;
 }
 
-interface DialogActionButton<T>{
-  show?: boolean;
-  button?: DialogActionButtonRenderer<T>
-}
-
-type DialogActionButtonRenderer<T> = string | {label: string, onClick: (props: DialogActions<T>) => void} | ((props: DialogActions<T>)=> ReactNode) | ReactNode 
-
-export interface DialogActionButtons<T> {
-  showCancel?: boolean;
-  showConfirm?: boolean;
-  cancelButton?: DialogActionButtonRenderer<T>
-  confirmButton?: DialogActionButtonRenderer<T>
-  customButtons?: Array<DialogActionButtonRenderer<T>>
+// Each dialog defines its own actions shape using DialogActionButton directly.
+// confirmDialog exposes cancel + optional custom buttons + confirm.
+// There is no shared DialogActionsConfig — the slot names and their presence
+// are specific to this dialog's semantics.
+export interface ConfirmDialogActionsConfig {
+  cancelButton?: DialogActionButton<ResolveValue>;
+  customButtons?: DialogActionButton<ResolveValue>[];
+  confirmButton?: DialogActionButton<ResolveValue>;
+  container?: DialogActionsContainer<ResolveValue>;
 }
 
 export interface ConfirmDialogProps {
   header?: ReactNode | ((props: DialogActions<ResolveValue>) => ReactNode) | ConfirmDialogHeader;
-  actions?: DialogActionButtons<ResolveValue>
+  actions?: ConfirmDialogActionsConfig;
 }
 
 function isConfirmDialogHeader(value: unknown): value is ConfirmDialogHeader {
@@ -43,35 +43,9 @@ function isConfirmDialogHeader(value: unknown): value is ConfirmDialogHeader {
   );
 }
 
-type ButtonDescriptor = { label: string; onClick: (props: DialogActions<ResolveValue>) => void };
-
-function isButtonDescriptor(value: unknown): value is ButtonDescriptor {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    !React.isValidElement(value) &&
-    "label" in value &&
-    "onClick" in value
-  );
-}
-
-function renderAction(
-  action: DialogActionButtonRenderer<ResolveValue>,
-  dialogProps: DialogActions<ResolveValue>,
-  defaultOnClick: () => void,
-  variant: React.ComponentProps<typeof Button>["variant"]
-): ReactNode {
-  if (typeof action === "function") return action(dialogProps);
-  if (typeof action === "string") {
-    return <Button variant={variant} onClick={defaultOnClick}>{action}</Button>;
-  }
-  if (isButtonDescriptor(action)) {
-    return <Button variant={variant} onClick={() => action.onClick(dialogProps)}>{action.label}</Button>;
-  }
-  return action as ReactNode;
-}
-
-export const confirmDialog = dialog(function (props: DialogComponentProps<ConfirmDialogProps, ResolveValue>) {
+export const confirmDialog = dialog(function (
+  props: DialogComponentProps<ConfirmDialogProps, ResolveValue>,
+) {
   const renderHeader = () => {
     if (typeof props.header === "function") {
       return props.header(props);
@@ -96,45 +70,31 @@ export const confirmDialog = dialog(function (props: DialogComponentProps<Confir
     return props.header;
   };
 
-  const renderActions = () => {
-    const { actions } = props;
-    const showCancel = actions?.showCancel !== false;
-    const showConfirm = actions?.showConfirm !== false;
-
-    const cancelNode = showCancel
-      ? actions?.cancelButton !== undefined
-        ? renderAction(actions.cancelButton, props, () => props.dismiss("cancel"), "outline")
-        : <Button type="button" variant="outline" onClick={() => props.dismiss("cancel")}>Cancel</Button>
-      : null;
-
-    const confirmNode = showConfirm
-      ? actions?.confirmButton !== undefined
-        ? renderAction(actions.confirmButton, props, () => props.confirm(true), "destructive")
-        : <Button type="submit" variant="destructive" onClick={() => props.confirm(true)}>Confirm</Button>
-      : null;
-
-    const customNodes = actions?.customButtons?.map((btn, i) => (
-      <React.Fragment key={i}>
-        {renderAction(btn, props, () => {}, "outline")}
-      </React.Fragment>
-    ));
-
-    return (
-      <div className="flex justify-end space-x-3 pt-2">
-        {customNodes}
-        {cancelNode}
-        {confirmNode}
-      </div>
-    );
-  };
-
   return (
     <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           {renderHeader()}
         </AlertDialogHeader>
-        {renderActions()}
+        {renderStandardDialogActions(
+          props.actions ?? {},
+          props,
+          undefined,
+          {
+            cancel: {
+              label: "Cancel",
+              variant: "outline",
+              type: "button",
+              onClick: (a) => a.dismiss("cancel"),
+            },
+            confirm: {
+              label: "Confirm",
+              variant: "destructive",
+              type: "submit",
+              onClick: (a) => a.confirm(true),
+            },
+          },
+        )}
       </AlertDialogContent>
     </AlertDialog>
   );
