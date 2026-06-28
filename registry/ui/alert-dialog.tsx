@@ -111,7 +111,6 @@ function AlertDialogDescription({
 }
 
 function AlertDialogAction({
-  className,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
   return (
@@ -123,7 +122,6 @@ function AlertDialogAction({
 }
 
 function AlertDialogCancel({
-  className,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) {
   return (
