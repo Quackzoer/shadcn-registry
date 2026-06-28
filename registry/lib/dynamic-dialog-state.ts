@@ -1,6 +1,6 @@
 import React from "react";
 
-type BuiltInDismissReason = "cancel" | "close" | "time-out";
+type BuiltInDismissReason = "cancel" | "close" | "time-out" | "success" | "error";
 
 // Extension point — users augment this interface to add custom dismiss reasons:
 // declare module '@/lib/dynamic-dialog-state' {

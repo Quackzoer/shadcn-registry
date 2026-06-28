@@ -20,20 +20,60 @@ export default function Page() {
       <main className="flex flex-col flex-1 gap-8">
         <Button
           onClick={() => {
-            const dialog = loadingDialog({
+            const promise = new Promise<string>((resolve) =>
+              setTimeout(() => resolve('done'), 3000)
+            )
+            loadingDialog({
               props: {
-                description: 'I will finish loading in 5 seconds'
+                title: 'Loading...',
+                description: 'Resolves after 3 seconds.',
+                promise,
               }
+            }).then(({ reason, value }) => {
+              // reason === 'success' → resolved, value is the resolved value
+              // reason === 'error'   → rejected, value is the error
+              // reason === 'close'   → user dismissed (only when allowCancel: true)
+              console.log('Loading dialog settled:', reason, value)
             })
-            dialog.then((result) => {
-              console.log(result)
-            })
-            setTimeout(()=>{
-              dialog.dismiss('time-out')
-            },5000)
           }}
         >
-          Loading dialog
+          Loading dialog (auto-dismiss on promise)
+        </Button>
+        <Button
+          onClick={() => {
+            const promise = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Something went wrong')), 2000)
+            )
+            loadingDialog({
+              props: {
+                title: 'Deleting...',
+                promise,
+              }
+            }).then(({ reason, value }) => {
+              console.log('Loading dialog settled:', reason, value)
+            })
+          }}
+        >
+          Loading dialog (rejects after 2s)
+        </Button>
+        <Button
+          onClick={() => {
+            const promise = new Promise<string>((resolve) =>
+              setTimeout(() => resolve('uploaded'), 5000)
+            )
+            loadingDialog({
+              props: {
+                title: 'Uploading...',
+                description: 'You can cancel this operation.',
+                allowCancel: true,
+                promise,
+              }
+            }).then(({ reason }) => {
+              console.log('Loading dialog reason:', reason)
+            })
+          }}
+        >
+          Loading dialog (cancellable)
         </Button>
         <Button
           onClick={() => {

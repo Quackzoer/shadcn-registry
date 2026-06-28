@@ -54,4 +54,4 @@ Each built-in dialog handles danger/warning styling ad-hoc. Consider a shared `v
 | 5 | `confirmDialog` called `confirm()` without passing `true` | Fixed to `confirm(true)` |
 | 6 | No way to query pending dialog state from outside React | `dialogObservable.getPendingIds()` and `hasPending(id)` added |
 | 7 | `beforeClose` for user-initiated close interception | `DialogOptions.beforeClose?: () => boolean \| Promise<boolean>` wired through to `DynamicDialogItem.onOpenChange` |
-| 8 | No blocking/loading dialog type | `LoadingDialog` + `loadingDialog` factory added (`allowCancel` defaults false) |
+| 8 | No blocking/loading dialog type | `LoadingDialog` + `loadingDialog` factory added; accepts `promise` prop that auto-dismisses with reason `"success"` on resolve or `"error"` on reject; `allowCancel` defaults false |
