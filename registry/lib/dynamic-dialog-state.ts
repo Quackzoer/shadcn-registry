@@ -33,12 +33,12 @@ export interface DialogResultData<T = unknown> {
   reason?: DismissReason;
 }
 
-export interface DialogResult<T = unknown> extends PromiseLike<
-  DialogResultData<T>
+export interface DialogResult<TValue = unknown, TProps = Record<string, unknown>> extends PromiseLike<
+  DialogResultData<TValue>
 > {
   id: string;
-  dismiss: (reason?: DismissReason, value?: T) => void;
-  update: (newProps: Record<string, unknown>) => void;
+  dismiss: (reason?: DismissReason, value?: TValue) => void;
+  update: (newProps: Partial<TProps>) => void;
 }
 
 type PendingDialog = {
@@ -143,7 +143,7 @@ export function dialog<
 ): (arg?: {
   props?: OwnProps<TProps, TValue>;
   options?: DialogOptions;
-}) => DialogResult<TValue> {
+}) => DialogResult<TValue, OwnProps<TProps, TValue>> {
   return (arg) => {
     const componentProps = (arg?.props ?? {}) as Record<string, unknown>;
     const options: DialogOptions = { ...defaultOptions, ...arg?.options };
@@ -156,8 +156,8 @@ export function dialog<
       id: baseResult.id,
       dismiss: baseResult.dismiss,
       then: baseResult.then,
-      update: (newProps) =>
-        dialogObservable.updateDialog(baseResult.id, newProps),
+      update: (newProps: Partial<OwnProps<TProps, TValue>>) =>
+        dialogObservable.updateDialog(baseResult.id, newProps as Record<string, unknown>),
     };
   };
 }
