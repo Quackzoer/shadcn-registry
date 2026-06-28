@@ -77,6 +77,22 @@ export default function Page() {
         >
           Hook example (two dialogs, isolated contexts)
         </Button>
+        <Button
+          onClick={() => {
+            const dialog = typeToConfirmDialog({
+              props: {
+                itemName: 'This will change after 5 seconds'
+              }
+            })
+            setTimeout(() => {
+              dialog.update({
+                itemName: 'I changed!'
+              })
+            }, 5000)
+          }}
+        >
+          Update dialog example
+        </Button>
       </main>
       <DynamicDialogProvider />
     </div>
