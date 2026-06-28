@@ -6,6 +6,7 @@ import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-t
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
 import { testDialog } from "./test-dialog"
 import { openHookExampleDialogs } from "./hook-example-dialogs"
+import { loadingDialog } from "@/registry/ui/dynamic-dialog/dialogs/loading-dialog"
 
 export default function Page() {
   return (
@@ -17,6 +18,23 @@ export default function Page() {
         </p>
       </header>
       <main className="flex flex-col flex-1 gap-8">
+        <Button
+          onClick={() => {
+            const dialog = loadingDialog({
+              props: {
+                description: 'I will finish loading in 5 seconds'
+              }
+            })
+            dialog.then((result) => {
+              console.log(result)
+            })
+            setTimeout(()=>{
+              dialog.dismiss('time-out')
+            },5000)
+          }}
+        >
+          Loading dialog
+        </Button>
         <Button
           onClick={() => {
             countdownDialog({ props: { countdownSeconds: 5 } }).then((result) => {
