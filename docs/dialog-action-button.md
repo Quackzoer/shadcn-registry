@@ -2,43 +2,47 @@
 
 ## Motivation
 
-The current `confirm-dialog.tsx` has several structural problems in how it handles action buttons:
+The current `confirm-dialog.tsx` has several structural problems:
 
 **1. Redundant show/hide controls.**  
-`showCancel?: boolean` and `cancelButton?` are separate. Passing `cancelButton: undefined` does NOT hide the button — you also need `showCancel: false`. Two props doing one job.
+`showCancel?: boolean` and `cancelButton?` are separate. `cancelButton: undefined` does NOT hide the button — you also need `showCancel: false`. Two props doing one job.
 
 **2. `renderAction` is a private implementation detail.**  
-The `renderAction` function lives inside `confirm-dialog.tsx` and is not available to other dialogs. `CountdownDialog` and `DelayedActionDialog` each hardcode their own button HTML — they can't reuse the same rendering logic, leading to divergence in layout, spacing, and prop handling.
+Lives only inside `confirm-dialog.tsx`. `CountdownDialog` and `DelayedActionDialog` hardcode their own button HTML, causing layout/spacing divergence.
 
 **3. The descriptor type is too narrow.**  
-The current `{ label: string, onClick: ... }` object form doesn't allow passing button-level props like `variant`, `size`, `className`, `disabled`, or `form`. Callers who want anything beyond label + click must fall back to a full render function.
+The current `{ label: string, onClick: ... }` object form doesn't allow `variant`, `size`, `className`, `disabled`, `form`, etc. Callers must fall back to a full render function for anything visual.
 
-**4. Custom buttons lack a default action.**  
-`customButtons` receives `() => {}` as its `defaultOnClick`, making string-only custom buttons silent no-ops.
+**4. No way to pass component state into button logic.**  
+`TypeToConfirmDialog` needs form validity to control the confirm button's `disabled` state, but there's no channel for that through the current API.
+
+**5. No canonical slot system.**  
+Adding a new button between cancel and confirm, or creating a reusable dialog with a custom action slot, has no clean pattern.
 
 ---
 
 ## Goals
 
-- `cancelButton?: DialogActionButton<T>` — presence/value controls both show and configuration. No separate `show` flag needed.
-- The object descriptor form passes through **all `Button` component props**, so callers never need a full render function just to change `variant` or `size`.
-- `renderDialogButton` and `renderDialogActions` become exported primitives, shared across all built-in dialogs.
-- An `actions?.container` prop controls the wrapper element around buttons without breaking the type contract.
+- `cancelButton?: DialogActionButton<T>` — presence/value controls both show and configuration. No separate `show` flag.
+- The descriptor form passes through **all `Button` component props**.
+- Context props flow into `disabled` and `onClick` — so form state, loading state, etc. can affect buttons without wrapping in a render function.
+- `renderDialogActions` and `renderDialogButton` become exported primitives, shared across all built-in dialogs.
+- **Each dialog defines its own actions shape** — there is no shared `DialogActionsConfig` interface with fixed `cancelButton`/`confirmButton` fields. Dialogs that don't have a confirm button simply don't include it in their actions type.
 
 ---
 
-## Type: `DialogActionButton<T>`
+## Type: `DialogActionButton<T, TCtx = void>`
 
-A single button in a dialog's action area. Each variant answers "what should this button look like and do?":
+A single button in a dialog's action area. The second type parameter `TCtx` carries context that flows into `disabled` and `onClick`.
 
 ```ts
-type DialogActionButton<T> =
-  | true                                           // show with all slot defaults
-  | false                                          // explicitly hide
-  | string                                         // custom label, all other defaults unchanged
-  | DialogActionButtonDescriptor<T>                // object: any Button prop + dialog-aware onClick/disabled
-  | ((actions: DialogActions<T>) => ReactNode)     // render function: full control, receives dialog methods
-  | ReactNode;                                     // static JSX: no dialog state access
+type DialogActionButton<T, TCtx = void> =
+  | true                                                      // show with all slot defaults
+  | false                                                     // explicitly hide
+  | string                                                    // custom label, all other defaults
+  | DialogActionButtonDescriptor<T, TCtx>                     // full object config
+  | ((actions: DialogActions<T>, ctx: TCtx) => ReactNode)    // render function: full control
+  | ReactNode;                                                // static JSX: no dialog/context access
 ```
 
 `undefined` (prop omitted) and `false` both mean "don't render". Everything else means "render, configured this way".
@@ -48,19 +52,19 @@ type DialogActionButton<T> =
 | You want to... | Use |
 |---|---|
 | Show with all defaults | `true` |
-| Suppress (explicit) | `false` |
+| Suppress explicitly | `false` |
 | Change only the label | `"My label"` |
-| Change label + variant/size/className | `{ label: 'My label', variant: 'secondary' }` |
-| Change only variant, keep default label | `{ variant: 'secondary' }` |
-| Call a custom action on click | `{ onClick: (a) => a.dismiss('cancel') }` |
+| Change label + variant/size/className | `{ label: 'Save', variant: 'default', size: 'sm' }` |
+| Change only variant, keep default label | `{ variant: 'ghost' }` |
+| Custom action on click | `{ onClick: (a) => a.dismiss('snoozed') }` |
+| Disable based on context (form state, etc.) | `{ disabled: (_, ctx) => !ctx.isFormValid }` |
 | Disable based on dialog state | `{ disabled: (a) => !a.open }` |
-| Conditionally disable via local state | `(actions) => <MyButton actions={actions} />` |
-| Completely custom (tooltip, link, etc.) | `(actions) => <Tooltip>...</Tooltip>` or static JSX |
+| Fully dynamic content, access to local state | `(actions, ctx) => <MyButton />` |
 | Static custom element | `<a href="/help">Help</a>` |
 
 ### Why `true` is in the union
 
-Without `true`, "show with defaults" requires either omitting the prop (which means don't show — contradiction) or passing an empty object `{}`. `true` is the unambiguous signal: "show this slot exactly as the dialog designed it". It's the symmetric counterpart to `false`.
+Without `true`, "show with defaults" requires omitting the prop — but omitting means don't show (contradiction) — or passing `{}` (confusing). `true` is the unambiguous "show exactly as the dialog designed this slot". Symmetric counterpart to `false`.
 
 ### Why `false` is in the union
 
@@ -68,152 +72,373 @@ For programmatic boolean-driven scenarios:
 ```ts
 confirmButton={isDangerous ? { label: 'Delete Forever', variant: 'destructive' } : false}
 ```
-This avoids ternaries that return `undefined` (which TypeScript sometimes complains about in JSX).
+
+### Why render function receives `ctx`
+
+The render function escape hatch should always have access to the same context that `disabled`/`onClick` on the descriptor get. Consistent signature: `(actions, ctx) => ReactNode`.
 
 ### Why `ReactNode` is the fallback
 
-The render function `(actions) => ReactNode` covers all cases where you need dialog state. For cases where you don't — a static badge, a link, a custom element — passing `ReactNode` directly avoids wrapping it in an unnecessary function.
+For static elements that don't need dialog state — a badge, a link, an icon — passing JSX directly avoids an unnecessary function wrapper.
 
 ---
 
-## Type: `DialogActionButtonDescriptor<T>`
+## Type: `DialogActionButtonDescriptor<T, TCtx = void>`
 
-The object configuration form. Extends all `Button` component props, replacing `children`, `onClick`, and `disabled` with dialog-aware versions:
+The object form. Extends all `Button` component props, replacing `children`, `onClick`, and `disabled` with dialog-aware + context-aware versions:
 
 ```ts
-type DialogActionButtonDescriptor<T> =
+type DialogActionButtonDescriptor<T, TCtx = void> =
   Omit<React.ComponentProps<typeof Button>, 'onClick' | 'disabled' | 'children'> & {
     /**
-     * Button label. Replaces `children`.
-     * Optional — if omitted, falls back to the slot's default label (e.g. "Cancel" or "Confirm").
-     * This lets you change only the variant without repeating the label:
+     * Button text/content. Replaces `children`.
+     * Optional — falls back to the slot's default label, so you can change
+     * variant without repeating the label:
      *   cancelButton={{ variant: 'ghost' }}  →  still shows "Cancel"
      */
     label?: ReactNode;
 
     /**
-     * Called with dialog control methods when the button is clicked.
-     * Optional — if omitted, falls back to the slot's default action
-     * (dismiss('cancel') for the cancel slot, confirm(value) for the confirm slot).
-     * This lets you change styling without reimplementing the action:
+     * Called with dialog methods and context when clicked.
+     * Optional — falls back to the slot's default action:
      *   cancelButton={{ className: 'w-full' }}  →  still calls dismiss('cancel')
      */
-    onClick?: (actions: DialogActions<T>) => void;
+    onClick?: (actions: DialogActions<T>, ctx: TCtx) => void;
 
     /**
-     * Boolean or function of dialog state.
-     * Use boolean for static disabled state.
-     * Use function for disabled state derived from dialog actions (e.g., open state).
-     * For disabled state derived from local component state, use the render function variant instead.
+     * Static boolean, or a function receiving dialog methods + context.
+     * Use the function form when disabled state comes from context (form validity,
+     * loading state, etc.). For local component state, use the render function variant.
      */
-    disabled?: boolean | ((actions: DialogActions<T>) => boolean);
+    disabled?: boolean | ((actions: DialogActions<T>, ctx: TCtx) => boolean);
   };
 ```
 
-Extending `React.ComponentProps<typeof Button>` means the descriptor inherits `variant`, `size`, `className`, `asChild`, `type`, `form`, `aria-*`, and every other prop the Button accepts — without the library needing to explicitly forward any of them.
+Extending `React.ComponentProps<typeof Button>` gives `variant`, `size`, `className`, `asChild`, `type`, `form`, `aria-*`, and anything else `Button` accepts — without the library forward-declaring each one.
 
-### Examples
+### Key examples
 
 ```ts
 // Change only the variant — inherits default label and onClick
 cancelButton={{ variant: 'ghost' }}
 
-// Custom label, custom variant, keep default onClick  
+// Custom label, custom variant, keep default onClick
 cancelButton={{ label: 'Go back', variant: 'outline', size: 'sm' }}
 
-// Custom label, custom action, custom variant
-confirmButton={{ label: 'Yes, delete', variant: 'destructive', onClick: (a) => a.confirm(true) }}
+// Submit a form by ID (no onClick needed — native form submit handles it)
+confirmButton={{ type: 'submit', form: 'my-form', label: 'Save changes' }}
 
-// Disabled until form is valid — note: for local state use render function instead
-confirmButton={{ disabled: true }}
+// Disabled from context — typeToConfirmDialog passes { isValid } as context
+confirmButton={{ disabled: (_, ctx) => !ctx.isValid }}
 
-// Submit a form by ID instead of using onClick
-confirmButton={{ type: 'submit', form: 'my-form', label: 'Save' }}
+// Disabled from dialog state
+confirmButton={{ disabled: (a) => !a.open }}
 
-// Full width button
-cancelButton={{ className: 'w-full', label: 'Cancel' }}
+// Full width
+cancelButton={{ className: 'w-full sm:w-auto' }}
+
+// Dynamic label based on context (e.g. countdown)
+confirmButton={{ label: (/* no access here */) => ... }}
+// For dynamic label: use render function instead:
+confirmButton={(actions, ctx) => (
+  <Button disabled={ctx.timeRemaining > 0}>
+    {ctx.timeRemaining > 0 ? `Wait (${ctx.timeRemaining}s)` : 'Confirm'}
+  </Button>
+)}
 ```
 
 ---
 
-## Type: `DialogActionsConfig<T>`
+## Dialog-specific actions shapes — NOT a shared interface
 
-Groups all button slots for a dialog's action area, replacing the current `DialogActionButtons<T>`:
+**`DialogActionsConfig<T>` as a shared interface with `cancelButton`/`confirmButton` fields is the wrong abstraction.** 
+
+Different dialogs have entirely different action semantics:
+- `confirmDialog` → cancel + confirm
+- `countdownDialog` → cancel only (confirm timing is internal)
+- `typeToConfirmDialog` → cancel + a form-submit confirm (with form state context)
+- `loadingDialog` → no user-facing buttons at all (or just a cancel when `allowCancel: true`)
+- A custom `SnoozeReminderDialog` might have → cancel + snooze + confirm
+
+Forcing all of these through a shared `{ cancelButton?, confirmButton?, customButtons? }` interface would mean:
+- Dialogs without a confirm button receive a `confirmButton` prop that does nothing or must be documented as "don't use"
+- Dialogs with additional semantic slots (snooze, skip, retry) can't name them
+- The dialog author loses the ability to document what each slot means
+
+**Instead: each dialog defines its own `ActionsConfig` using `DialogActionButton<T, TCtx>` directly:**
 
 ```ts
-interface DialogActionsConfig<T> {
-  /**
-   * Renders before cancelButton and confirmButton (leftmost).
-   * Each element follows the same DialogActionButton<T> contract.
-   * For custom buttons, there is no default onClick — callers must provide one
-   * via the descriptor's onClick, a render function, or direct JSX.
-   */
-  customButtons?: DialogActionButton<T>[];
+// confirmDialog
+interface ConfirmDialogActionsConfig {
+  cancelButton?: DialogActionButton<boolean | undefined>;
+  confirmButton?: DialogActionButton<boolean | undefined>;
+  container?: DialogActionsContainer<boolean | undefined>;
+}
 
-  /**
-   * The cancel/dismiss slot. Undefined or false = don't show.
-   * Default action: dismiss('cancel').
-   */
-  cancelButton?: DialogActionButton<T>;
+// countdownDialog — only exposes cancel; confirm timing is internal
+interface CountdownDialogActionsConfig {
+  cancelButton?: DialogActionButton<string>;
+}
 
-  /**
-   * The confirm/primary-action slot. Undefined or false = don't show.
-   * Default action: the dialog's confirm() call (varies per dialog).
-   */
-  confirmButton?: DialogActionButton<T>;
+// typeToConfirmDialog — confirm disabled state depends on form validity
+interface TypeToConfirmDialogActionsConfig {
+  cancelButton?: DialogActionButton<{ itemName: string }, { isValid: boolean }>;
+  confirmButton?: DialogActionButton<{ itemName: string }, { isValid: boolean }>;
+}
 
-  /**
-   * Controls the wrapper element around all rendered buttons.
-   * See DialogActionsContainer<T>.
-   */
-  container?: DialogActionsContainer<T>;
+// A custom snooze dialog with three slots
+interface SnoozeDialogActionsConfig {
+  dismissButton?: DialogActionButton<SnoozeResult>;
+  snoozeButton?: DialogActionButton<SnoozeResult>;
+  confirmButton?: DialogActionButton<SnoozeResult>;
+  container?: DialogActionsContainer<SnoozeResult>;
 }
 ```
 
-### Migration from `DialogActionButtons<T>`
-
-| Old | New |
-|---|---|
-| `{ showCancel: false }` | `{ cancelButton: false }` |
-| `{ showCancel: true }` (default) | omit `cancelButton`, or `{ cancelButton: true }` |
-| `{ cancelButton: 'Go back' }` | `{ cancelButton: 'Go back' }` (unchanged) |
-| `{ cancelButton: { label: '...', onClick: ... } }` | `{ cancelButton: { label: '...', onClick: ... } }` (unchanged) |
-| `{ showConfirm: false }` | `{ confirmButton: false }` |
-| `{ customButtons: [...] }` | `{ customButtons: [...] }` (unchanged) |
+Each slot name is meaningful, documented, and typed correctly for its own TCtx.
 
 ---
 
-## Type: `DialogActionsContainer<T>`
+## `renderDialogActions<T, TCtx>` — the shared renderer
 
-Controls the wrapper element that groups the rendered buttons:
+The shared primitive that all built-in dialogs use internally. It accepts a **named slot map** in render order and a context object.
 
 ```ts
-type DialogActionsContainer<T> =
+// Slot map — keys are slot names, values are the resolved button definitions.
+// Key insertion order determines left-to-right render order.
+type DialogActionsSlotMap<T, TCtx> = Record<
+  string,
+  DialogActionButton<T, TCtx> | DialogActionButton<T, TCtx>[] | undefined
+>;
+
+function renderDialogActions<T, TCtx = void>(
+  slots: DialogActionsSlotMap<T, TCtx>,
+  context: TCtx,
+  dialogActions: DialogActions<T>,
+  container?: DialogActionsContainer<T, TCtx>,
+): ReactNode
+```
+
+Array values in the slot map render each element consecutively in position — useful for grouped or repeated slots.
+
+### How a dialog uses this
+
+The dialog:
+1. Defines its default slot map (with all defaults filled in as `DialogActionButtonDescriptor` values)
+2. Merges the user-provided overrides on top using `resolveDialogActions`
+3. Calls `renderDialogActions` with the merged map, context, and dialog methods
+
+```tsx
+// confirmDialog internal rendering
+const slots = resolveDialogActions(props.actions, {
+  cancel: {
+    label: 'Cancel',
+    variant: 'outline',
+    type: 'button',
+    onClick: (a) => a.dismiss('cancel'),
+  },
+  confirm: {
+    label: 'Confirm',
+    variant: 'destructive',
+    type: 'submit',
+    onClick: (a) => a.confirm(true),
+  },
+});
+
+{renderDialogActions(slots, undefined, props, props.actions?.container)}
+```
+
+```tsx
+// typeToConfirmDialog internal rendering — passes form state as context
+const slots = resolveDialogActions(props.actions, {
+  cancel: {
+    label: 'Cancel',
+    variant: 'outline',
+    onClick: (a) => a.dismiss('cancel'),
+  },
+  confirm: {
+    label: 'Delete Forever',
+    variant: 'destructive',
+    type: 'submit',
+    form: 'type-to-confirm-form',
+    disabled: (_, ctx) => !ctx.isValid,
+  },
+});
+
+{renderDialogActions(
+  slots,
+  { isValid: form.formState.isValid },  // context from component state
+  props,
+)}
+```
+
+```tsx
+// snoozeDialog — three named slots, user can override any
+const slots = resolveDialogActions(props.actions, {
+  dismiss: {
+    label: 'Dismiss',
+    variant: 'ghost',
+    onClick: (a) => a.dismiss('cancel'),
+  },
+  snooze: {
+    label: 'Snooze 10 min',
+    variant: 'outline',
+    onClick: (a) => a.confirm({ snoozed: true, minutes: 10 }),
+  },
+  confirm: {
+    label: 'Mark done',
+    variant: 'default',
+    onClick: (a) => a.confirm({ snoozed: false }),
+  },
+});
+
+{renderDialogActions(slots, undefined, props)}
+```
+
+---
+
+## `resolveDialogActions<T, TCtx>` — merging defaults with user overrides
+
+The dialog calls this before `renderDialogActions` to produce the final slot map.
+
+```ts
+function resolveDialogActions<T, TCtx>(
+  userActions: Record<string, DialogActionButton<T, TCtx> | undefined> | undefined,
+  defaults: Record<string, DialogActionButtonDescriptor<T, TCtx>>,
+): DialogActionsSlotMap<T, TCtx>
+```
+
+**Merge semantics per slot:**
+
+| User provides | Result |
+|---|---|
+| Nothing (slot not in `userActions`) | Render with `defaults[slot]` |
+| `true` | Render with `defaults[slot]` |
+| `false` or `undefined` | Don't render |
+| `string` | Render with custom label, rest from `defaults[slot]` |
+| descriptor | Render with descriptor merged on top of `defaults[slot]` (descriptor wins per field) |
+| function | Call function (defaults ignored — user has full control) |
+| `ReactNode` | Render directly (defaults ignored) |
+
+**Key property**: `defaults` determines the available slot names AND their render order (insertion order). User overrides can only hide or modify existing slots — they cannot add new named slots or change order. For entirely custom layouts, the `container` render function is the right tool.
+
+---
+
+## Positioning / Inserting Between Existing Slots
+
+The render order of named slots follows the **insertion order of the `defaults` map** that the dialog passes to `resolveDialogActions`. Users cannot reorder slots — they can only override slot content or hide slots.
+
+**To provide a user-facing insertion point between two existing slots**, the dialog explicitly names a slot for it:
+
+```ts
+// Dialog exposes a "between" slot
+interface ConfirmDialogActionsConfig {
+  cancelButton?: DialogActionButton<boolean | undefined>;
+  middleButton?: DialogActionButton<boolean | undefined>;   // between cancel and confirm
+  confirmButton?: DialogActionButton<boolean | undefined>;
+}
+
+// Dialog's defaults — middleButton defaults to false (hidden)
+const defaults = {
+  cancel: { label: 'Cancel', ... },
+  middle: false,                  // hidden by default — user opts in
+  confirm: { label: 'Confirm', ... },
+};
+```
+
+User then does:
+```ts
+confirmDialog({
+  props: {
+    actions: {
+      middleButton: { label: 'Save as draft', variant: 'secondary', onClick: ... }
+    }
+  }
+})
+```
+
+For fully custom orderings (e.g. putting confirm first), the `container` render function is the escape hatch:
+```ts
+container: (children) => <div className="flex flex-row-reverse gap-3">{children}</div>
+```
+
+---
+
+## `renderDialogButton<T, TCtx>` — single-slot primitive
+
+Exported for dialogs that need per-slot control (e.g., countdown needs `disabled` tied to component state that can't be expressed in context).
+
+```ts
+interface DialogActionButtonSlotDefaults<T, TCtx = void> {
+  label: ReactNode;
+  variant: React.ComponentProps<typeof Button>['variant'];
+  onClick: (actions: DialogActions<T>, ctx: TCtx) => void;
+  type?: React.ComponentProps<typeof Button>['type'];
+}
+
+function renderDialogButton<T, TCtx = void>(
+  button: DialogActionButton<T, TCtx> | undefined,
+  dialogActions: DialogActions<T>,
+  context: TCtx,
+  defaults: DialogActionButtonSlotDefaults<T, TCtx>,
+): ReactNode
+```
+
+### Resolution order
+
+```
+undefined | false | null  → null
+function                  → button(dialogActions, context)
+true                      → <Button ...defaults />
+string                    → <Button ...defaults label={string} />
+React.isValidElement      → rendered as-is
+Array                     → rendered as-is (ReactNode)
+non-object primitive      → rendered as-is (number, etc.)
+plain object (descriptor) → <Button merged(descriptor, defaults) />
+```
+
+### Descriptor merge detail
+
+```ts
+const { label, onClick, disabled, ...buttonProps } = descriptor;
+
+<Button
+  type={buttonProps.type ?? defaults.type ?? 'button'}
+  variant={buttonProps.variant ?? defaults.variant}
+  disabled={typeof disabled === 'function' ? disabled(dialogActions, context) : disabled}
+  onClick={() => (onClick ?? defaults.onClick)(dialogActions, context)}
+  {...buttonProps}
+>
+  {label ?? defaults.label}
+</Button>
+```
+
+The spread order means any explicit `buttonProps` override `defaults` for non-special fields.
+
+---
+
+## `DialogActionsContainer<T, TCtx = void>`
+
+Controls the wrapper element around all rendered buttons:
+
+```ts
+type DialogActionsContainer<T, TCtx = void> =
   | React.ComponentProps<'div'>
-  | ((children: ReactNode, actions: DialogActions<T>) => ReactNode);
+  | ((children: ReactNode, dialogActions: DialogActions<T>, ctx: TCtx) => ReactNode);
 ```
 
-**Div props form**: `className` is merged (not replaced) with the default layout classes (`flex justify-end gap-3 pt-2`). All other div props override directly.
+**Div props form**: `className` merges with defaults (`flex justify-end gap-3 pt-2`). Other props are passed through.
 
 ```ts
-// Expand to full width, stack vertically on mobile
 container: { className: 'flex-col-reverse sm:flex-row sm:justify-end' }
-
-// Add a data attribute
-container: { 'data-testid': 'dialog-actions' }
+container: { 'data-testid': 'dialog-footer' }
 ```
 
-**Render function form**: receives already-rendered button nodes + dialog actions. Use for completely custom layouts or wrapping buttons in non-div elements:
+**Render function form**: receives rendered buttons + dialog methods + context. The full escape hatch.
 
 ```ts
-// Grid layout
-container: (children) => (
-  <div className="grid grid-cols-2 gap-2 w-full">{children}</div>
-)
-
-// Permission gate around the action area
-container: (children, actions) => (
-  <RequiresPermission permission="admin" fallback={null}>
+container: (children, actions, ctx) => (
+  <RequiresPermission permission="admin" fallback={<p>No permission</p>}>
     {children}
   </RequiresPermission>
 )
@@ -221,200 +446,12 @@ container: (children, actions) => (
 
 ---
 
-## `DialogActionButtonSlotDefaults<T>`
-
-Each button slot in a dialog has a set of defaults — what to render when the button value is `true`, or when the descriptor omits `label` / `onClick`:
-
-```ts
-interface DialogActionButtonSlotDefaults<T> {
-  /** Label shown when button is true or descriptor omits label. */
-  label: ReactNode;
-  /** Variant applied when button is true or descriptor omits variant. */
-  variant: React.ComponentProps<typeof Button>['variant'];
-  /** Action called when button is true, a string, or descriptor omits onClick. */
-  onClick: (actions: DialogActions<T>) => void;
-  /** Default type attribute. Typically 'button' for cancel, 'submit' for confirm. */
-  type?: React.ComponentProps<typeof Button>['type'];
-}
-```
-
-Dialogs provide these when calling `renderDialogActions`. They encode the semantic meaning of each slot for that dialog.
-
----
-
-## `renderDialogButton<T>` — exported primitive
-
-Renders a single `DialogActionButton<T>` value. Exported from the shared actions module so dialogs can use individual slots when they need finer control than `renderDialogActions` provides.
-
-```ts
-function renderDialogButton<T>(
-  button: DialogActionButton<T> | undefined,
-  actions: DialogActions<T>,
-  defaults: DialogActionButtonSlotDefaults<T>,
-): ReactNode
-```
-
-### Resolution order
-
-```
-undefined | false | null → null (don't render)
-function              → button(actions)
-true                  → <Button variant={defaults.variant} type={defaults.type} onClick={() => defaults.onClick(actions)}>{defaults.label}</Button>
-string                → <Button variant={defaults.variant} type={defaults.type} onClick={() => defaults.onClick(actions)}>{string}</Button>
-React.isValidElement  → button as-is (ReactNode)
-Array                 → button as-is (ReactNode)
-typeof !== 'object'   → button as-is (number, etc.)
-object (descriptor)   → <Button {...descriptorProps} variant={descriptor.variant ?? defaults.variant} ... />
-```
-
-### Descriptor resolution detail
-
-```ts
-// When button is a DialogActionButtonDescriptor<T>:
-const { label, onClick, disabled, ...buttonProps } = button;
-
-<Button
-  type={buttonProps.type ?? defaults.type ?? 'button'}
-  variant={buttonProps.variant ?? defaults.variant}
-  disabled={typeof disabled === 'function' ? disabled(actions) : disabled}
-  onClick={() => (onClick ?? defaults.onClick)(actions)}
-  {...buttonProps}  // remaining props: size, className, asChild, form, aria-*, etc.
->
-  {label ?? defaults.label}
-</Button>
-```
-
----
-
-## `renderDialogActions<T>` — exported public API
-
-Renders the full action area — all button slots in order + the container wrapper. This is the primary export intended for use in all built-in dialogs.
-
-```ts
-interface RenderDialogActionsOptions<T> {
-  /** User-supplied button configuration. Undefined = render all slots with defaults. */
-  buttons: DialogActionsConfig<T> | undefined;
-  /** Dialog control methods (confirm, dismiss, open, onOpenChange). */
-  actions: DialogActions<T>;
-  /** Defaults for the cancel slot. */
-  cancelDefaults: DialogActionButtonSlotDefaults<T>;
-  /** Defaults for the confirm slot. */
-  confirmDefaults: DialogActionButtonSlotDefaults<T>;
-}
-
-function renderDialogActions<T>(options: RenderDialogActionsOptions<T>): ReactNode
-```
-
-### Default behavior when `buttons` is undefined
-
-When the user doesn't pass `actions` to the dialog, `renderDialogActions` renders both cancel and confirm slots with their full defaults. This means dialogs "just work" with no configuration:
-- `confirmDialog()` shows "Cancel" + "Confirm" out of the box.
-
-### Render order
-
-```
-[customButtons[0], customButtons[1], ...] [cancelButton] [confirmButton]
-```
-
-Left-to-right, primary action always rightmost. This matches conventional modal layouts.
-
-### Container rendering
-
-```ts
-// When container is undefined or div props:
-<div className={cn('flex justify-end gap-3 pt-2', container?.className)} ...rest>
-  {buttons}
-</div>
-
-// When container is a render function:
-container(buttons, actions)
-```
-
----
-
-## Usage across dialogs
-
-### `confirmDialog`
-
-```tsx
-{renderDialogActions({
-  buttons: props.actions,
-  actions: props,
-  cancelDefaults: {
-    label: 'Cancel',
-    variant: 'outline',
-    onClick: (a) => a.dismiss('cancel'),
-    type: 'button',
-  },
-  confirmDefaults: {
-    label: 'Confirm',
-    variant: 'destructive',
-    onClick: (a) => a.confirm(true),
-    type: 'submit',
-  },
-})}
-```
-
-### `countdownDialog`
-
-The countdown dialog has a time-dependent disabled state on the confirm button, so it uses `renderDialogButton` for the confirm slot directly:
-
-```tsx
-<div className="flex justify-end gap-3 pt-2">
-  {renderDialogButton(
-    props.actions?.cancelButton,
-    props,
-    { label: 'Cancel', variant: 'outline', onClick: (a) => a.dismiss('cancel'), type: 'button' }
-  )}
-  <Button
-    onClick={() => props.confirm('confirm pressed')}
-    disabled={timeRemaining > 0 && !props.autoConfirm}
-  >
-    {timeRemaining > 0 && !props.autoConfirm ? `Confirm (${timeRemaining}s)` : 'Confirm'}
-  </Button>
-</div>
-```
-
-Or, if the disabled/label logic is provided as defaults with a closure over component state:
-
-```tsx
-{renderDialogActions({
-  buttons: props.actions,
-  actions: props,
-  cancelDefaults: { label: 'Cancel', variant: 'outline', onClick: (a) => a.dismiss('cancel') },
-  confirmDefaults: {
-    label: timeRemaining > 0 ? `Confirm (${timeRemaining}s)` : 'Confirm',
-    variant: 'default',
-    onClick: (a) => a.confirm('confirm pressed'),
-    // disabled is part of the descriptor — pass it as a default override via buttons prop
-    // or handle inline as above
-  },
-})}
-```
-
-### `delayedActionDialog`
-
-```tsx
-{renderDialogActions({
-  buttons: props.actions,
-  actions: props,
-  cancelDefaults: { label: 'Cancel', variant: 'outline', onClick: (a) => a.dismiss('cancel') },
-  confirmDefaults: {
-    label: canInteract ? 'Continue' : `Please wait (${timeRemaining}s)`,
-    variant: props.dangerAction ? 'destructive' : 'default',
-    onClick: (a) => a.confirm(true),
-  },
-})}
-```
-
----
-
 ## Discrimination at runtime
 
-The union `DialogActionButton<T>` requires runtime type narrowing because `ReactNode` and `DialogActionButtonDescriptor<T>` are both objects. The discrimination guard used in `renderDialogButton`:
+`DialogActionButton<T, TCtx>` requires runtime narrowing because `ReactNode` and `DialogActionButtonDescriptor` are both objects. The discriminator used in `renderDialogButton`:
 
 ```ts
-function isDescriptor<T>(value: unknown): value is DialogActionButtonDescriptor<T> {
+function isDescriptor<T, TCtx>(value: unknown): value is DialogActionButtonDescriptor<T, TCtx> {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -424,16 +461,54 @@ function isDescriptor<T>(value: unknown): value is DialogActionButtonDescriptor<
 }
 ```
 
-Any plain object that isn't a React element and isn't an array is treated as a descriptor. TypeScript enforces at the call site that only valid shapes are passed — the runtime guard just handles the JSX element / descriptor ambiguity.
-
-This is more permissive than the current `isButtonDescriptor` (which required `label` and `onClick`). Since `label` is now optional in the descriptor, we can't use it as a discriminator.
+Any plain object that is not a React element and not an array is treated as a descriptor. TypeScript enforces correct shapes at the call site — the runtime guard only handles the React element / descriptor boundary.
 
 ---
 
-## Open questions / deferred decisions
+## Note: `GenerateDialogTypes<TProps, TValue, TCtx>` utility type
 
-- **`customButtons` default action**: Currently no meaningful default exists (the old code passed `() => {}`). Should custom buttons require an `onClick`? One option: make `customButtons` only accept `DialogActionButtonDescriptor<T>` (with `onClick` required), render function, or `ReactNode` — excluding `true`, `false`, and `string` which have no semantic meaning without a slot-defined default.
+When authoring a custom dialog, the user currently needs to write several related types manually:
+- Component props: `DialogComponentProps<MyProps, MyValue>` (i.e. `MyProps & DialogActions<MyValue>`)
+- Hook return: `DialogActions<MyValue> & { props: MyProps }` when using `useDynamicDialog`
+- Dialog result: `DialogResultData<MyValue>` for the `.then()` callback
 
-- **Button ordering**: The render order is fixed (custom → cancel → confirm). Should `container` support re-ordering, or is a render function sufficient for that?
+A utility type could generate these from one declaration:
 
-- **`confirmDefaults.disabled`**: Time-dependent disabled state (countdown, delayed-action) can't be expressed in `DialogActionButtonSlotDefaults<T>` because it closes over component state. Pattern: pass the confirm button via `props.actions?.confirmButton` and fall back to a hardcoded button when component state needs to control `disabled`. Or add a `defaultDisabled` field to `DialogActionButtonSlotDefaults`.
+```ts
+type G = GenerateDialogTypes<MyProps, MyValue, MyContext>;
+
+// G['componentProps'] = MyProps & DialogActions<MyValue>
+// G['hookReturn']     = DialogActions<MyValue> & { props: MyProps }
+// G['result']         = DialogResultData<MyValue>
+```
+
+Usage in a custom dialog:
+
+```ts
+interface MyDialogProps { title: string; items: string[] }
+type G = GenerateDialogTypes<MyDialogProps, boolean>;
+
+// Instead of:
+function MyDialog(props: DialogComponentProps<MyDialogProps, boolean>) { ... }
+// Write:
+function MyDialog(props: G['componentProps']) { ... }
+
+// Instead of:
+const { confirm, dismiss, props } = useDynamicDialog<MyDialogProps, boolean>();
+// Could use:
+const { confirm, dismiss, props } = useDynamicDialog<G>();
+```
+
+**Deferred**: not implemented yet. Needs design for how `useDynamicDialog` overloads would consume the generated type.
+
+---
+
+## Open questions
+
+- **`customButtons` slot in positional arrays**: Should `renderDialogActions` treat array-valued slots specially (render each in sequence) vs. always requiring named slots? Arrays break the "each slot is named" model but are needed for `customButtons?: DialogActionButton<T>[]`.
+
+- **Descriptor `label` being a function**: Should `label` accept `(actions, ctx) => ReactNode` for dynamic labels (like the countdown's "Confirm (3s)")? Currently only the render function variant supports dynamic labels. Adding `label?: ReactNode | ((a, ctx) => ReactNode)` would close this gap cleanly.
+
+- **`resolveDialogActions` type**: Currently typed as `Record<string, ...>`. In practice each dialog knows its exact slot names — the result type could be `{ [K in keyof Defaults]: DialogActionButton<T, TCtx> }` (preserving slot names). Worth typing precisely when implementing.
+
+- **`confirmDefaults.disabled` for time-based dialogs**: Countdown/delayed-action need `disabled` tied to `timeRemaining` (component state). Three options: (a) pass `timeRemaining` in context, (b) use `renderDialogButton` for that slot directly, (c) add `defaultDisabled` to `DialogActionButtonSlotDefaults`. Option (a) is cleanest if the context type is designed upfront.
