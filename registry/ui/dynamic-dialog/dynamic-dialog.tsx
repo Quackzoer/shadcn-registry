@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
-import type { DialogActions } from '@/registry/lib/dynamic-dialog-state';
+import type { DialogActions, DismissReason } from '@/registry/lib/dynamic-dialog-state';
 
 interface DynamicDialogContextValue {
   actions: DialogActions<unknown>;
@@ -29,7 +29,7 @@ interface DialogStateItem {
 
 function DynamicDialogItem({ id, open, Component, componentProps }: DialogStateItem) {
   const confirm = (value?: unknown) => dialogObservable.confirmDialog(id, value);
-  const dismiss = (reason?: string, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
+  const dismiss = (reason?: DismissReason, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
   const onOpenChange = (isOpen: boolean) => { if (!isOpen) dismiss('close'); };
 
   const actions: DialogActions<unknown> = { confirm, dismiss, open, onOpenChange };
