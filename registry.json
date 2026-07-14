@@ -23,7 +23,7 @@
         {
           "path": "registry/lib/dynamic-dialog-state.ts",
           "type": "registry:file",
-          "target": "@lib/dynamic-dialog/dynamic-state.ts"
+          "target": "@lib/dynamic-dialog/dynamic-dialog-state.ts"
         }
       ]
     },

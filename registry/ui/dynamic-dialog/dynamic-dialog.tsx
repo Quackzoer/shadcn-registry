@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState, useEffect, useContext, createContext, useRef } from 'react';
-import { dialogObservable } from '@/lib/dynamic-dialog-state';
-import type { DialogActions, DismissReason } from '@/lib/dynamic-dialog-state';
+import { dialogObservable } from '@/lib/dynamic-dialog/dynamic-dialog-state';
+import type { DialogActions, DismissReason } from '@/lib/dynamic-dialog/dynamic-dialog-state';
 
 interface DynamicDialogContextValue {
   actions: DialogActions<unknown>;
