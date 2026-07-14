@@ -75,7 +75,7 @@ export default function TanstackFormFieldsPage() {
                     >
                         {(field)=>{
                             return (
-                                <field.Password label="Password" required/>
+                                <field.Password/>
                             )
                         }}
                     </form.AppField>

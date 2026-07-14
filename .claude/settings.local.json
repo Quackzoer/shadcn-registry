@@ -6,7 +6,11 @@
       "Bash(gh api *)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(node_modules/.bin/tsc --noEmit)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(bun run *)",
+      "Bash(bun --version)",
+      "Bash(bun list *)",
+      "Bash(pkill -f \"next dev\")"
     ],
     "deny": [],
     "ask": []

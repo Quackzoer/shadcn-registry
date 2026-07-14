@@ -5,8 +5,8 @@ import { FormProvider, type UseFormReturn } from "react-hook-form"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
-import { useFormField } from "@/registry/ui/form"
-import { Label } from "@/registry/ui/label"
+import { useFormField } from "@/components/ui/form"
+import { Label } from "@/components/ui/label"
 
 // ——— Schema context ———
 
