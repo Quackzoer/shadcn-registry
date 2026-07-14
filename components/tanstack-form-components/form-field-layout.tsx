@@ -5,7 +5,6 @@ import { FieldDescription } from "./field-description"
 import { FieldError } from "./field-error"
 
 interface FormFieldLayoutProps {
-    id: string
     label?: React.ReactNode
     description?: React.ReactNode
     required?: boolean

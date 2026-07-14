@@ -46,7 +46,7 @@ export default function RootLayout({
               <Link href="/mark-searched-phrase">Mark Searched Phrase Example</Link>
             </li>
             <li>
-              <Link href="/tanstack-form-fields">Tanstack Form Fields</Link>
+              <Link href="/tanstack-form-components">Tanstack Form Components</Link>
             </li>
           </ol>
         </nav>

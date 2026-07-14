@@ -1,7 +1,8 @@
 "use client"
-import { FieldResetValueButton } from "@/components/tanstack-form-fields/field-reset-value-button"
-import { FormFieldCardSelectOption } from "@/components/tanstack-form-fields/form-field-card-select"
-import { useAppForm } from "@/components/tanstack-form-fields/hook"
+import { FieldResetValueButton } from "@/components/tanstack-form-components/field-reset-value-button"
+import { FormFieldCardSelectOption } from "@/components/tanstack-form-components/form-field-card-select"
+import { FormFieldLayout } from "@/components/tanstack-form-components/form-field-layout"
+import { useAppForm } from "@/components/tanstack-form-components/hook"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -17,7 +18,7 @@ type FormSchema = z.infer<typeof formSchema>
 
 const formDefaultValues: Partial<FormSchema> = {
     firstName: '',
-    password: 'chuj',
+    password: '123',
 }
 
 export default function TanstackFormFieldsPage() {
@@ -48,32 +49,15 @@ export default function TanstackFormFieldsPage() {
                         form.handleSubmit()
                     }}
                 >
-                    <form.Field
+                    <form.AppField
                         name="firstName"
                     >
-                        {(field) => {
-                            const isInvalid =
-                                field.state.meta.isTouched && !field.state.meta.isValid
-                            return (
-                                <Field data-invalid={isInvalid}>
-                                    <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
-                                    <Input
-                                        id={field.name}
-                                        name={field.name}
-                                        value={field.state.value}
-                                        onBlur={field.handleBlur}
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                        aria-invalid={isInvalid}
-                                        placeholder="Login button not working on mobile"
-                                        autoComplete="off"
-                                    />
-                                    {isInvalid && (
-                                        <FieldError errors={field.state.meta.errors} />
-                                    )}
-                                </Field>
-                            )
-                        }}
-                    </form.Field>
+                        {(field) => (
+                            <FormFieldLayout label={'First Name'} required description={'Name you were assigned at birth'}>
+                                <field.Text/>
+                            </FormFieldLayout>
+                        )}
+                    </form.AppField>
                     <form.AppField
                         name='password'
                     >
