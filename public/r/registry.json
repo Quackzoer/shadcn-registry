@@ -17,11 +17,13 @@
       "files": [
         {
           "path": "registry/ui/dynamic-dialog/dynamic-dialog.tsx",
-          "type": "registry:ui"
+          "type": "registry:file",
+          "target": "~/components/dynamic-dialog/dynamic-dialog.tsx"
         },
         {
           "path": "registry/lib/dynamic-dialog-state.ts",
-          "type": "registry:lib"
+          "type": "registry:file",
+          "target": "~/lib/dynamic-dialog/dynamic-state.ts"
         }
       ]
     },
@@ -145,6 +147,20 @@
         {
           "path": "registry/blocks/complex-component/hooks/use-pokemon.ts",
           "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "field-label",
+      "type": "registry:ui",
+      "title": "Field Label",
+      "description": "A form label that automatically shows a required asterisk based on the Zod schema. Use SchemaFormProvider instead of Form to enable schema introspection.",
+      "dependencies": ["react-hook-form", "zod"],
+      "registryDependencies": ["label", "form"],
+      "files": [
+        {
+          "path": "registry/ui/field-label.tsx",
+          "type": "registry:ui"
         }
       ]
     },
