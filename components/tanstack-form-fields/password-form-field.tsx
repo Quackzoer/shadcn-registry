@@ -3,13 +3,18 @@ import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
 import * as React from "react"
 import { useFieldContext } from "./hook"
+import { cn } from "@/lib/utils"
 
-export function FormPasswordField() {
+interface FormPasswordFieldProps {
+    className?: string
+}
+
+export function FormPasswordField({className}: Readonly<FormPasswordFieldProps>) {
     const field = useFieldContext<string>()
     const [showPassword, setShowPassword] = React.useState(false)
 
     return (
-        <div className="relative">
+        <div className={cn("relative",className)}>
             <Input
                 id={field.name}
                 type={showPassword ? "text" : "password"}

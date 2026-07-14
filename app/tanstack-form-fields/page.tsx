@@ -1,4 +1,5 @@
 "use client"
+import { FieldResetValueButton } from "@/components/tanstack-form-fields/field-reset-value-button"
 import { useAppForm } from "@/components/tanstack-form-fields/hook"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,7 @@ type FormSchema = z.infer<typeof formSchema>
 
 const formDefaultValues: FormSchema = {
     firstName: '',
-    password: ''
+    password: 'chuj'
 }
 
 export default function TanstackFormFieldsPage() {
@@ -75,7 +76,10 @@ export default function TanstackFormFieldsPage() {
                     >
                         {(field)=>{
                             return (
-                                <field.Password/>
+                                <div className="flex">
+                                    <field.Password className='w-full'/>
+                                    <FieldResetValueButton/>
+                                </div>
                             )
                         }}
                     </form.AppField>
