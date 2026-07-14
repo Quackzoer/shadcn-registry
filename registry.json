@@ -165,6 +165,18 @@
       ]
     },
     {
+      "name": "mark-searched-phrase",
+      "type": "registry:ui",
+      "title": "Mark Searched Phrase",
+      "description": "Text element that applies style to text if provided value was found within it.",
+      "files": [
+        {
+          "path": "components/ui/mark-searched-phrase.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "example-with-css",
       "type": "registry:component",
       "title": "Example with CSS",
