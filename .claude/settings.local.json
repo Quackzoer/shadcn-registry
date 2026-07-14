@@ -10,7 +10,9 @@
       "Bash(bun run *)",
       "Bash(bun --version)",
       "Bash(bun list *)",
-      "Bash(pkill -f \"next dev\")"
+      "Bash(pkill -f \"next dev\")",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs"
     ],
     "deny": [],
     "ask": []

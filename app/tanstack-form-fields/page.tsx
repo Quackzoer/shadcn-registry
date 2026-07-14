@@ -1,20 +1,23 @@
 "use client"
 import { FieldResetValueButton } from "@/components/tanstack-form-fields/field-reset-value-button"
+import { FormFieldCardSelectOption } from "@/components/tanstack-form-fields/form-field-card-select"
 import { useAppForm } from "@/components/tanstack-form-fields/hook"
+import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import * as z from "zod"
 
 const formSchema = z.object({
     firstName: z.string(),
-    password: z.string()
+    password: z.string(),
+    accountType: z.enum(['personal', 'workRelated', 'other'])
 })
 
 type FormSchema = z.infer<typeof formSchema>
 
-const formDefaultValues: FormSchema = {
+const formDefaultValues: Partial<FormSchema> = {
     firstName: '',
-    password: 'chuj'
+    password: 'chuj',
 }
 
 export default function TanstackFormFieldsPage() {
@@ -22,7 +25,7 @@ export default function TanstackFormFieldsPage() {
         validators: {
             onSubmit: formSchema
         },
-        defaultValues: formDefaultValues,
+        defaultValues: formDefaultValues as FormSchema,
         onSubmit: async ({ value }) => {
             console.log(value)
         }
@@ -72,13 +75,73 @@ export default function TanstackFormFieldsPage() {
                         }}
                     </form.Field>
                     <form.AppField
-                    name='password'
+                        name='password'
                     >
-                        {(field)=>{
+                        {(field) => {
                             return (
                                 <div className="flex">
-                                    <field.Password className='w-full'/>
-                                    <FieldResetValueButton/>
+                                    <field.Password className='w-full' />
+                                    <FieldResetValueButton />
+                                </div>
+                            )
+                        }}
+                    </form.AppField>
+                    <form.AppField
+                        name='accountType'
+                    >
+                        {(field) => {
+                            const options: FormFieldCardSelectOption<FormSchema['accountType']>[] = [
+                                {
+                                    label: 'Personal',
+                                    value: 'personal'
+                                },
+                                {
+                                    value: 'workRelated',
+                                    label: "Work Related"
+                                },
+                                {
+                                    value: "other",
+                                    label: "Other"
+                                }
+                            ]
+                            return (
+                                <div className="flex">
+                                    <field.CardSelect options={options} />
+                                </div>
+                            )
+                        }}
+                    </form.AppField>
+                    <form.AppField
+                        name='accountType'
+                    >
+                        {(field) => {
+                            const options: FormFieldCardSelectOption<FormSchema['accountType']>[] = [
+                                {
+                                    label: 'Personal',
+                                    value: 'personal'
+                                },
+                                {
+                                    value: 'workRelated',
+                                    label: "Work Related"
+                                },
+                                {
+                                    value: "other",
+                                    label: "Other"
+                                }
+                            ]
+                            return (
+                                <div className="flex">
+                                    <field.CardSelect
+                                        options={options}
+                                        render={({isSelected, setValue, option, index}) => (
+                                            <Button 
+                                            variant={isSelected ? 'default' : 'outline'} 
+                                            onClick={()=>setValue()}
+                                            >
+                                                {option.label}{' '}{index+1}
+                                            </Button>
+                                    )}
+                                    />
                                 </div>
                             )
                         }}

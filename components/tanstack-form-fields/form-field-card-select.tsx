@@ -1,48 +1,54 @@
 import * as React from "react"
 import { Card, CardContent, CardHeader } from "../ui/card"
 import { useFieldContext } from "./hook"
+import { cn } from "@/lib/utils"
 
-interface Option {
-    value: string
+export interface FormFieldCardSelectOption<V = string> {
+    value: V
     label: string
     icon?: React.ReactNode
 }
 
-interface RenderProps {
-    value: string
+interface RenderProps<O extends FormFieldCardSelectOption<any> = FormFieldCardSelectOption<string>> {
+    option: O
     isSelected: boolean
     index: number
     setValue: () => void
 }
 
-interface FormCardSelectFieldProps {
-    render?: (props: RenderProps) => React.ReactNode
-    options: Array<Option>
+interface FormCardSelectFieldProps<O extends FormFieldCardSelectOption<any> = FormFieldCardSelectOption<string>> {
+    render?: (props: RenderProps<O>) => React.ReactNode
+    options: Array<O>
+    className?: string
 }
 
-export function FormCardSelectField({ render, options }: Readonly<FormCardSelectFieldProps>) {
-    const field = useFieldContext<string>()
+export function FormCardSelectField<O extends FormFieldCardSelectOption<any>>({ render, options, className }: Readonly<FormCardSelectFieldProps<O>>) {
+    const field = useFieldContext()
 
     return (
-        <div className="relative">
-            {options.map(({ value, icon, label }, index) => {
-                const isSelected = value === field.state.value
+        <div className={cn('flex gap-2 w-full', className)}>
+            {options.map((option, index) => {
+                const isSelected = option.value === field.state.value
                 const setValue = () => {
-                    field.setValue(value)
+                    field.setValue(option.value)
                 }
                 if (render) return render({
-                    value,
+                    option,
                     isSelected,
-                    index, 
+                    index,
                     setValue
                 })
                 return (
-                    <Card key={value} onClick={() => setValue()}>
+                    <Card key={option.value} onClick={() => setValue()} className={
+                        cn("basis-0 grow",
+                            isSelected && 'bg-primary text-primary-foreground'
+                        )
+                    }>
                         <CardHeader>
-                            {icon}
+                            {option.icon}
                         </CardHeader>
                         <CardContent>
-                            {label}
+                            {option.label}
                         </CardContent>
                     </Card>
                 )
