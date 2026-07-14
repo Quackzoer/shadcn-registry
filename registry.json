@@ -8,12 +8,6 @@
       "type": "registry:component",
       "title": "Dynamic Dialog",
       "description": "A dynamic dialog component.",
-      "dependencies": [
-        "zod"
-      ],
-      "registryDependencies": [
-        "dialog"
-      ],
       "files": [
         {
           "path": "components/dynamic-dialog/dynamic-dialog.tsx",
@@ -42,7 +36,7 @@
         "button",
         "input",
         "form",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
@@ -60,12 +54,13 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
           "path": "components/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/delayed-action-dialog.tsx"
         }
       ]
     },
@@ -77,12 +72,13 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
           "path": "components/dynamic-dialog/dialogs/countdown-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/countdown-dialog.tsx"
         }
       ]
     },
@@ -99,12 +95,13 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
           "path": "components/dynamic-dialog/dialogs/confirm-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/confirm-dialog.tsx"
         }
       ]
     },
