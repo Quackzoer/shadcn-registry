@@ -19,7 +19,7 @@ import {
   type DialogActionButton,
   type DialogActionsContainer,
   renderStandardDialogActions,
-} from "@/registry/lib/dialog-actions";
+} from "@/lib/dynamic-dialog-actions";
 
 export interface TypeToConfirmDialogProps {
   itemName: string;

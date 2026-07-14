@@ -1,12 +1,12 @@
 "use client"
 
 import { Button } from "@/registry/ui/button"
-import { countdownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
-import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
-import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
+import { countdownDialog } from "@/components/dynamic-dialog/dialogs/countdown-dialog"
+import { typeToConfirmDialog } from "@/components/dynamic-dialog/dialogs/type-to-confirm-dialog"
+import { DynamicDialogProvider } from "@/components/dynamic-dialog/dynamic-dialog"
 import { testDialog } from "./test-dialog"
 import { openHookExampleDialogs } from "./hook-example-dialogs"
-import { loadingDialog } from "@/registry/ui/dynamic-dialog/dialogs/loading-dialog"
+import { loadingDialog } from "@/components/dynamic-dialog/dialogs/loading-dialog"
 
 export default function Page() {
   return (

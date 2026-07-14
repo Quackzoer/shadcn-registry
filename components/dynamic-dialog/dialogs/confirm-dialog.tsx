@@ -6,7 +6,7 @@ import {
   type DialogActionButton,
   type DialogActionsContainer,
   renderStandardDialogActions,
-} from "@/registry/lib/dialog-actions";
+} from "@/lib/dynamic-dialog-actions";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/registry/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 

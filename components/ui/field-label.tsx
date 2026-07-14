@@ -24,7 +24,7 @@ interface SchemaFormProviderProps {
   children: React.ReactNode
 }
 
-export function SchemaFormProvider({ form, schema, children }: SchemaFormProviderProps) {
+export function SchemaFormProvider({ form, schema, children }: Readonly<SchemaFormProviderProps>) {
   return (
     <ZodSchemaContext.Provider value={schema}>
       <FormProvider {...form}>{children}</FormProvider>
@@ -80,7 +80,7 @@ interface FieldLabelProps extends React.ComponentProps<typeof Label> {
   name?: string
 }
 
-export function FieldLabel({ name: nameProp, className, children, ...props }: FieldLabelProps) {
+export function FieldLabel({ name: nameProp, className, children, ...props }: Readonly<FieldLabelProps>) {
   const { name: contextName, formItemId, error } = useFormField()
   const schema = useZodSchema()
   const name = nameProp ?? contextName

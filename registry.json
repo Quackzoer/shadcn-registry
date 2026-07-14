@@ -16,14 +16,14 @@
       ],
       "files": [
         {
-          "path": "registry/ui/dynamic-dialog/dynamic-dialog.tsx",
+          "path": "/components/dynamic-dialog/dynamic-dialog.tsx",
           "type": "registry:file",
           "target": "@components/dynamic-dialog/dynamic-dialog.tsx"
         },
         {
-          "path": "registry/lib/dynamic-dialog-state.ts",
+          "path": "/lib/dynamic-dialog-state.ts",
           "type": "registry:file",
-          "target": "@lib/dynamic-dialog/dynamic-dialog-state.ts"
+          "target": "@lib/dynamic-dialog-state.ts"
         }
       ]
     },
@@ -159,7 +159,7 @@
       "registryDependencies": ["label", "form"],
       "files": [
         {
-          "path": "registry/ui/field-label.tsx",
+          "path": "components/ui/field-label.tsx",
           "type": "registry:ui"
         }
       ]
