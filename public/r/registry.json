@@ -8,22 +8,16 @@
       "type": "registry:component",
       "title": "Dynamic Dialog",
       "description": "A dynamic dialog component.",
-      "dependencies": [
-        "zod"
-      ],
-      "registryDependencies": [
-        "dialog"
-      ],
       "files": [
         {
-          "path": "registry/ui/dynamic-dialog/dynamic-dialog.tsx",
+          "path": "components/dynamic-dialog/dynamic-dialog.tsx",
           "type": "registry:file",
           "target": "@components/dynamic-dialog/dynamic-dialog.tsx"
         },
         {
-          "path": "registry/lib/dynamic-dialog-state.ts",
+          "path": "lib/dynamic-dialog-state.ts",
           "type": "registry:file",
-          "target": "@lib/dynamic-dialog/dynamic-state.ts"
+          "target": "@lib/dynamic-dialog-state.ts"
         }
       ]
     },
@@ -42,12 +36,13 @@
         "button",
         "input",
         "form",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
-          "path": "registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
-          "type": "registry:component"
+          "path": "components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx"
         }
       ]
     },
@@ -59,12 +54,13 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "@kazor/dynamic-dialog"
+        "./public/r/dynamic-dialog.json"
       ],
       "files": [
         {
-          "path": "registry/ui/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
-          "type": "registry:component"
+          "path": "components/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/delayed-action-dialog.tsx"
         }
       ]
     },
@@ -76,12 +72,13 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
-          "path": "registry/ui/dynamic-dialog/dialogs/countdown-dialog.tsx",
-          "type": "registry:component"
+          "path": "components/dynamic-dialog/dialogs/countdown-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/countdown-dialog.tsx"
         }
       ]
     },
@@ -98,12 +95,13 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "@kazor/dynamic-dialog"
+        "Quackzoer/shadcn-registry/dynamic-dialog"
       ],
       "files": [
         {
-          "path": "registry/ui/dynamic-dialog/dialogs/confirm-dialog.tsx",
-          "type": "registry:component"
+          "path": "components/dynamic-dialog/dialogs/confirm-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/dynamic-dialog/dialogs/confirm-dialog.tsx"
         }
       ]
     },
@@ -116,37 +114,10 @@
         "@tanstack/react-query",
         "@lukemorales/query-key-factory"
       ],
-      "files": []
-    },
-    {
-      "name": "complex-component",
-      "type": "registry:component",
-      "title": "Complex Component",
-      "description": "A complex component showing hooks, libs and components.",
-      "registryDependencies": [
-        "card"
-      ],
       "files": [
         {
-          "path": "registry/blocks/complex-component/page.tsx",
-          "type": "registry:page",
-          "target": "app/pokemon/page.tsx"
-        },
-        {
-          "path": "registry/blocks/complex-component/components/pokemon-card.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/blocks/complex-component/components/pokemon-image.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/blocks/complex-component/lib/pokemon.ts",
+          "path": "lib/use-query.ts",
           "type": "registry:lib"
-        },
-        {
-          "path": "registry/blocks/complex-component/hooks/use-pokemon.ts",
-          "type": "registry:hook"
         }
       ]
     },
@@ -159,24 +130,20 @@
       "registryDependencies": ["label", "form"],
       "files": [
         {
-          "path": "registry/ui/field-label.tsx",
+          "path": "components/ui/field-label.tsx",
           "type": "registry:ui"
         }
       ]
     },
     {
-      "name": "example-with-css",
-      "type": "registry:component",
-      "title": "Example with CSS",
-      "description": "A login form with a CSS file.",
+      "name": "mark-searched-phrase",
+      "type": "registry:ui",
+      "title": "Mark Searched Phrase",
+      "description": "Text element that applies style to text if provided value was found within it.",
       "files": [
         {
-          "path": "registry/blocks/example-with-css/example-card.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/blocks/example-with-css/example-card.css",
-          "type": "registry:component"
+          "path": "components/ui/mark-searched-phrase.tsx",
+          "type": "registry:ui"
         }
       ]
     }

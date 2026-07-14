@@ -54,7 +54,7 @@
       "registryDependencies": [
         "button",
         "dialog",
-        "Quackzoer/shadcn-registry/dynamic-dialog"
+        "./public/r/dynamic-dialog.json"
       ],
       "files": [
         {

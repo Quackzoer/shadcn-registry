@@ -7,6 +7,12 @@
     "@tanstack/react-query",
     "@lukemorales/query-key-factory"
   ],
-  "files": [],
+  "files": [
+    {
+      "path": "lib/use-query.ts",
+      "content": "import { useQuery, UseQueryOptions, QueryKey } from \"@tanstack/react-query\";\r\n\r\n/**\r\n * Factory function to create typed useQuery hooks with automatic type inference\r\n */\r\nexport function createUseQuery<TQueryFnData, TProps = void>(\r\n  queryFn: (props: TProps) => Promise<TQueryFnData>,\r\n  defaultOptions:\r\n    | ((\r\n        props: TProps\r\n      ) => Omit<\r\n        UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,\r\n        \"queryFn\" | \"select\"\r\n      >)\r\n    | Omit<\r\n        UseQueryOptions<TQueryFnData, Error, TQueryFnData, QueryKey>,\r\n        \"queryFn\"\r\n      >\r\n) {\r\n  return <TData = TQueryFnData>(\r\n    ...args: TProps extends void\r\n      ? [\r\n          config?: {\r\n            props?: void;\r\n            options?: Omit<\r\n              UseQueryOptions<TQueryFnData, Error, TData, QueryKey>,\r\n              \"queryKey\" | \"queryFn\"\r\n            > & {\r\n              queryKey?: QueryKey;\r\n            };\r\n          }\r\n        ]\r\n      : [\r\n          config: {\r\n            props: TProps;\r\n            options?: Omit<\r\n              UseQueryOptions<TQueryFnData, Error, TData, QueryKey>,\r\n              \"queryKey\" | \"queryFn\"\r\n            > & {\r\n              queryKey?: QueryKey;\r\n            };\r\n          }\r\n        ]\r\n  ) => {\r\n    const { props, options } = args[0] ?? {};\r\n    const defaultQueryKeys =\r\n      typeof defaultOptions === \"function\"\r\n        ? defaultOptions(props as TProps).queryKey ?? []\r\n        : defaultOptions.queryKey ?? [];\r\n    const optionsQueryKey = options?.queryKey ?? [];\r\n    const queryKey = [...defaultQueryKeys, ...optionsQueryKey];\r\n    return useQuery<TQueryFnData, Error, TData, QueryKey>({\r\n      queryFn: () => queryFn(props as TProps),\r\n      ...(typeof defaultOptions === \"function\"\r\n        ? defaultOptions(props as TProps)\r\n        : defaultOptions),\r\n      ...options,\r\n      queryKey: queryKey,\r\n    });\r\n  };\r\n}\r\n",
+      "type": "registry:lib"
+    }
+  ],
   "type": "registry:lib"
 }
