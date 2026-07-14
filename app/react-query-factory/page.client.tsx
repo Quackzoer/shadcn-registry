@@ -14,14 +14,14 @@ const exampleQueryFnWithParams = async (props: ExampleQueryFnWithParamsProps) =>
     return {
         a: `A${props.page}`,
         b: `B${props.page}`,
-        c: [`C${props.page}1`, `C${props.page}2`, `C${props.page}3`],
+        c: [`C.${props.page}.1`, `C.${props.page}.2`, `C.${props.page}.3`],
     };
 };
 const exampleQueryFnWithoutParams = async () => {
     return {
         a: `A`,
         b: `B`,
-        c: [`C1`, `C2`, `C3`],
+        c: [`C.1`, `C.2`, `C.3`],
     };
 };
 

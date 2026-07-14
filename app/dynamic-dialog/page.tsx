@@ -1,9 +1,12 @@
 "use client"
 
 import { Button } from "@/registry/ui/button"
-import { countDownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
+import { countdownDialog } from "@/registry/ui/dynamic-dialog/dialogs/countdown-dialog"
 import { typeToConfirmDialog } from "@/registry/ui/dynamic-dialog/dialogs/type-to-confirm-dialog"
 import { DynamicDialogProvider } from "@/registry/ui/dynamic-dialog/dynamic-dialog"
+import { testDialog } from "./test-dialog"
+import { openHookExampleDialogs } from "./hook-example-dialogs"
+import { loadingDialog } from "@/registry/ui/dynamic-dialog/dialogs/loading-dialog"
 
 export default function Page() {
   return (
@@ -17,9 +20,64 @@ export default function Page() {
       <main className="flex flex-col flex-1 gap-8">
         <Button
           onClick={() => {
-            countDownDialog({
-              countdownSeconds: 5,
-            }).async().then((result) => {
+            const promise = new Promise<string>((resolve) =>
+              setTimeout(() => resolve('done'), 3000)
+            )
+            loadingDialog({
+              props: {
+                title: 'Loading...',
+                description: 'Resolves after 3 seconds.',
+                promise,
+              }
+            }).then(({ reason, value }) => {
+              // reason === 'success' → resolved, value is the resolved value
+              // reason === 'error'   → rejected, value is the error
+              // reason === 'close'   → user dismissed (only when allowCancel: true)
+              console.log('Loading dialog settled:', reason, value)
+            })
+          }}
+        >
+          Loading dialog (auto-dismiss on promise)
+        </Button>
+        <Button
+          onClick={() => {
+            const promise = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Something went wrong')), 2000)
+            )
+            loadingDialog({
+              props: {
+                title: 'Deleting...',
+                promise,
+              }
+            }).then(({ reason, value }) => {
+              console.log('Loading dialog settled:', reason, value)
+            })
+          }}
+        >
+          Loading dialog (rejects after 2s)
+        </Button>
+        <Button
+          onClick={() => {
+            const promise = new Promise<string>((resolve) =>
+              setTimeout(() => resolve('uploaded'), 5000)
+            )
+            loadingDialog({
+              props: {
+                title: 'Uploading...',
+                description: 'You can cancel this operation.',
+                allowCancel: true,
+                promise,
+              }
+            }).then(({ reason }) => {
+              console.log('Loading dialog reason:', reason)
+            })
+          }}
+        >
+          Loading dialog (cancellable)
+        </Button>
+        <Button
+          onClick={() => {
+            countdownDialog({ props: { countdownSeconds: 5 } }).then((result) => {
               console.log(result)
             })
           }}
@@ -28,9 +86,7 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            typeToConfirmDialog({
-              itemName: 'some-file.txt'
-            }).async().then((result) => {
+            typeToConfirmDialog({ props: { itemName: 'some-file.txt' } }).then((result) => {
               console.log(result)
             })
           }}
@@ -39,17 +95,13 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const typeToConfirmDialogRes = typeToConfirmDialog({
-              itemName: 'some-file.txt',
+            const typeToConfirmDialogRes = typeToConfirmDialog({ props: { itemName: 'some-file.txt' } })
+            const countdownDialogRes = countdownDialog({ props: { countdownSeconds: 10 } })
+            typeToConfirmDialogRes.then(({ value }) => {
+              console.log('Type to confirm result:', value)
             })
-            const countDownDialogRes = countDownDialog({
-              countdownSeconds: 10,
-            })
-            typeToConfirmDialogRes.value.then((result) => {
-              console.log('Type to confirm result:', result)
-            })
-            countDownDialogRes.value.then((result) => {
-              console.log('Countdown dialog result:', result)
+            countdownDialogRes.then(({ value }) => {
+              console.log('Countdown dialog result:', value)
             })
           }}
         >
@@ -57,15 +109,47 @@ export default function Page() {
         </Button>
         <Button
           onClick={() => {
-            const countDownDialogRes = countDownDialog({
-              countdownSeconds: 20,
-            })
+            const countdownDialogRes = countdownDialog({ props: { countdownSeconds: 20 } })
             setTimeout(() => {
-              countDownDialogRes.dismiss("timer", 'Dismissed after 5 seconds')
+              countdownDialogRes.dismiss("time-out", 'Dismissed after 5 seconds')
             }, 5000)
           }}
         >
           Dialog dismissed after 5 seconds
+        </Button>
+        <Button
+          onClick={() => {
+            testDialog().then((result) => {
+              console.log(result)
+            })
+          }}
+        >
+          Test Dialog
+        </Button>
+        <Button
+          onClick={() => {
+            openHookExampleDialogs().then((result) => {
+              console.log("Hook example result:", result)
+            })
+          }}
+        >
+          Hook example (two dialogs, isolated contexts)
+        </Button>
+        <Button
+          onClick={() => {
+            const dialog = typeToConfirmDialog({
+              props: {
+                itemName: 'This will change after 5 seconds'
+              }
+            })
+            setTimeout(() => {
+              dialog.update({
+                itemName: 'I changed!'
+              })
+            }, 5000)
+          }}
+        >
+          Update dialog example
         </Button>
       </main>
       <DynamicDialogProvider />

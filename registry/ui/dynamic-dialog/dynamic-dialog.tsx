@@ -1,107 +1,102 @@
 "use client"
 
-import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { useState, useEffect } from 'react';
-import type { DialogState, DialogRendererProps, DismissReason } from '@/registry/lib/dynamic-dialog-state';
-import { dialogObservable } from '@/registry/lib/dynamic-dialog-state';
-import { Dialog, DialogContent } from '@/registry/ui/dialog';
+import React, { useState, useEffect, useContext, createContext, useRef } from 'react';
+import { dialogObservable } from '@/lib/dynamic-dialog-state';
+import type { DialogActions, DismissReason } from '@/lib/dynamic-dialog-state';
 
-function DynamicDialog(props: Readonly<DialogState>) {
+interface DynamicDialogContextValue {
+  actions: DialogActions<unknown>;
+  componentProps: Record<string, unknown>;
+}
 
-  useEffect(() => {
-    props.onOpen();
-    return () => props.onClose();
-  }, [props]);
+const DynamicDialogContext = createContext<DynamicDialogContextValue | null>(null);
 
-  const handleBackdropClick = () => {
-    dialogObservable.dismissDialog(props.id, "backdrop");
+export function useDynamicDialog(): DialogActions<unknown>;
+export function useDynamicDialog<TProps extends object, TValue = unknown>(): DialogActions<TValue> & { props: TProps };
+export function useDynamicDialog() {
+  const ctx = useContext(DynamicDialogContext);
+  if (!ctx) throw new Error('useDynamicDialog must be used within a dialog rendered by DynamicDialogProvider');
+  return { ...ctx.actions, props: ctx.componentProps };
+}
+
+interface DialogStateItem {
+  id: string;
+  open: boolean;
+  Component: React.ComponentType<Record<string, unknown>>;
+  componentProps: Record<string, unknown>;
+  beforeClose?: () => boolean | Promise<boolean>;
+}
+
+export interface DynamicDialogProviderProps {
+  /** Milliseconds to wait after close animation before unmounting the dialog. Must match the CSS exit animation duration. */
+  removeDelay?: number;
+}
+
+function DynamicDialogItem({ id, open, Component, componentProps, beforeClose }: DialogStateItem) {
+  const confirm = (value?: unknown) => dialogObservable.confirmDialog(id, value);
+  const dismiss = (reason?: DismissReason, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
+  const onOpenChange = async (isOpen: boolean) => {
+    if (!isOpen) {
+      if (beforeClose) {
+        const canClose = await beforeClose();
+        if (!canClose) return;
+      }
+      dismiss('close');
+    }
   };
 
-  const confirm = (value?: unknown) => {
-    dialogObservable.confirmDialog(props.id, value);
-  };
-
-  const deny = (value?: unknown) => {
-    dialogObservable.denyDialog(props.id, value);
-  };
-
-  const cancel = () => {
-    dialogObservable.dismissDialog(props.id, "cancel");
-  };
-
-  const dismiss = (reason: DismissReason, value?: unknown) => {
-    dialogObservable.dismissDialog(props.id, reason, value);
-  };
-
-  const closeDialog = () => {
-    dialogObservable.dismissDialog(props.id, "close");
-  };
-  const [dialogContentProps, setDialogContentProps] = useState<DialogPrimitive.DialogContentProps|undefined>(props.dialogContentProps);
-  const renderProps: DialogRendererProps = {
-    ...props,
-    confirm,
-    deny,
-    cancel,
-    dismiss,
-    closeDialog,
-    setDialogContentProps
-  };
+  const actions: DialogActions<unknown> = { confirm, dismiss, open, onOpenChange };
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      {/* TODO Instead of using DialogContent directly, make user use it internally and add onInteractionOutside and other dialog related props to another prop passed to render function so that we don't have to do setDialogContentProps */}
-      <DialogContent
-        onInteractOutside={e => {
-          if (props.important) { e.preventDefault() } else { handleBackdropClick() }
-        }}
-        {...dialogContentProps}
-      >
-        {props.render?.(renderProps)}
-      </DialogContent>
-    </Dialog>
+    <DynamicDialogContext.Provider value={{ actions, componentProps }}>
+      <Component {...componentProps} {...actions} />
+    </DynamicDialogContext.Provider>
   );
 }
 
-export function DynamicDialogProvider() {
-  const [dialogs, setDialogs] = useState<DialogState[]>([]);
+export function DynamicDialogProvider({ removeDelay = 300 }: DynamicDialogProviderProps) {
+  const [dialogs, setDialogs] = useState<DialogStateItem[]>([]);
+  const removeDelayRef = useRef(removeDelay);
+  removeDelayRef.current = removeDelay;
 
   useEffect(() => {
-    const unsubscribe = dialogObservable.subscribe((action, data) => {
-      switch (action) {
-        case 'SHOW_DIALOG': {
-          const dialogState: DialogState = {
-            ...data,
-            id: data.id!,
-            render: data.render!,
+    const unsubscribe = dialogObservable.subscribe((event) => {
+      switch (event.action) {
+        case 'SHOW_DIALOG':
+          setDialogs(prev => [...prev, {
+            id: event.id,
             open: true,
-            onOpen: data.onOpen || (() => { }),
-            onClose: data.onClose || (() => { }),
-            onOpenChange: (open: boolean) => {
-              if (!open) {
-                dialogObservable.dismissDialog(data.id!, "close");
-              }
-            }
-          };
-          setDialogs(current => [...current, dialogState]);
+            Component: event.Component,
+            componentProps: event.componentProps,
+            beforeClose: event.beforeClose,
+          }]);
           break;
-        }
-        case 'HIDE_DIALOG': {
-          setDialogs(current => current.filter(d => d.id !== data.id));
+        case 'UPDATE_DIALOG':
+          setDialogs(prev =>
+            prev.map(d => d.id === event.id ? { ...d, componentProps: event.componentProps } : d)
+          );
           break;
-        }
+        case 'HIDE_DIALOG':
+          setDialogs(prev =>
+            prev.map(d => d.id === event.id ? { ...d, open: false } : d)
+          );
+          setTimeout(() => {
+            setDialogs(prev => prev.filter(d => d.id !== event.id));
+          }, removeDelayRef.current);
+          break;
       }
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      dialogObservable.dismissAllDialogs('close');
+    };
   }, []);
 
   return (
     <>
-      {dialogs.map(dialog => (
-        <DynamicDialog
-          key={dialog.id}
-          {...dialog}
-        />
+      {dialogs.map(d => (
+        <DynamicDialogItem key={d.id} {...d} />
       ))}
     </>
   );
