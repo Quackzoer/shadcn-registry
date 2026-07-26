@@ -1,11 +1,11 @@
 "use client"
-import { FieldResetValueButton } from "@/components/tanstack-form-components/field-reset-value-button"
-import { FormFieldCardSelectOption } from "@/components/tanstack-form-components/form-field-card-select"
-import { FormFieldLayout } from "@/components/tanstack-form-components/form-field-layout"
-import { useAppForm } from "@/components/tanstack-form-components/hook"
+import { FieldResetValueButton } from "@/components/tanstack-form-field-components/field-reset-value-button"
+import { FormFieldCardSelectOption } from "@/components/tanstack-form-field-components/form-field-card-select"
+import { FormFieldLayout } from "@/components/tanstack-form-field-components/form-field-layout"
+import { useAppForm } from "@/components/tanstack-form-field-components/hook"
+import { FormAutosave } from "@/components/tanstack-form-components/form-autosave"
+import { localStorageAdapter } from "@/components/tanstack-form-components/form-autosave-adapter"
 import { Button } from "@/components/ui/button"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import * as z from "zod"
 
 const formSchema = z.object({
@@ -49,6 +49,12 @@ export default function TanstackFormFieldsPage() {
                         form.handleSubmit()
                     }}
                 >
+                    <FormAutosave
+                        adapter={localStorageAdapter}
+                        storageKey="tanstack-form-example"
+                        debounceMs={300}
+                        autoRestore
+                    />
                     <form.AppField
                         name="firstName"
                     >
