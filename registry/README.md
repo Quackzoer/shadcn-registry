@@ -28,15 +28,29 @@ Two directories at the repo root are deliberately **not** part of this scheme:
 | Item | Published | Demo | What it is |
 | --- | --- | --- | --- |
 | [`store-slice`](./store-slice) | ✅ | [`/store-slice`](../app/store-slice) | Composable zustand slices that mirror TanStack Query |
+| [`data-table`](./data-table) | ✅ | — | Virtualized TanStack Table with per-instance state, row grouping, filters popover |
+| [`combobox`](./combobox) | ✅ | [`/combobox`](../app/combobox) | Composable combobox built on Base UI primitives |
+| [`breadcrumbs`](./breadcrumbs) | ✅ | — | Declarative breadcrumbs for nested routes; router-agnostic |
+| [`entity-sidebar`](./entity-sidebar) | ✅ | — | State + filter/sort primitives for a searchable entity list |
+| [`layout-slots`](./layout-slots) | ✅ | — | Nested routes render into a parent layout; slots clear on unmount |
+| [`react-hooks`](./react-hooks) | ✅ | — | Six small hooks: click-outside, element size, remaining height, … |
+| [`ts-utils`](./ts-utils) | ✅ | — | Type-level utilities: `Prettify`, `Autocomplete`, `CommonProperties`, … |
 | [`dynamic-dialog`](./dynamic-dialog) | ✅ | [`/dynamic-dialog`](../app/dynamic-dialog) | Sonner-style programmatic dialogs, plus five prebuilt dialog types |
-| [`react-query`](./react-query) | ✅ | [`/react-query-factory`](../app/react-query-factory) | Query-hook factory and query-key boilerplate |
+| [`react-query`](./react-query) | ✅ | [`/react-query-factory`](../app/react-query-factory) | Query-hook factories and query-key conventions |
 | [`field-label`](./field-label) | ✅ | — | Form label with a required asterisk driven by the Zod schema |
 | [`mark-searched-phrase`](./mark-searched-phrase) | ✅ | [`/mark-searched-phrase`](../app/mark-searched-phrase) | Highlights a matched phrase inside text |
 | [`permission-guard`](./permission-guard) | ✅ | [`/permission-guard`](../app/permission-guard) | Renders children only for permitted users |
 | [`multi-step-form`](./multi-step-form) | ✅ | — | Multi-step form with per-step validation and navigation |
 | [`devtools`](./devtools) | — | — | Pluggable in-app devtools drawer. Typechecks clean; a publishing candidate |
-| [`data-table`](./data-table) | — | — | TanStack Table wrapper. **Does not typecheck** — `table-filters-popover.tsx` still imports `@/features/crm/…` from the project it was copied out of |
 | [`tanstack-form`](./tanstack-form) | — | [`/tanstack-form-components`](../app/tanstack-form-components) | TanStack Form field components. **Does not typecheck** yet |
+
+### State-only items
+
+`entity-sidebar`, `layout-slots` and (partly) `breadcrumbs` ship state and
+logic without the surrounding chrome. That was deliberate in each case: the
+shells they came from were bound to app-specific concerns — a user avatar and
+sign-out, a particular page-header field set, typed route params — and chrome
+is exactly where apps diverge. What generalises is the model underneath.
 
 "Published" means the item has an entry in `registry.json` and is served from
 `public/r/<name>.json`. The three unpublished items are organized here but

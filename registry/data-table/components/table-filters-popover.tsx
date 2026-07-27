@@ -6,22 +6,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Filter } from 'lucide-react';
 import { Table as TableType } from '@tanstack/react-table';
-import { CrmSystemCheckboxSelectSanitized } from '@/features/crm/components/organisms/CrmSystemCheckboxSelectSanitized';
-import { CrmSystemIds } from '@/features/crm_system/lib/_core/crmSystem/crmSystem.types.gen';
-import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, useComboboxAnchor } from '@/components/ui/combobox';
-import { CRM_NAMING } from '@/constants/crm/_shared/naming';
+import {
+    Combobox,
+    ComboboxChip,
+    ComboboxChips,
+    ComboboxChipsInput,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxItem,
+    ComboboxList,
+    ComboboxValue,
+    useComboboxAnchor,
+} from '@/registry/combobox/components/combobox';
 
-interface ConnectionOption {
-    id: number;
-    name: string | null;
-}
-
-interface ProjectConnectionOption {
-    id: number;
-    name: string | null;
-    connectionName: string | null;
-}
-
+/**
+ * A single entry in the filters popover.
+ *
+ * `component` is rendered as-is, so a filter can be anything — this file ships
+ * two builders for the common shapes, but an app is expected to write its own
+ * domain-specific builders and pass them in alongside.
+ */
 export interface TableFilterOption {
     key: string;
     isActive: boolean;
@@ -34,6 +38,13 @@ interface TableFiltersPopoverProps {
     filters: TableFilterOption[];
 }
 
+/**
+ * The generic shell: a trigger button with an active-filter count badge, and a
+ * popover that renders each filter's component separated by dividers.
+ *
+ * It knows nothing about what the filters do — that is entirely in the
+ * `component` each option supplies.
+ */
 export function TableFiltersPopover({ filters }: Readonly<TableFiltersPopoverProps>) {
     const activeCount = filters.reduce((sum, f) => sum + (f.activeCount ?? (f.isActive ? 1 : 0)), 0);
 
@@ -64,59 +75,46 @@ export function TableFiltersPopover({ filters }: Readonly<TableFiltersPopoverPro
     );
 }
 
-export function buildCrmSystemFilter<TData>(table: TableType<TData>): TableFilterOption {
-    const filterValue = table.getColumn('crm_system')?.getFilterValue() as CrmSystemIds[] | undefined;
-    const recordsByCrm = table.getPreFilteredRowModel().rows.reduce(
-        (acc, row) => {
-            const sys = (row.original as Record<string, unknown>)['crm_system'] as string | undefined;
-            if (sys) acc[sys] = (acc[sys] ?? 0) + 1;
-            return acc;
-        },
-        {} as Record<string, number>
-    );
+// ─────────────────────────────────────────────────────────────────────────────
+// Generic builders
+//
+// These cover the two shapes that come up constantly. Anything domain-specific
+// (filtering by a CRM system, a connection, a tenant…) belongs in your app as
+// its own `build*Filter` function returning a TableFilterOption.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A single on/off checkbox bound to a column's filter value.
+ *
+ * Sets the filter to `true` when checked and `undefined` when not, so an
+ * unchecked box removes the filter rather than filtering for `false`.
+ */
+export function buildCheckboxFilter<TData>({
+    table,
+    columnId,
+    label,
+}: {
+    table: TableType<TData>;
+    columnId: string;
+    label: string;
+}): TableFilterOption {
+    const isActive = !!table.getColumn(columnId)?.getFilterValue();
+    const inputId = `${columnId}-filter`;
 
     return {
-        key: 'crm_system',
-        isActive: !!(filterValue?.length),
-        component: (
-            <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">CRM System</p>
-                <CrmSystemCheckboxSelectSanitized
-                    className="flex-wrap"
-                    checkedSystemsIds={filterValue ?? []}
-                    handleCheckboxChange={(id: CrmSystemIds, checked: boolean) => {
-                        table.getColumn('crm_system')?.setFilterValue(
-                            (prev: CrmSystemIds[] = []) =>
-                                checked ? [...prev, id] : prev.filter((i) => i !== id)
-                        );
-                    }}
-                    recordsByCrm={recordsByCrm}
-                />
-            </div>
-        ),
-    };
-}
-
-export function buildWithoutConnectionsFilter<TData>(
-    table: TableType<TData>,
-    label = 'Without connections only'
-): TableFilterOption {
-    const isActive = !!table.getColumn('without_connections')?.getFilterValue();
-
-    return {
-        key: 'without_connections',
+        key: columnId,
         isActive,
         component: (
             <div className="flex items-center gap-2">
                 <Checkbox
-                    id="without-connections-filter"
+                    id={inputId}
                     checked={isActive}
                     onCheckedChange={(checked) => {
-                        table.getColumn('without_connections')?.setFilterValue(checked || undefined);
+                        table.getColumn(columnId)?.setFilterValue(checked || undefined);
                     }}
                     className="size-5"
                 />
-                <Label htmlFor="without-connections-filter" className="text-sm cursor-pointer">
+                <Label htmlFor={inputId} className="text-sm cursor-pointer">
                     {label}
                 </Label>
             </div>
@@ -124,40 +122,51 @@ export function buildWithoutConnectionsFilter<TData>(
     };
 }
 
-function ConnectionsFilterContent({
-    connections,
+export interface MultiSelectFilterOption<TId extends string | number> {
+    id: TId;
+    name: string | null;
+}
+
+function MultiSelectFilterContent<TId extends string | number>({
+    label,
+    options,
     value,
     onChange,
+    emptyMessage,
 }: {
-    connections: ConnectionOption[];
-    value: number[];
-    onChange: (value: number[]) => void;
+    label: string;
+    options: MultiSelectFilterOption<TId>[];
+    value: TId[];
+    onChange: (value: TId[]) => void;
+    emptyMessage: string;
 }) {
     const anchor = useComboboxAnchor();
-    const [selected, setSelected] = useState<number[]>(value);
+    const [selected, setSelected] = useState<TId[]>(value);
 
-    const handleChange = (vals: number[]) => {
+    const handleChange = (vals: TId[]) => {
         setSelected(vals);
         onChange(vals);
     };
 
     return (
         <div className="flex flex-col gap-2" ref={anchor}>
-            <p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">{CRM_NAMING.crm}</p>
+            <p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">{label}</p>
             <Combobox
                 multiple
                 autoHighlight
-                items={connections}
-                itemToStringValue={(c) => c.name ?? ''}
+                items={options}
+                // Base UI infers the item type from `value` (TId[]) rather than
+                // `items` once the option type is generic, so this widens first.
+                itemToStringValue={(o: unknown) => (o as MultiSelectFilterOption<TId>).name ?? ''}
                 value={selected}
-                onValueChange={(vals) => handleChange(vals as number[])}
+                onValueChange={(vals) => handleChange(vals as TId[])}
             >
                 <ComboboxChips className="w-full max-w-xs">
                     <ComboboxValue>
                         <>
                             {selected.map((id) => (
                                 <ComboboxChip key={id}>
-                                    {connections.find((c) => c.id === id)?.name ?? id}
+                                    {options.find((o) => o.id === id)?.name ?? id}
                                 </ComboboxChip>
                             ))}
                         </>
@@ -167,291 +176,57 @@ function ConnectionsFilterContent({
                 <ComboboxContent anchor={anchor} className={'overflow-y-scroll'}>
                     <ComboboxList>
                         {(item) => {
-                            const conn = item as ConnectionOption;
+                            const option = item as MultiSelectFilterOption<TId>;
                             return (
-                                <ComboboxItem key={conn.id} value={conn.id}>
-                                    {conn.name ?? conn.id}
+                                <ComboboxItem key={option.id} value={option.id}>
+                                    {option.name ?? option.id}
                                 </ComboboxItem>
                             );
                         }}
                     </ComboboxList>
-                    <ComboboxEmpty>No connections</ComboboxEmpty>
+                    <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
                 </ComboboxContent>
             </Combobox>
         </div>
     );
 }
 
-function ProjectConnectionsFilterContent({
-    projectConnections,
-    value,
-    onChange,
+/**
+ * A multi-select combobox bound to a column's filter value, rendering the
+ * selection as removable chips.
+ *
+ * `activeCount` reports the number of selected values so the popover badge
+ * counts each selection rather than counting the whole filter as one.
+ */
+export function buildMultiSelectFilter<TData, TId extends string | number>({
+    table,
+    columnId,
+    label,
+    options,
+    emptyMessage = 'No options',
 }: {
-    projectConnections: ProjectConnectionOption[];
-    value: number[];
-    onChange: (value: number[]) => void;
-}) {
-    const anchor = useComboboxAnchor();
-    const [selected, setSelected] = useState<number[]>(value);
-
-    const handleChange = (vals: number[]) => {
-        setSelected(vals);
-        onChange(vals);
-    };
-
-    return (
-        <div className="flex flex-col gap-2" 
-        ref={anchor}
-        >
-            <p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">{CRM_NAMING.project}</p>
-            <Combobox
-                multiple
-                autoHighlight
-                items={projectConnections}
-                itemToStringValue={(p) => p.name ?? ''}
-                value={selected}
-                onValueChange={(vals) => handleChange(vals as number[])}
-            >
-                <ComboboxChips  className="w-full max-w-xs">
-                    <ComboboxValue>
-                        <>
-                            {selected.map((id) => (
-                                <ComboboxChip key={id}>
-                                    {projectConnections.find((p) => p.id === id)?.name ?? id}
-                                </ComboboxChip>
-                            ))}
-                        </>
-                        <ComboboxChipsInput />
-                    </ComboboxValue>
-                </ComboboxChips>
-                <ComboboxContent 
-                anchor={anchor}
-                className={'overflow-y-scroll'}
-                >
-                    <ComboboxList>
-                        {(item) => {
-                            const proj = item as ProjectConnectionOption;
-                            return (
-                                <ComboboxItem key={proj.id} value={proj.id}>
-                                    {proj.name ?? proj.id}
-                                    {proj.connectionName && (
-                                        <span className="ml-auto text-xs text-muted-foreground">{proj.connectionName}</span>
-                                    )}
-                                </ComboboxItem>
-                            );
-                        }}
-                    </ComboboxList>
-                    <ComboboxEmpty>No project connections</ComboboxEmpty>
-                </ComboboxContent>
-            </Combobox>
-        </div>
-    );
-}
-
-export function buildConnectionsFilter({
-    connections,
-    value,
-    onChange,
-}: {
-    connections: ConnectionOption[];
-    value: number[];
-    onChange: (value: number[]) => void;
+    table: TableType<TData>;
+    columnId: string;
+    label: string;
+    options: MultiSelectFilterOption<TId>[];
+    emptyMessage?: string;
 }): TableFilterOption {
-    return {
-        key: 'connections',
-        isActive: value.length > 0,
-        component: <ConnectionsFilterContent connections={connections} value={value} onChange={onChange} />,
-    };
-}
+    const filterValue = (table.getColumn(columnId)?.getFilterValue() as TId[] | undefined) ?? [];
 
-export function buildProjectConnectionsFilter({
-    projectConnections,
-    value,
-    onChange,
-}: {
-    projectConnections: ProjectConnectionOption[];
-    value: number[];
-    onChange: (value: number[]) => void;
-}): TableFilterOption {
     return {
-        key: 'project_connections',
-        isActive: value.length > 0,
-        component: <ProjectConnectionsFilterContent projectConnections={projectConnections} value={value} onChange={onChange} />,
-    };
-}
-
-export function buildNuqsWithoutConnectionFilter({
-    value,
-    onChange,
-    label = 'Show projects without connection',
-}: {
-    value: boolean;
-    onChange: (value: boolean) => void;
-    label?: string;
-}): TableFilterOption {
-    return {
-        key: 'nuqs_without_connection',
-        isActive: value,
+        key: columnId,
+        isActive: filterValue.length > 0,
+        activeCount: filterValue.length,
         component: (
-            <div className="flex items-center gap-2">
-                <Checkbox
-                    id="nuqs-without-connection-filter"
-                    checked={value}
-                    onCheckedChange={(checked) => onChange(!!checked)}
-                    className="size-5"
-                />
-                <Label htmlFor="nuqs-without-connection-filter" className="text-sm cursor-pointer">
-                    {label}
-                </Label>
-            </div>
-        ),
-    };
-}
-
-export function buildNuqsCrmSystemFilter({
-    value,
-    onChange,
-    recordsByCrm,
-}: {
-    value: CrmSystemIds[];
-    onChange: (ids: CrmSystemIds[]) => void;
-    recordsByCrm?: Record<string, number>;
-}): TableFilterOption {
-    return {
-        key: 'nuqs_crm_system',
-        isActive: value.length > 0,
-        component: (
-            <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">CRM System</p>
-                <CrmSystemCheckboxSelectSanitized
-                    className="flex-wrap"
-                    checkedSystemsIds={value}
-                    handleCheckboxChange={(id: CrmSystemIds, checked: boolean) => {
-                        onChange(checked ? [...value, id] : value.filter((i) => i !== id));
-                    }}
-                    recordsByCrm={recordsByCrm ?? {}}
-                />
-            </div>
-        ),
-    };
-}
-
-export function buildConnectionsGroupFilter({
-    connections,
-    projectConnections,
-    connectionValue,
-    projectConnectionValue,
-    withoutConnection,
-    onConnectionChange,
-    onProjectConnectionChange,
-    onWithoutConnectionChange,
-}: {
-    connections: ConnectionOption[];
-    projectConnections: ProjectConnectionOption[];
-    connectionValue: number[];
-    projectConnectionValue: number[];
-    withoutConnection: boolean;
-    onConnectionChange: (value: number[]) => void;
-    onProjectConnectionChange: (value: number[]) => void;
-    onWithoutConnectionChange: (value: boolean) => void;
-}): TableFilterOption {
-    const activeCount =
-        (connectionValue.length > 0 ? 1 : 0) +
-        (projectConnectionValue.length > 0 ? 1 : 0) +
-        (withoutConnection ? 1 : 0);
-
-    return {
-        key: 'connections_group',
-        isActive: activeCount > 0,
-        activeCount,
-        component: (
-            <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">Filters for {CRM_NAMING.crm}(s)</p>
-                <ConnectionsFilterContent
-                    connections={connections}
-                    value={connectionValue}
-                    onChange={onConnectionChange}
-                />
-                <ProjectConnectionsFilterContent
-                    projectConnections={projectConnections}
-                    value={projectConnectionValue}
-                    onChange={onProjectConnectionChange}
-                />
-                <div className="flex items-center gap-2 my-0.5">
-                    <div className="flex-1 border-t border-border" />
-                    <span className="px-1 text-xs text-muted-foreground">or</span>
-                    <div className="flex-1 border-t border-border" />
-                </div>
-                <div className="flex items-center gap-2">
-                    <Checkbox
-                        id="connections-group-without-filter"
-                        checked={withoutConnection}
-                        onCheckedChange={(checked) => onWithoutConnectionChange(!!checked)}
-                        className="size-5 shrink-0"
-                    />
-                    <Label htmlFor="connections-group-without-filter" className="text-sm cursor-pointer">
-                        Include projects without a connection
-                    </Label>
-                </div>
-            </div>
-        ),
-    };
-}
-
-export function buildNuqsWithoutConnectionOnlyFilter({
-    value,
-    onChange,
-}: {
-    value: boolean;
-    onChange: (value: boolean) => void;
-}): TableFilterOption {
-    return {
-        key: 'nuqs_without_connection_only',
-        isActive: value,
-        component: (
-            <div className="flex items-start gap-2">
-                <Checkbox
-                    id="nuqs-without-connection-only-filter"
-                    checked={value}
-                    onCheckedChange={(checked) => onChange(!!checked)}
-                    className="size-5 shrink-0 mt-0.5"
-                />
-                <div className="flex flex-col gap-0.5">
-                    <Label htmlFor="nuqs-without-connection-only-filter" className="text-sm leading-snug cursor-pointer">
-                        Unassigned projects only
-                    </Label>
-                    <p className="text-xs leading-snug text-muted-foreground">
-                        Hides all projects that already have a connection
-                    </p>
-                </div>
-            </div>
-        ),
-    };
-}
-
-export function buildFromThisProjectConnectionFilter<TData>(
-    table: TableType<TData>,
-    label = 'From this project connection only'
-): TableFilterOption {
-    const isActive = !!table.getColumn('this_project_connection')?.getFilterValue();
-
-    return {
-        key: 'this_project_connection',
-        isActive,
-        component: (
-            <div className="flex items-center gap-2">
-                <Checkbox
-                    id="this-project-connection-filter"
-                    checked={isActive}
-                    onCheckedChange={(checked) => {
-                        table.getColumn('this_project_connection')?.setFilterValue(checked || undefined);
-                    }}
-                    className="size-5"
-                />
-                <Label htmlFor="this-project-connection-filter" className="text-sm cursor-pointer">
-                    {label}
-                </Label>
-            </div>
+            <MultiSelectFilterContent
+                label={label}
+                options={options}
+                value={filterValue}
+                emptyMessage={emptyMessage}
+                onChange={(vals) => {
+                    table.getColumn(columnId)?.setFilterValue(vals.length ? vals : undefined);
+                }}
+            />
         ),
     };
 }

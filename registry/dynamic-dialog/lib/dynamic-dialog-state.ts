@@ -19,6 +19,15 @@ type ConfirmFn<T> =
 
 export interface DialogActions<T = unknown> {
   confirm: ConfirmFn<T>;
+  /**
+   * An explicit negative answer, as distinct from dismissing.
+   *
+   * "Discard changes?" has three outcomes, not two: discard (confirm), keep
+   * editing (deny), and closed-without-answering (dismiss). Collapsing deny
+   * into dismiss loses the difference between "the user said no" and "the user
+   * never answered".
+   */
+  deny: (value?: T) => void;
   dismiss: (reason?: DismissReason, value?: T) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -27,16 +36,39 @@ export interface DialogActions<T = unknown> {
 export type DialogComponentProps<TProps, TValue = void> = TProps &
   DialogActions<TValue>;
 
+/**
+ * @deprecated Migration alias. Prefer `DialogComponentProps<TProps, TValue>`
+ * for a dialog component's props, or `DialogActions<T>` for the actions alone.
+ *
+ * Exists because an earlier generation of this API named the injected props
+ * `DialogRendererProps` and composed them as `TProps & DialogRendererProps<T>`
+ * — which is exactly `DialogComponentProps<TProps, T>`. Keeping the alias lets
+ * a codebase move onto this runtime first and rename at its own pace.
+ */
+export type DialogRendererProps<T = unknown> = DialogActions<T>;
+
 export type DialogOptions = {
   id?: string;
   singleton?: boolean;
   /** Return false (or Promise<false>) to prevent the dialog from closing when the user triggers a close gesture. Does not block programmatic dismiss(). */
   beforeClose?: () => boolean | Promise<boolean>;
+  /** Fired once when the dialog mounts. */
+  onOpen?: () => void;
+  /**
+   * Fired once when the dialog closes, however it closed — confirm, deny,
+   * dismiss, or unmount. For cleanup that must run regardless of outcome;
+   * branch on the resolved result if you need to know which it was.
+   */
+  onClose?: () => void;
 };
 
 export interface DialogResultData<T = unknown> {
   id: string;
   confirmed: boolean;
+  /** True only when the user explicitly answered no via `deny()`. */
+  denied: boolean;
+  /** True when the dialog closed without an explicit answer. Always the complement of confirmed/denied. */
+  dismissed: boolean;
   value?: T;
   reason?: DismissReason;
 }
@@ -57,7 +89,7 @@ type PendingDialog = {
 type AnyComponentType = React.ComponentType<Record<string, unknown>>;
 
 type DialogEvent =
-  | { action: "SHOW_DIALOG"; id: string; Component: AnyComponentType; componentProps: Record<string, unknown>; beforeClose?: () => boolean | Promise<boolean> }
+  | { action: "SHOW_DIALOG"; id: string; Component: AnyComponentType; componentProps: Record<string, unknown>; beforeClose?: () => boolean | Promise<boolean>; onOpen?: () => void; onClose?: () => void }
   | { action: "UPDATE_DIALOG"; id: string; componentProps: Record<string, unknown> }
   | { action: "HIDE_DIALOG"; id: string };
 
@@ -105,7 +137,15 @@ class DialogObservable {
       });
     });
 
-    this.notify({ action: "SHOW_DIALOG", id, Component, componentProps, beforeClose: options.beforeClose });
+    this.notify({
+      action: "SHOW_DIALOG",
+      id,
+      Component,
+      componentProps,
+      beforeClose: options.beforeClose,
+      onOpen: options.onOpen,
+      onClose: options.onClose,
+    });
 
     return {
       id,
@@ -128,7 +168,15 @@ class DialogObservable {
   confirmDialog(id: string, value?: unknown) {
     const dialog = this.pendingDialogs.get(id);
     if (!dialog) return;
-    dialog.resolve({ id, confirmed: true, value });
+    dialog.resolve({ id, confirmed: true, denied: false, dismissed: false, value });
+    this.pendingDialogs.delete(id);
+    this.notify({ action: "HIDE_DIALOG", id });
+  }
+
+  denyDialog(id: string, value?: unknown) {
+    const dialog = this.pendingDialogs.get(id);
+    if (!dialog) return;
+    dialog.resolve({ id, confirmed: false, denied: true, dismissed: false, value });
     this.pendingDialogs.delete(id);
     this.notify({ action: "HIDE_DIALOG", id });
   }
@@ -136,7 +184,7 @@ class DialogObservable {
   dismissDialog(id: string, reason: DismissReason = "close", value?: unknown) {
     const dialog = this.pendingDialogs.get(id);
     if (!dialog) return;
-    dialog.resolve({ id, confirmed: false, value, reason });
+    dialog.resolve({ id, confirmed: false, denied: false, dismissed: true, value, reason });
     this.pendingDialogs.delete(id);
     this.notify({ action: "HIDE_DIALOG", id });
   }

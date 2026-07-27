@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "layout-slots",
+  "title": "Layout Slots",
+  "description": "Lets nested routes render content into a parent layout — titles, header buttons — without prop drilling. Slots clear automatically on unmount.",
+  "dependencies": [
+    "zustand"
+  ],
+  "files": [
+    {
+      "path": "registry/layout-slots/lib/layout-slots-slice.ts",
+      "content": "import type { ReactNode } from 'react'\n\n/** Minimal structural `set` — compatible with zustand's `StateCreator` set. */\nexport type SetLike<TStore> = (\n  partial: Partial<TStore> | ((state: TStore) => Partial<TStore>)\n) => void\n\nexport interface LayoutSlotsSlice<TSlot extends string = string> {\n  layout_slots: Partial<Record<TSlot, ReactNode>>\n  layoutSlotActions: {\n    setSlot: (name: TSlot, node: ReactNode) => void\n    clearSlot: (name: TSlot) => void\n    resetSlots: () => void\n  }\n  layoutSlotGetters: {\n    getSlot: (name: TSlot) => ReactNode\n  }\n}\n\n/**\n * Lets a deeply nested route render content into a parent layout — a page title,\n * header buttons, a status chip — without prop drilling or a context per slot.\n *\n * The parent renders `getSlot('header-actions')`; a child anywhere below fills\n * it. Neither has to know about the other.\n *\n * ```ts\n * type Slot = 'title' | 'header-actions' | 'footer-actions'\n *\n * const useAppStore = create<AppStore>()((set, get) => ({\n *   ...createLayoutSlotsSlice<AppStore, Slot>()(set, get),\n * }))\n * ```\n *\n * Constraining `TSlot` to a union is worth doing: slot names are a contract\n * between two files that never import each other, so a typo is otherwise\n * silent — the content simply never appears.\n */\nexport const createLayoutSlotsSlice =\n  <TStore extends LayoutSlotsSlice<TSlot>, TSlot extends string = string>() =>\n  (set: SetLike<TStore>, get: () => TStore): LayoutSlotsSlice<TSlot> => {\n    const write = (partial: Partial<LayoutSlotsSlice<TSlot>>) =>\n      set(partial as Partial<TStore>)\n\n    return {\n      layout_slots: {},\n\n      layoutSlotActions: {\n        setSlot: (name, node) =>\n          write({ layout_slots: { ...get().layout_slots, [name]: node } }),\n\n        clearSlot: (name) => {\n          const next = { ...get().layout_slots }\n          delete next[name]\n          write({ layout_slots: next })\n        },\n\n        resetSlots: () => write({ layout_slots: {} }),\n      },\n\n      layoutSlotGetters: {\n        getSlot: (name) => get().layout_slots[name],\n      },\n    }\n  }\n",
+      "type": "registry:lib",
+      "target": "@lib/layout-slots/lib/layout-slots-slice.ts"
+    },
+    {
+      "path": "registry/layout-slots/hooks/use-layout-slot.ts",
+      "content": "'use client'\n\nimport { useEffect, type ReactNode } from 'react'\n\nimport type { LayoutSlotsSlice } from '../lib/layout-slots-slice'\n\n/** Structural shape of a zustand hook (`UseBoundStore<StoreApi<T>>`). */\nexport interface StoreHookLike<TStore> {\n  <TReturn>(selector: (state: TStore) => TReturn): TReturn\n}\n\n/**\n * Binds the slot hooks to your store once:\n *\n * ```ts\n * export const { useLayoutSlot, useSlotContent } =\n *   createLayoutSlotHooks<AppStore, Slot>(useAppStore)\n * ```\n */\nexport function createLayoutSlotHooks<\n  TStore extends LayoutSlotsSlice<TSlot>,\n  TSlot extends string = string,\n>(useStore: StoreHookLike<TStore>) {\n  /**\n   * Fills a slot for as long as the calling component is mounted, and clears it\n   * on unmount.\n   *\n   * The cleanup is the whole point. Without it, a route that sets header\n   * actions leaves them behind when the user navigates away, and the next\n   * screen inherits buttons that act on an entity it isn't showing.\n   */\n  function useLayoutSlot(name: TSlot, node: ReactNode): void {\n    const setSlot = useStore((s) => s.layoutSlotActions.setSlot)\n    const clearSlot = useStore((s) => s.layoutSlotActions.clearSlot)\n\n    useEffect(() => {\n      setSlot(name, node)\n      return () => clearSlot(name)\n    }, [name, node, setSlot, clearSlot])\n  }\n\n  /** Reads a slot's content. Use in the layout that renders the slot. */\n  function useSlotContent(name: TSlot): ReactNode {\n    return useStore((s) => s.layout_slots[name])\n  }\n\n  return { useLayoutSlot, useSlotContent }\n}\n",
+      "type": "registry:hook",
+      "target": "@lib/layout-slots/hooks/use-layout-slot.ts"
+    }
+  ],
+  "type": "registry:lib"
+}

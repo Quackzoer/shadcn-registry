@@ -33,7 +33,7 @@ export function DataTable() {
     },[table])
     const rowGroup = useDataTableStore((s) => s.rowGroup)
 
-    const tableContainerRef = useRef<HTMLDivElement>(undefined)
+    const tableContainerRef = useRef<HTMLDivElement>(null)
     const outerRef = useRef<HTMLDivElement>(null)
     const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined)
     const [widthCalculated, setWidthCalculated] = useState(false)
@@ -50,10 +50,16 @@ export function DataTable() {
     return (
         <div className="flex-1 min-w-0 min-h-0 overflow-hidden border rounded-md" ref={outerRef}>
             {widthCalculated && (
+                // The virtualizer measures scroll against this element, so the
+                // item owns its scroll container rather than relying on the one
+                // stock shadcn <Table> hardcodes (that one is overflow-x only
+                // and exposes no ref).
+                <div
+                    ref={tableContainerRef}
+                    className="relative h-full overflow-auto"
+                    style={{ width: containerWidth }}
+                >
                 <Table
-                    ref={tableContainerRef} // previously it was 'wrapperRef' so it might be that Table component was modified
-                    wrapperClassName="h-full"
-                    wrapperStyle={{ width: containerWidth }}
                     className="table-fixed"
                     style={{ minWidth: table.getTotalSize() }}
                 >
@@ -84,6 +90,7 @@ export function DataTable() {
                         rowGroup={rowGroup}
                     />
                 </Table>
+                </div>
             )}
         </div>
     )
@@ -93,7 +100,7 @@ type VirtualItem<TData> = { type: 'row'; row: Row<TData> } | { type: 'separator'
 
 interface VirtualizedTableBodyProps<TData> {
     table: TableType<TData>
-    tableContainerRef: RefObject<HTMLDivElement>
+    tableContainerRef: RefObject<HTMLDivElement | null>
     rowGroup?: RowGroup<TData>
 }
 
@@ -137,7 +144,9 @@ function VirtualizedTableBody<TData>({
     const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
     const paddingBottom =
         virtualRows.length > 0 ? rowVirtualizer.getTotalSize() - (virtualRows.at(-1)?.end ?? 0) : 0
-    const colSpan = table.getAllColumns().length
+    // Visible leaf columns, not all columns — otherwise the empty/separator row
+    // spans too far once any column is hidden via columnDef.meta.toggleVisibility.
+    const colSpan = table.getVisibleLeafColumns().length
 
     return (
         <TableBody>

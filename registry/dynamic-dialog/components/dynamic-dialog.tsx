@@ -25,6 +25,8 @@ interface DialogStateItem {
   Component: React.ComponentType<Record<string, unknown>>;
   componentProps: Record<string, unknown>;
   beforeClose?: () => boolean | Promise<boolean>;
+  onOpen?: () => void;
+  onClose?: () => void;
 }
 
 export interface DynamicDialogProviderProps {
@@ -32,8 +34,18 @@ export interface DynamicDialogProviderProps {
   removeDelay?: number;
 }
 
-function DynamicDialogItem({ id, open, Component, componentProps, beforeClose }: DialogStateItem) {
+function DynamicDialogItem({ id, open, Component, componentProps, beforeClose, onOpen, onClose }: DialogStateItem) {
+  // Fires once per mounted dialog. onClose runs on unmount, so it covers every
+  // exit path — confirm, deny, dismiss, or the provider tearing down — rather
+  // than only the ones routed through a close handler.
+  React.useEffect(() => {
+    onOpen?.();
+    return () => onClose?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const confirm = (value?: unknown) => dialogObservable.confirmDialog(id, value);
+  const deny = (value?: unknown) => dialogObservable.denyDialog(id, value);
   const dismiss = (reason?: DismissReason, value?: unknown) => dialogObservable.dismissDialog(id, reason, value);
   const onOpenChange = async (isOpen: boolean) => {
     if (!isOpen) {
@@ -45,7 +57,7 @@ function DynamicDialogItem({ id, open, Component, componentProps, beforeClose }:
     }
   };
 
-  const actions: DialogActions<unknown> = { confirm, dismiss, open, onOpenChange };
+  const actions: DialogActions<unknown> = { confirm, deny, dismiss, open, onOpenChange };
 
   return (
     <DynamicDialogContext.Provider value={{ actions, componentProps }}>
@@ -69,6 +81,8 @@ export function DynamicDialogProvider({ removeDelay = 300 }: DynamicDialogProvid
             Component: event.Component,
             componentProps: event.componentProps,
             beforeClose: event.beforeClose,
+            onOpen: event.onOpen,
+            onClose: event.onClose,
           }]);
           break;
         case 'UPDATE_DIALOG':

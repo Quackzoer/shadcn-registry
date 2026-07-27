@@ -37,7 +37,12 @@ export type DialogActionButtonDescriptor<T, TCtx = undefined> =
 export type DialogActionButtonSlotDefaults<T, TCtx = undefined> =
   DialogActionButtonDescriptor<T, TCtx> & {
     label: ReactNode;
-    onClick: (actions: DialogActions<T>, ctx: TCtx) => void;
+    /**
+     * Optional, because a slot can act without a click handler: a confirm slot
+     * defaulting to `type="submit"` + `form=…` is driven by form submission,
+     * and attaching an onClick would double-fire it.
+     */
+    onClick?: (actions: DialogActions<T>, ctx: TCtx) => void;
   };
 
 // ─── Main union ───────────────────────────────────────────────────────────────
@@ -124,7 +129,7 @@ export function renderDialogButton<T, TCtx = undefined>(
       <Button
         {...defButtonProps}
         disabled={defDisabled}
-        onClick={() => defOnClick(dialogActions, ctx)}
+        onClick={defOnClick && (() => defOnClick(dialogActions, ctx))}
       >
         {defLabel}
       </Button>
@@ -136,7 +141,7 @@ export function renderDialogButton<T, TCtx = undefined>(
       <Button
         {...defButtonProps}
         disabled={defDisabled}
-        onClick={() => defOnClick(dialogActions, ctx)}
+        onClick={defOnClick && (() => defOnClick(dialogActions, ctx))}
       >
         {button}
       </Button>
@@ -155,7 +160,10 @@ export function renderDialogButton<T, TCtx = undefined>(
       {...defButtonProps}
       {...descButtonProps}
       disabled={disabled ?? defDisabled}
-      onClick={() => (onClick ?? defOnClick)(dialogActions, ctx)}
+      onClick={(() => {
+        const handler = onClick ?? defOnClick;
+        return handler && (() => handler(dialogActions, ctx));
+      })()}
     >
       {label ?? defLabel}
     </Button>

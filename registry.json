@@ -119,6 +119,11 @@
           "path": "registry/react-query/lib/use-query.ts",
           "type": "registry:lib",
           "target": "@lib/use-query.ts"
+        },
+        {
+          "path": "registry/react-query/lib/create-query-hook.ts",
+          "type": "registry:lib",
+          "target": "@lib/create-query-hook.ts"
         }
       ]
     },
@@ -171,6 +176,210 @@
           "path": "registry/store-slice/hooks/use-sync-query.ts",
           "type": "registry:hook",
           "target": "@lib/store-slice/hooks/use-sync-query.ts"
+        }
+      ]
+    },
+    {
+      "name": "ts-utils",
+      "type": "registry:lib",
+      "title": "TypeScript Utils",
+      "description": "Type-level utilities: Prettify, Autocomplete, CommonProperties, PrefixedKeys, WithRequired. No runtime code, no dependencies.",
+      "files": [
+        {
+          "path": "registry/ts-utils/types/ts-utils.ts",
+          "type": "registry:lib",
+          "target": "@lib/ts-utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "layout-slots",
+      "type": "registry:lib",
+      "title": "Layout Slots",
+      "description": "Lets nested routes render content into a parent layout — titles, header buttons — without prop drilling. Slots clear automatically on unmount.",
+      "dependencies": ["zustand"],
+      "files": [
+        {
+          "path": "registry/layout-slots/lib/layout-slots-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/layout-slots/lib/layout-slots-slice.ts"
+        },
+        {
+          "path": "registry/layout-slots/hooks/use-layout-slot.ts",
+          "type": "registry:hook",
+          "target": "@lib/layout-slots/hooks/use-layout-slot.ts"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumbs",
+      "type": "registry:component",
+      "title": "Breadcrumbs",
+      "description": "Declarative breadcrumbs for nested routes. Declare the hierarchy once and each screen points at its node; trails are derived, so moving a route re-parents its breadcrumbs. Router-agnostic via an injected adapter.",
+      "dependencies": ["zustand"],
+      "registryDependencies": ["button", "command", "popover", "spinner"],
+      "files": [
+        {
+          "path": "registry/breadcrumbs/types/breadcrumbs.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/types/breadcrumbs.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/types/router-adapter.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/types/router-adapter.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/lib/create-breadcrumb-router.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/lib/create-breadcrumb-router.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/lib/breadcrumbs-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/lib/breadcrumbs-slice.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/components/breadcrumbs.tsx",
+          "type": "registry:component",
+          "target": "@lib/breadcrumbs/components/breadcrumbs.tsx"
+        },
+        {
+          "path": "registry/breadcrumbs/components/entity-breadcrumb.tsx",
+          "type": "registry:component",
+          "target": "@lib/breadcrumbs/components/entity-breadcrumb.tsx"
+        }
+      ]
+    },
+    {
+      "name": "entity-sidebar",
+      "type": "registry:lib",
+      "title": "Entity Sidebar State",
+      "description": "Zustand slice plus filter/sort primitives for a searchable, filterable, sortable entity list. Filters and sorts are stored as data, and both recurse into nested sub-entities.",
+      "dependencies": ["zustand"],
+      "files": [
+        {
+          "path": "registry/entity-sidebar/types/entity-sidebar.ts",
+          "type": "registry:lib",
+          "target": "@lib/entity-sidebar/types/entity-sidebar.ts"
+        },
+        {
+          "path": "registry/entity-sidebar/lib/entity-sidebar-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/entity-sidebar/lib/entity-sidebar-slice.ts"
+        },
+        {
+          "path": "registry/entity-sidebar/lib/filters-and-sorts.ts",
+          "type": "registry:lib",
+          "target": "@lib/entity-sidebar/lib/filters-and-sorts.ts"
+        }
+      ]
+    },
+    {
+      "name": "react-hooks",
+      "type": "registry:hook",
+      "title": "React Hooks",
+      "description": "Six small React hooks: click-outside, element size, mouse position, imperative-handle-as-state, remaining viewport height, and URL-backed pagination state.",
+      "dependencies": ["nuqs"],
+      "files": [
+        {
+          "path": "registry/react-hooks/hooks/use-click-outside.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-click-outside.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-element-size.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-element-size.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-mouse-position.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-mouse-position.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-access-imperative-handle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-access-imperative-handle.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-remaining-height.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-remaining-height.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-pagination-query-state.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-pagination-query-state.ts"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:component",
+      "title": "Data Table",
+      "description": "Virtualized TanStack Table wrapper with a per-instance zustand store, row grouping, column pinning, and a composable filters popover.",
+      "dependencies": [
+        "@tanstack/react-table",
+        "@tanstack/react-virtual",
+        "zustand"
+      ],
+      "registryDependencies": [
+        "table",
+        "button",
+        "checkbox",
+        "label",
+        "popover",
+        "separator",
+        "dropdown-menu",
+        "input-group",
+        "Quackzoer/shadcn-registry/combobox"
+      ],
+      "files": [
+        {
+          "path": "registry/data-table/components/data-table-context.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-context.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table-provider.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-provider.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table-column-header.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-column-header.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table-search.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-search.tsx"
+        },
+        {
+          "path": "registry/data-table/components/table-filters-popover.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/table-filters-popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "A composable combobox built on Base UI primitives. Every part is a separate export — input, chips, list, groups, empty state — so the layout is yours to arrange.",
+      "dependencies": ["@base-ui/react"],
+      "registryDependencies": ["button", "input-group"],
+      "files": [
+        {
+          "path": "registry/combobox/components/combobox.tsx",
+          "type": "registry:ui",
+          "target": "@ui/combobox.tsx"
         }
       ]
     },
