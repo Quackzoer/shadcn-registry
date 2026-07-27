@@ -7,7 +7,7 @@ import {
   PermissionShield,
   useAuth,
   type PermissionShieldProps,
-} from "@/components/ui/permission-guard";
+} from "@/registry/permission-guard/components/permission-guard";
 
 // --- App-Specific Types ---
 

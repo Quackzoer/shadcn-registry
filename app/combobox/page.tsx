@@ -9,7 +9,7 @@ import {
   ComboboxSeparator,
   ComboboxTrigger,
   ComboboxValue,
-} from "@/registry/ui/combobox"
+} from "@/components/ui/combobox"
 
 const frameworks = [
   { value: "next", label: "Next.js" },

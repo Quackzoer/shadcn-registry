@@ -1,6 +1,6 @@
 "use client"
 
-import { MarkSearchedPhrase } from "@/registry/ui/mark-searched-phrase"
+import { MarkSearchedPhrase } from "@/registry/mark-searched-phrase/components/mark-searched-phrase"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 

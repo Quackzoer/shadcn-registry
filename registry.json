@@ -10,12 +10,12 @@
       "description": "A dynamic dialog component.",
       "files": [
         {
-          "path": "components/dynamic-dialog/dynamic-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dynamic-dialog.tsx",
           "type": "registry:file",
           "target": "@components/dynamic-dialog/dynamic-dialog.tsx"
         },
         {
-          "path": "lib/dynamic-dialog-state.ts",
+          "path": "registry/dynamic-dialog/lib/dynamic-dialog-state.ts",
           "type": "registry:file",
           "target": "@lib/dynamic-dialog-state.ts"
         }
@@ -40,7 +40,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/type-to-confirm-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx"
         }
@@ -58,7 +58,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/delayed-action-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/delayed-action-dialog.tsx"
         }
@@ -76,7 +76,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/countdown-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/countdown-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/countdown-dialog.tsx"
         }
@@ -99,7 +99,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/confirm-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/confirm-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/confirm-dialog.tsx"
         }
@@ -116,8 +116,61 @@
       ],
       "files": [
         {
-          "path": "lib/use-query.ts",
-          "type": "registry:lib"
+          "path": "registry/react-query/lib/use-query.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-query.ts"
+        }
+      ]
+    },
+    {
+      "name": "store-slice",
+      "type": "registry:lib",
+      "title": "Store Slice",
+      "description": "Composable zustand slices that mirror TanStack Query. Generates state keys, setters and a one-call syncQuery from just a name and a data type, so an entity slice is one line instead of a hundred.",
+      "dependencies": [
+        "zustand",
+        "@tanstack/react-query"
+      ],
+      "files": [
+        {
+          "path": "registry/store-slice/index.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/index.ts"
+        },
+        {
+          "path": "registry/store-slice/types/query-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/types/query-state.ts"
+        },
+        {
+          "path": "registry/store-slice/types/slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/types/slice.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/query-snapshot.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/query-snapshot.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/create-entity-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/create-entity-slice.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/create-list-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/create-list-slice.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/create-entity-access.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/create-entity-access.ts"
+        },
+        {
+          "path": "registry/store-slice/hooks/use-sync-query.ts",
+          "type": "registry:hook",
+          "target": "@lib/store-slice/hooks/use-sync-query.ts"
         }
       ]
     },
@@ -130,8 +183,9 @@
       "registryDependencies": ["label", "form"],
       "files": [
         {
-          "path": "components/ui/field-label.tsx",
-          "type": "registry:ui"
+          "path": "registry/field-label/components/field-label.tsx",
+          "type": "registry:ui",
+          "target": "@ui/field-label.tsx"
         }
       ]
     },
@@ -142,8 +196,9 @@
       "description": "Text element that applies style to text if provided value was found within it.",
       "files": [
         {
-          "path": "components/ui/mark-searched-phrase.tsx",
-          "type": "registry:ui"
+          "path": "registry/mark-searched-phrase/components/mark-searched-phrase.tsx",
+          "type": "registry:ui",
+          "target": "@ui/mark-searched-phrase.tsx"
         }
       ]
     },
@@ -154,8 +209,9 @@
       "description": "Component guarding its children based on user object and their permissions",
       "files": [
         {
-          "path": "components/ui/permission-guard.tsx",
-          "type": "registry:ui"
+          "path": "registry/permission-guard/components/permission-guard.tsx",
+          "type": "registry:ui",
+          "target": "@ui/permission-guard.tsx"
         }
       ]
     },
@@ -164,12 +220,14 @@
       "type": "registry:ui",
       "title": "Multi step form",
       "description": "Helper for creating multi step forms that handles validation and navigation",
+      "registryDependencies": ["button"],
       "files": [
         {
-          "path": "components/ui/multi-step-form.tsx",
-          "type": "registry:ui"
+          "path": "registry/multi-step-form/components/multi-step-form.tsx",
+          "type": "registry:ui",
+          "target": "@ui/multi-step-form.tsx"
         }
       ]
-    },
+    }
   ]
 }

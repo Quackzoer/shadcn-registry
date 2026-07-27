@@ -1,9 +1,9 @@
 "use client"
 
-import { dialog } from "@/lib/dynamic-dialog-state";
-import { useDynamicDialog } from "@/components/dynamic-dialog/dynamic-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/registry/ui/dialog";
-import { Button } from "@/registry/ui/button";
+import { dialog } from "@/registry/dynamic-dialog/lib/dynamic-dialog-state";
+import { useDynamicDialog } from "@/registry/dynamic-dialog/components/dynamic-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 // --- Dialog 1 ---
