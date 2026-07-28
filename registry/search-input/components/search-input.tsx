@@ -1,6 +1,7 @@
 'use client'
 
 import { useDebouncer } from '@tanstack/react-pacer'
+import { useHotkey } from '@tanstack/react-hotkeys'
 import { SearchIcon, XIcon } from 'lucide-react'
 import {
   useCallback,
@@ -226,17 +227,10 @@ export function SearchInput<TItem>({
   }, [items])
 
   // ⌘K / Ctrl+K to focus.
-  useEffect(() => {
+  useHotkey('Control+K',() => {
     if (!shortcut) return
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key.toLowerCase() !== shortcut.toLowerCase()) return
-      if (!event.metaKey && !event.ctrlKey) return
-      event.preventDefault()
-      inputRef.current?.focus()
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [shortcut])
+    inputRef.current?.focus()
+  })
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     commit(event.target.value)
