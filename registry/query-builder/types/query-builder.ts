@@ -131,7 +131,9 @@ export interface QueryBuilderStyling {
 // Component props
 // ---------------------------------------------------------------------------
 
-export interface QueryBuilderProps<TData = unknown> extends QueryBuilderStyling {
+export interface QueryBuilderProps<
+  TData = unknown,
+> extends QueryBuilderStyling {
   schema: readonly QueryFieldSchema[];
   conditions?: QueryCondition[];
   onConditionsChange?: (conditions: QueryCondition[]) => void;
@@ -158,5 +160,16 @@ export interface QueryBuilderProps<TData = unknown> extends QueryBuilderStyling 
     getFilteredData: () => TData[];
     conditions: QueryCondition[];
     setConditions: (conditions: QueryCondition[]) => void;
+  }) => React.ReactNode;
+  renderEntityChip?: (props: {
+    field: string;
+    fieldSchema: QueryFieldSchema | undefined;
+  }) => React.ReactNode;
+  renderOperatorChip?: (props: {
+    operator: string;
+    label: string;
+  }) => React.ReactNode;
+  renderValueChip?: (props: {
+    value: string;
   }) => React.ReactNode;
 }
