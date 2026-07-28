@@ -12,6 +12,24 @@ export interface DevtoolsPluginProps {
   isDark?: boolean;
 }
 
+export interface DevtoolsTab {
+  id: string;
+  label: React.ReactNode;
+  content: React.ReactNode;
+}
+
+export interface DevtoolsStatusBarItem {
+  id: string;
+  item: React.ReactNode;
+}
+
+export interface DevtoolsAction {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+}
+
 export interface DevtoolsConfig {
   enabled?: boolean;
   position?: "bottom" | "right" | "left";
@@ -29,6 +47,12 @@ export interface DevtoolsContextType {
   plugins: DevtoolsPlugin[];
   registerPlugin: (plugin: DevtoolsPlugin) => void;
   unregisterPlugin: (pluginId: string) => void;
+  statusBarItems: DevtoolsStatusBarItem[];
+  registerStatusBarItem: (item: DevtoolsStatusBarItem) => void;
+  unregisterStatusBarItem: (id: string) => void;
+  actions: DevtoolsAction[];
+  registerAction: (action: DevtoolsAction) => void;
+  unregisterAction: (id: string) => void;
   activeTab: string;
   setActiveTab: (tabId: string) => void;
   isDark: boolean;
