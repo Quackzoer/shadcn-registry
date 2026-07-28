@@ -533,6 +533,11 @@
           "target": "@lib/query-builder/parse-query.ts"
         },
         {
+          "path": "registry/query-builder/hooks/use-query-filter.ts",
+          "type": "registry:lib",
+          "target": "@lib/query-builder/use-query-filter.ts"
+        },
+        {
           "path": "registry/query-builder/components/query-builder.tsx",
           "type": "registry:ui",
           "target": "@ui/query-builder.tsx"

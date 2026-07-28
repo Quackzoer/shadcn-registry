@@ -9,7 +9,6 @@ import {
   type QueryBuilderProps,
   type QueryCondition,
   type QueryFieldSchema,
-  type QueryOperator,
   OPERATOR_LABELS,
 } from "@/registry/query-builder/types/query-builder"
 import {
@@ -17,6 +16,9 @@ import {
   getOperatorsForField,
   needsValue,
 } from "@/registry/query-builder/lib/parse-query"
+import {
+  useQueryFilter as defaultUseQueryFilter,
+} from "@/registry/query-builder/hooks/use-query-filter"
 
 // ---------------------------------------------------------------------------
 // Draft helpers
@@ -54,9 +56,9 @@ function computeCurrent(
   const vp = getValuePart(draft)
   if (
     getFieldSchema(schema, fp) &&
-    getOperatorsForField(schema, fp).includes(op as QueryOperator)
+    getOperatorsForField(schema, fp).includes(op)
   ) {
-    const cond: QueryCondition = { field: fp, operator: op as QueryOperator }
+    const cond: QueryCondition = { field: fp, operator: op }
     if (vp) cond.value = vp
     return cond
   }
@@ -64,7 +66,23 @@ function computeCurrent(
 }
 
 // ---------------------------------------------------------------------------
-// Query chip
+// Default chip styling
+// ---------------------------------------------------------------------------
+
+const DEFAULT_ENTITY_CLASS =
+  "flex items-center rounded-l-md bg-blue-500/15 px-2 py-0.5 text-blue-700 dark:text-blue-400"
+
+const DEFAULT_OPERATOR_CLASS =
+  "flex items-center bg-purple-500/15 px-1.5 py-0.5 text-purple-700 dark:text-purple-400"
+
+const DEFAULT_VALUE_CLASS =
+  "flex items-center rounded-r-md bg-green-500/15 px-2 py-0.5 text-green-700 dark:text-green-400"
+
+const DEFAULT_VALUE_EMPTY_CLASS =
+  "flex items-center rounded-r-md bg-green-500/15 px-2 py-0.5"
+
+// ---------------------------------------------------------------------------
+// Condition chip
 // ---------------------------------------------------------------------------
 
 function ConditionChip({
@@ -72,13 +90,62 @@ function ConditionChip({
   schema,
   onRemove,
   dashed,
+  renderEntityChip,
+  renderOperatorChip,
+  renderValueChip,
+  entityChipClassName,
+  operatorChipClassName,
+  valueChipClassName,
 }: {
   condition: QueryCondition
   schema: readonly QueryFieldSchema[]
   onRemove: () => void
   dashed?: boolean
+  renderEntityChip?: QueryBuilderProps["renderEntityChip"]
+  renderOperatorChip?: QueryBuilderProps["renderOperatorChip"]
+  renderValueChip?: QueryBuilderProps["renderValueChip"]
+  entityChipClassName?: QueryBuilderProps["entityChipClassName"]
+  operatorChipClassName?: QueryBuilderProps["operatorChipClassName"]
+  valueChipClassName?: QueryBuilderProps["valueChipClassName"]
 }) {
   const fs = getFieldSchema(schema, condition.field)
+
+  const entityContent = renderEntityChip
+    ? renderEntityChip({ field: condition.field, fieldSchema: fs })
+    : null
+
+  const operatorContent = renderOperatorChip
+    ? renderOperatorChip({
+        operator: condition.operator,
+        label: OPERATOR_LABELS[condition.operator] ?? condition.operator,
+      })
+    : null
+
+  const valueContent =
+    condition.value !== undefined
+      ? renderValueChip
+        ? renderValueChip({ value: condition.value })
+        : null
+      : null
+
+  const resolvedEntityClass =
+    typeof entityChipClassName === "function"
+      ? entityChipClassName({ field: condition.field, fieldSchema: fs })
+      : entityChipClassName
+
+  const resolvedOperatorClass =
+    typeof operatorChipClassName === "function"
+      ? operatorChipClassName({
+          operator: condition.operator,
+          label: OPERATOR_LABELS[condition.operator] ?? condition.operator,
+        })
+      : operatorChipClassName
+
+  const resolvedValueClass =
+    typeof valueChipClassName === "function"
+      ? valueChipClassName({ value: condition.value ?? "" })
+      : valueChipClassName
+
   return (
     <span
       className={cn(
@@ -88,22 +155,37 @@ function ConditionChip({
           : "border border-transparent",
       )}
     >
-      <span className="flex items-center rounded-l-md bg-blue-500/15 px-2 py-0.5 text-blue-700 dark:text-blue-400">
-        {fs?.label ?? condition.field}
-      </span>
-      <span className="flex items-center bg-purple-500/15 px-1.5 py-0.5 text-purple-700 dark:text-purple-400">
-        {OPERATOR_LABELS[condition.operator]}
-      </span>
-      {condition.value !== undefined && (
-        <span className="flex items-center rounded-r-md bg-green-500/15 px-2 py-0.5 text-green-700 dark:text-green-400">
-          {condition.value}
+      {entityContent !== null ? (
+        entityContent
+      ) : (
+        <span className={cn(DEFAULT_ENTITY_CLASS, resolvedEntityClass)}>
+          {fs?.label ?? condition.field}
         </span>
       )}
+
+      {operatorContent !== null ? (
+        operatorContent
+      ) : (
+        <span className={cn(DEFAULT_OPERATOR_CLASS, resolvedOperatorClass)}>
+          {OPERATOR_LABELS[condition.operator] ?? condition.operator}
+        </span>
+      )}
+
+      {condition.value !== undefined &&
+        (valueContent !== null ? (
+          valueContent
+        ) : (
+          <span className={cn(DEFAULT_VALUE_CLASS, resolvedValueClass)}>
+            {condition.value}
+          </span>
+        ))}
+
       {condition.value === undefined && (
-        <span className="flex items-center rounded-r-md bg-green-500/15 px-2 py-0.5">
+        <span className={cn(DEFAULT_VALUE_EMPTY_CLASS, resolvedValueClass)}>
           <span className="sr-only">empty</span>
         </span>
       )}
+
       <button
         type="button"
         onClick={(e) => {
@@ -183,12 +265,24 @@ function QueryInput({
   onConditionsChange,
   placeholder = "Add filter...",
   className,
-}: Pick<
-  QueryBuilderProps,
-  "schema" | "conditions" | "onConditionsChange" | "placeholder" | "className"
-> & {
+  renderEntityChip,
+  renderOperatorChip,
+  renderValueChip,
+  entityChipClassName,
+  operatorChipClassName,
+  valueChipClassName,
+}: {
+  schema: readonly QueryFieldSchema[];
   conditions: QueryCondition[];
   onConditionsChange: (c: QueryCondition[]) => void;
+  placeholder?: string;
+  className?: string;
+  renderEntityChip?: QueryBuilderProps["renderEntityChip"];
+  renderOperatorChip?: QueryBuilderProps["renderOperatorChip"];
+  renderValueChip?: QueryBuilderProps["renderValueChip"];
+  entityChipClassName?: QueryBuilderProps["entityChipClassName"];
+  operatorChipClassName?: QueryBuilderProps["operatorChipClassName"];
+  valueChipClassName?: QueryBuilderProps["valueChipClassName"];
 }) {
   const [draft, setDraft] = React.useState("")
   const [focused, setFocused] = React.useState(false)
@@ -204,7 +298,6 @@ function QueryInput({
   const valuePart = getValuePart(draft)
   const fieldSchema = getFieldSchema(schema, fieldPart)
 
-  // Live condition computed from draft — no state, no effect
   const current = computeCurrent(draft, schema)
 
   const rawOptions = React.useMemo(() => {
@@ -241,20 +334,19 @@ function QueryInput({
   function handleSelect(value: string) {
     if (stage === "field") {
       const fs = getFieldSchema(schema, value)
-      if (fs && fs.operators?.length === 1 && fs.operators[0] && !needsValue(fs.operators[0])) {
+      if (fs && fs.operators.length === 1 && !needsValue(fs.operators[0])) {
         commit({ field: value, operator: fs.operators[0] })
         return
       }
       setDraft(value + ",")
     } else if (stage === "operator") {
-      const op = value as QueryOperator
-      if (!needsValue(op)) {
-        commit({ field: fieldPart, operator: op })
+      if (!needsValue(value)) {
+        commit({ field: fieldPart, operator: value })
         return
       }
       setDraft(fieldPart + "," + value + ",")
     } else {
-      commit({ field: fieldPart, operator: operatorPart as QueryOperator, value })
+      commit({ field: fieldPart, operator: operatorPart, value })
     }
   }
 
@@ -279,9 +371,9 @@ function QueryInput({
       } else if (draft.trim()) {
         if (stage === "operator" && fieldSchema) {
           const validOps = getOperatorsForField(schema, fieldPart)
-          if (validOps.includes(operatorPart as QueryOperator)) {
-            if (!needsValue(operatorPart as QueryOperator)) {
-              commit({ field: fieldPart, operator: operatorPart as QueryOperator })
+          if (validOps.includes(operatorPart)) {
+            if (!needsValue(operatorPart)) {
+              commit({ field: fieldPart, operator: operatorPart })
             } else {
               setDraft(fieldPart + "," + operatorPart + ",")
             }
@@ -289,7 +381,7 @@ function QueryInput({
         } else if (stage === "value" && fieldSchema) {
           commit({
             field: fieldPart,
-            operator: operatorPart as QueryOperator,
+            operator: operatorPart,
             value: valuePart || undefined,
           })
         }
@@ -322,7 +414,7 @@ function QueryInput({
       <span className="flex items-center gap-2">
         <code className="text-xs">{op}</code>
         <span className="text-muted-foreground text-xs">
-          {OPERATOR_LABELS[op as QueryOperator]}
+          {OPERATOR_LABELS[op] ?? op}
         </span>
       </span>
     )
@@ -343,6 +435,12 @@ function QueryInput({
           condition={c}
           schema={schema}
           onRemove={() => removeCondition(i)}
+          renderEntityChip={renderEntityChip}
+          renderOperatorChip={renderOperatorChip}
+          renderValueChip={renderValueChip}
+          entityChipClassName={entityChipClassName}
+          operatorChipClassName={operatorChipClassName}
+          valueChipClassName={valueChipClassName}
         />
       ))}
 
@@ -352,6 +450,12 @@ function QueryInput({
           schema={schema}
           onRemove={() => setDraft("")}
           dashed
+          renderEntityChip={renderEntityChip}
+          renderOperatorChip={renderOperatorChip}
+          renderValueChip={renderValueChip}
+          entityChipClassName={entityChipClassName}
+          operatorChipClassName={operatorChipClassName}
+          valueChipClassName={valueChipClassName}
         />
       )}
 
@@ -365,7 +469,10 @@ function QueryInput({
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
           placeholder={conditions.length === 0 ? placeholder : "Add filter..."}
-          className="w-full bg-transparent py-0.5 text-sm outline-none placeholder:text-muted-foreground"
+          className={cn(
+            "w-full bg-transparent py-0.5 text-sm outline-none placeholder:text-muted-foreground",
+            current && "text-transparent caret-foreground",
+          )}
         />
 
         {showDropdown && (
@@ -388,17 +495,32 @@ function QueryInput({
 }
 
 // ---------------------------------------------------------------------------
-// QueryBuilder — wrapper that manages conditions
+// QueryBuilder — full component with hook integration + render props
 // ---------------------------------------------------------------------------
 
-function QueryBuilder({
-  schema,
-  conditions: controlledConditions,
-  onConditionsChange,
-  multi = true,
-  placeholder = "Add filter...",
-  className,
-}: QueryBuilderProps) {
+function QueryBuilderInner<TData>(
+  props: QueryBuilderProps<TData>,
+  ref: React.Ref<HTMLDivElement>,
+) {
+  const {
+    schema,
+    conditions: controlledConditions,
+    onConditionsChange,
+    placeholder = "Add filter...",
+    className,
+    wrapperClassName,
+    entityChipClassName,
+    operatorChipClassName,
+    valueChipClassName,
+    renderEntityChip,
+    renderOperatorChip,
+    renderValueChip,
+    resolver,
+    data,
+    useQueryFilter: useQueryFilterProp,
+    children,
+  } = props
+
   const [internalConditions, setInternalConditions] = React.useState<
     QueryCondition[]
   >([])
@@ -406,16 +528,94 @@ function QueryBuilder({
   const conditions = controlledConditions ?? internalConditions
   const setConditions = onConditionsChange ?? setInternalConditions
 
+  const useFilter = useQueryFilterProp ?? defaultUseQueryFilter
+  const { filtered } = useFilter({ conditions, schema, resolver, data })
+
+  const getFilteredData = React.useCallback(() => filtered, [filtered])
+
+  const entity = React.useCallback(
+    (field: string) => {
+      const fs = getFieldSchema(schema, field)
+      if (renderEntityChip) return renderEntityChip({ field, fieldSchema: fs })
+      const cls =
+        typeof entityChipClassName === "function"
+          ? entityChipClassName({ field, fieldSchema: fs })
+          : entityChipClassName
+      return (
+        <span className={cn(DEFAULT_ENTITY_CLASS, cls)}>
+          {fs?.label ?? field}
+        </span>
+      )
+    },
+    [schema, renderEntityChip, entityChipClassName],
+  )
+
+  const operator = React.useCallback(
+    (op: string) => {
+      const label = OPERATOR_LABELS[op] ?? op
+      if (renderOperatorChip) return renderOperatorChip({ operator: op, label })
+      const cls =
+        typeof operatorChipClassName === "function"
+          ? operatorChipClassName({ operator: op, label })
+          : operatorChipClassName
+      return (
+        <span className={cn(DEFAULT_OPERATOR_CLASS, cls)}>{label}</span>
+      )
+    },
+    [renderOperatorChip, operatorChipClassName],
+  )
+
+  const value = React.useCallback(
+    (val: string) => {
+      if (renderValueChip) return renderValueChip({ value: val })
+      const cls =
+        typeof valueChipClassName === "function"
+          ? valueChipClassName({ value: val })
+          : valueChipClassName
+      return (
+        <span className={cn(DEFAULT_VALUE_CLASS, cls)}>{val}</span>
+      )
+    },
+    [renderValueChip, valueChipClassName],
+  )
+
+  const resolvedWrapperClass =
+    typeof wrapperClassName === "function"
+      ? wrapperClassName({ className })
+      : wrapperClassName ?? className
+
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
+    <div ref={ref} className={cn("flex flex-col gap-2", resolvedWrapperClass)}>
       <QueryInput
         schema={schema}
         conditions={conditions}
         onConditionsChange={setConditions}
         placeholder={placeholder}
+        className={className}
+        renderEntityChip={renderEntityChip}
+        renderOperatorChip={renderOperatorChip}
+        renderValueChip={renderValueChip}
+        entityChipClassName={entityChipClassName}
+        operatorChipClassName={operatorChipClassName}
+        valueChipClassName={valueChipClassName}
       />
+
+      {children?.({
+        entity,
+        operator,
+        value,
+        getFilteredData,
+        conditions,
+        setConditions,
+      })}
     </div>
   )
 }
+
+const QueryBuilder = React.forwardRef(QueryBuilderInner) as <
+  TData = unknown,
+>(
+  props: QueryBuilderProps<TData> & { ref?: React.Ref<HTMLDivElement> },
+) => React.ReactNode
 
 export { QueryBuilder }

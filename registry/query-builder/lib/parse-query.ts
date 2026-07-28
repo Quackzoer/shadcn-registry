@@ -1,8 +1,7 @@
 import {
   type QueryCondition,
   type QueryFieldSchema,
-  type QueryOperator,
-  DEFAULT_OPERATORS,
+  NULL_OPERATORS,
 } from "@/registry/query-builder/types/query-builder";
 
 function splitRespectingQuotes(input: string): string[] {
@@ -37,11 +36,8 @@ function stripQuotes(s: string): string {
   return trimmed;
 }
 
-function getOperators(
-  fieldSchema: QueryFieldSchema | undefined,
-): QueryOperator[] {
-  if (!fieldSchema) return DEFAULT_OPERATORS.string;
-  return fieldSchema.operators ?? DEFAULT_OPERATORS[fieldSchema.type];
+function getOperators(fieldSchema: QueryFieldSchema | undefined): string[] {
+  return fieldSchema?.operators ?? [];
 }
 
 function parseValue(raw: string): string | undefined {
@@ -78,11 +74,11 @@ export function parseQuery(
       continue;
     }
 
-    const needsValue = !["is_null", "is_not_null"].includes(operator);
-    const value = needsValue ? parseValue(segments[i + 2] ?? "") : undefined;
+    const needsVal = !NULL_OPERATORS.has(operator);
+    const value = needsVal ? parseValue(segments[i + 2] ?? "") : undefined;
 
     conditions.push({ field: fieldRaw, operator, value });
-    i += needsValue ? 3 : 2;
+    i += needsVal ? 3 : 2;
   }
 
   return conditions;
@@ -91,7 +87,7 @@ export function parseQuery(
 export function toQueryString(conditions: QueryCondition[]): string {
   return conditions
     .map((c) => {
-      if (["is_null", "is_not_null"].includes(c.operator)) {
+      if (NULL_OPERATORS.has(c.operator)) {
         return `${c.field},${c.operator}`;
       }
       const needsQuoting = c.value?.includes(",") ?? false;
@@ -111,10 +107,10 @@ export function getFieldSchema(
 export function getOperatorsForField(
   schema: readonly QueryFieldSchema[],
   fieldName: string,
-): QueryOperator[] {
+): string[] {
   return getOperators(getFieldSchema(schema, fieldName));
 }
 
-export function needsValue(operator: QueryOperator): boolean {
-  return !["is_null", "is_not_null"].includes(operator);
+export function needsValue(operator: string): boolean {
+  return !NULL_OPERATORS.has(operator);
 }
