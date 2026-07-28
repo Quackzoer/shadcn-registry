@@ -8,12 +8,14 @@ interface FormPasswordFieldProps {
     className?: string
 }
 
-export function FormPasswordField({className}: Readonly<FormPasswordFieldProps>) {
+export function FormPasswordField({ className }: Readonly<FormPasswordFieldProps>) {
     const [showPassword, setShowPassword] = React.useState(false)
 
     return (
-        <div className={cn("relative",className)}>
-            <FormTextField/>
+        <div className={cn("relative", className)}>
+            <FormTextField
+                type={showPassword ? 'text' : 'password'}
+            />
             <Button
                 type="button"
                 variant="ghost"
