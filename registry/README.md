@@ -30,6 +30,8 @@ Two directories at the repo root are deliberately **not** part of this scheme:
 | [`store-slice`](./store-slice) | ✅ | [`/store-slice`](../app/store-slice) | Composable zustand slices that mirror TanStack Query |
 | [`data-table`](./data-table) | ✅ | — | Virtualized TanStack Table with per-instance state, row grouping, filters popover |
 | [`combobox`](./combobox) | ✅ | [`/combobox`](../app/combobox) | Composable combobox built on Base UI primitives |
+| [`action-button`](./action-button) | ✅ | [`/action-button`](../app/action-button) | Button that runs an async action, with confirm dialog and tooltip |
+| [`loading-swap`](./loading-swap) | ✅ | — | Swaps content for a spinner without resizing. **Third-party** (WDS, MIT) |
 | [`breadcrumbs`](./breadcrumbs) | ✅ | — | Declarative breadcrumbs for nested routes; router-agnostic |
 | [`entity-sidebar`](./entity-sidebar) | ✅ | — | State + filter/sort primitives for a searchable entity list |
 | [`layout-slots`](./layout-slots) | ✅ | — | Nested routes render into a parent layout; slots clear on unmount |

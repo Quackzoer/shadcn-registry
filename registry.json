@@ -180,6 +180,40 @@
       ]
     },
     {
+      "name": "loading-swap",
+      "type": "registry:ui",
+      "title": "Loading Swap",
+      "description": "Swaps content for a spinner without the element changing size. Republished unmodified from WebDevSimplified's registry under its MIT license.",
+      "files": [
+        {
+          "path": "registry/loading-swap/components/loading-swap.tsx",
+          "type": "registry:ui",
+          "target": "@ui/loading-swap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "action-button",
+      "type": "registry:ui",
+      "title": "Action Button",
+      "description": "A Button that runs an async action with a loading spinner, an optional confirmation dialog, and an optional tooltip that still works while disabled. Adapted from WebDevSimplified's ActionButton, using promise-based confirmDialog.",
+      "dependencies": ["sonner"],
+      "registryDependencies": [
+        "button",
+        "tooltip",
+        "Quackzoer/shadcn-registry/loading-swap",
+        "Quackzoer/shadcn-registry/dynamic-dialog",
+        "Quackzoer/shadcn-registry/dynamic-dialog-confirmation"
+      ],
+      "files": [
+        {
+          "path": "registry/action-button/components/action-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/action-button.tsx"
+        }
+      ]
+    },
+    {
       "name": "ts-utils",
       "type": "registry:lib",
       "title": "TypeScript Utils",
