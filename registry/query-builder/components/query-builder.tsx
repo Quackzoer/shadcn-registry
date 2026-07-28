@@ -43,6 +43,26 @@ function getValuePart(draft: string): string {
   return draft.split(",").slice(2).join(",").trim()
 }
 
+function computeCurrent(
+  draft: string,
+  schema: readonly QueryFieldSchema[],
+): QueryCondition | null {
+  const commas = (draft.match(/,/g) ?? []).length
+  if (commas < 1) return null
+  const fp = getFieldPart(draft)
+  const op = getOperatorPart(draft)
+  const vp = getValuePart(draft)
+  if (
+    getFieldSchema(schema, fp) &&
+    getOperatorsForField(schema, fp).includes(op as QueryOperator)
+  ) {
+    const cond: QueryCondition = { field: fp, operator: op as QueryOperator }
+    if (vp) cond.value = vp
+    return cond
+  }
+  return null
+}
+
 // ---------------------------------------------------------------------------
 // Query chip
 // ---------------------------------------------------------------------------
@@ -51,14 +71,23 @@ function ConditionChip({
   condition,
   schema,
   onRemove,
+  dashed,
 }: {
   condition: QueryCondition
   schema: readonly QueryFieldSchema[]
   onRemove: () => void
+  dashed?: boolean
 }) {
   const fs = getFieldSchema(schema, condition.field)
   return (
-    <span className="inline-flex h-7 items-center gap-0 rounded-md border border-transparent text-sm transition-colors select-none">
+    <span
+      className={cn(
+        "inline-flex h-7 items-center gap-0 rounded-md text-sm transition-colors select-none",
+        dashed
+          ? "border border-dashed border-muted-foreground/30 opacity-60"
+          : "border border-transparent",
+      )}
+    >
       <span className="flex items-center rounded-l-md bg-blue-500/15 px-2 py-0.5 text-blue-700 dark:text-blue-400">
         {fs?.label ?? condition.field}
       </span>
@@ -71,7 +100,7 @@ function ConditionChip({
         </span>
       )}
       {condition.value === undefined && (
-        <span className="flex items-center rounded-r-md bg-green-500/15 px-2 py-0.5 text-green-700 dark:text-green-400">
+        <span className="flex items-center rounded-r-md bg-green-500/15 px-2 py-0.5">
           <span className="sr-only">empty</span>
         </span>
       )}
@@ -98,7 +127,6 @@ interface SuggestionDropdownProps {
   highlightIndex: number;
   onSelect: (value: string) => void;
   renderOption?: (value: string) => React.ReactNode;
-  anchorRef: React.RefObject<HTMLDivElement | null>;
 }
 
 function SuggestionDropdown({
@@ -106,7 +134,6 @@ function SuggestionDropdown({
   highlightIndex,
   onSelect,
   renderOption,
-  anchorRef,
 }: SuggestionDropdownProps) {
   const listRef = React.useRef<HTMLDivElement>(null)
 
@@ -168,13 +195,17 @@ function QueryInput({
   const [highlightIndex, setHighlightIndex] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const conditionsRef = React.useRef(conditions)
+  conditionsRef.current = conditions
 
   const stage = getStage(draft)
   const fieldPart = getFieldPart(draft)
   const operatorPart = getOperatorPart(draft)
   const valuePart = getValuePart(draft)
-
   const fieldSchema = getFieldSchema(schema, fieldPart)
+
+  // Live condition computed from draft — no state, no effect
+  const current = computeCurrent(draft, schema)
 
   const rawOptions = React.useMemo(() => {
     if (stage === "field") return schema.map((f) => f.name)
@@ -197,29 +228,14 @@ function QueryInput({
     setHighlightIndex(0)
   }, [draft])
 
-  // Emit onConditionsChange when 2+ parts exist so results filter live
-  React.useEffect(() => {
-    const commas = (draft.match(/,/g) ?? []).length
-    if (commas >= 1) {
-      const fp = getFieldPart(draft)
-      const op = getOperatorPart(draft)
-      const vp = getValuePart(draft)
-      if (getFieldSchema(schema, fp) && getOperatorsForField(schema, fp).includes(op as QueryOperator)) {
-        const cond: QueryCondition = { field: fp, operator: op as QueryOperator }
-        if (vp) cond.value = vp
-        onConditionsChange([...conditions, cond])
-      }
-    }
-  }, [draft, conditions, onConditionsChange, schema])
-
   function commit(condition: QueryCondition) {
-    onConditionsChange([...conditions, condition])
+    onConditionsChange([...conditionsRef.current, condition])
     setDraft("")
     setHighlightIndex(0)
   }
 
   function removeCondition(index: number) {
-    onConditionsChange(conditions.filter((_, i) => i !== index))
+    onConditionsChange(conditionsRef.current.filter((_, i) => i !== index))
   }
 
   function handleSelect(value: string) {
@@ -243,26 +259,9 @@ function QueryInput({
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value
-
-    // Check if a comma was just typed — validate the completed part
-    if (raw.endsWith(",")) {
-      const justTypedComma = !draft.endsWith(",")
-      if (justTypedComma) {
-        if (stage === "field") {
-          const fs = getFieldSchema(schema, fieldPart)
-          if (!fs) return // reject invalid field
-        } else if (stage === "operator") {
-          const validOps = fieldSchema ? getOperatorsForField(schema, fieldPart) : []
-          if (!validOps.includes(operatorPart as QueryOperator)) return
-          if (!needsValue(operatorPart as QueryOperator)) {
-            commit({ field: fieldPart, operator: operatorPart as QueryOperator })
-            return
-          }
-        }
-      }
-    }
-
+    const raw = current
+      ? fieldPart + "," + operatorPart + "," + e.target.value
+      : e.target.value
     setDraft(raw)
   }
 
@@ -278,7 +277,6 @@ function QueryInput({
       if (options[highlightIndex]) {
         handleSelect(options[highlightIndex])
       } else if (draft.trim()) {
-        // Commit whatever is typed
         if (stage === "operator" && fieldSchema) {
           const validOps = getOperatorsForField(schema, fieldPart)
           if (validOps.includes(operatorPart as QueryOperator)) {
@@ -298,8 +296,13 @@ function QueryInput({
       }
     } else if (e.key === "Escape") {
       setFocused(false)
-    } else if (e.key === "Backspace" && draft === "" && conditions.length > 0) {
-      removeCondition(conditions.length - 1)
+    } else if (e.key === "Backspace") {
+      const inputEmpty = (current ? valuePart : draft) === ""
+      if (inputEmpty && current) {
+        setDraft(fieldPart + "," + operatorPart)
+      } else if (inputEmpty && !current && conditionsRef.current.length > 0) {
+        removeCondition(conditionsRef.current.length - 1)
+      }
     }
   }
 
@@ -343,11 +346,20 @@ function QueryInput({
         />
       ))}
 
+      {current && (
+        <ConditionChip
+          condition={current}
+          schema={schema}
+          onRemove={() => setDraft("")}
+          dashed
+        />
+      )}
+
       <div className="relative min-w-[160px] flex-1">
         <input
           ref={inputRef}
           type="text"
-          value={draft}
+          value={current ? valuePart : draft}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
@@ -368,7 +380,6 @@ function QueryInput({
                   ? renderOperatorOption
                   : undefined
             }
-            anchorRef={containerRef}
           />
         )}
       </div>
@@ -377,16 +388,13 @@ function QueryInput({
 }
 
 // ---------------------------------------------------------------------------
-// QueryBuilder — wrapper that manages conditions + serializes
+// QueryBuilder — wrapper that manages conditions
 // ---------------------------------------------------------------------------
 
 function QueryBuilder({
   schema,
-  value,
-  onChange,
   conditions: controlledConditions,
   onConditionsChange,
-  onSubmit,
   multi = true,
   placeholder = "Add filter...",
   className,
