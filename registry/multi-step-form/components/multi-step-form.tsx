@@ -1,196 +1,66 @@
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { FormApi } from "@tanstack/react-form";
-import { cn } from "@/lib/utils"; // Assumes your project's cn utility
+import z from "zod";
+import { formOptions } from "@tanstack/react-form";
+import { withForm } from "@/registry/tanstack-form/hooks/use-app-form";
 
-interface MultiStepFormContextType {
-    currentStepIndex: number;
-    totalSteps: number;
-    isFirstStep: boolean;
-    isLastStep: boolean;
-    next: () => Promise<boolean>;
-    prev: () => void;
-    goTo: (index: number) => void;
-    isSubmitting: boolean;
-}
+const step1Schema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+})
 
-const MultiStepFormContext = React.createContext<MultiStepFormContextType | null>(null);
+const step2Schema = z.object({
+  name: z.string().min(3, 'Name must be at least 3 characters'),
+})
 
-export function useMultiStepForm() {
-    const context = React.useContext(MultiStepFormContext);
-    if (!context) {
-        throw new Error("useMultiStepForm must be used within a <MultiStepForm /> provider");
-    }
-    return context;
-}
+const wizardFormOpts = formOptions({
+  defaultValues: {
+    step1: {
+      name: '',
+    },
+    step2: {
+      name: '',
+    },
+  },
+})
 
-interface MultiStepFormProps<T extends Record<string, any>> {
-    form: FormApi<T, any, any, any, any, any, any, any, any, any, any, any>;
-    children: React.ReactNode;
-    /**
-     * An array of field name arrays, corresponding to each step.
-     * Tells the orchestrator which fields to trigger validation for
-     * before allowing a transition to the next step.
-     */
-    stepFields: (keyof T)[][];
-    className?: string;
-}
-
-export function MultiStepForm<T extends Record<string, any>>({
-    form,
-    children,
-    stepFields,
-    className,
-}: Readonly<MultiStepFormProps<T>>) {
-    const [currentStepIndex, setCurrentStepIndex] = React.useState(0);
-    const childrenArray = React.Children.toArray(children);
-    const totalSteps = childrenArray.length;
-
-    const isFirstStep = currentStepIndex === 0;
-    const isLastStep = currentStepIndex === totalSteps - 1;
-
-    // Reactively subscribe to form state using TanStack's useStore hook
-    const isSubmitting = form.useStore((state) => state.isSubmitting);
-    const fieldMeta = form.useStore((state) => state.fieldMeta);
-
-    // Automatically route back to the first step with an error if submission fails
-    React.useEffect(() => {
-        // Collect keys of fields that currently have validation errors
-        const errorFields = Object.keys(fieldMeta).filter((fieldName) => {
-            const meta = fieldMeta[fieldName];
-            return meta?.errors && meta.errors.length > 0;
-        });
-
-        if (errorFields.length === 0) return;
-
-        // Find the first step index that contains one of the invalid fields
-        const firstInvalidStepIndex = stepFields.findIndex((fields) =>
-            fields.some((field) => errorFields.includes(field as string))
-        );
-
-        // Jump to the invalid step safely
-        if (firstInvalidStepIndex !== -1 && firstInvalidStepIndex !== currentStepIndex) {
-            setCurrentStepIndex(firstInvalidStepIndex);
-        }
-    }, [fieldMeta, stepFields, currentStepIndex]);
-
-    const next = async () => {
-        if (isLastStep) return false;
-        const fieldsToValidate = stepFields[currentStepIndex];
-
-        // Manually trigger validation for all fields in the current step
-        await Promise.all(
-            fieldsToValidate.map((field) => form.validateField(field as any, "submit"))
-        );
-
-        // Read fresh field validation state
-        const currentFieldMeta = form.state.fieldMeta;
-        const hasErrors = fieldsToValidate.some((field) => {
-            const meta = currentFieldMeta[field as string];
-            return meta?.errors && meta.errors.length > 0;
-        });
-
-        if (!hasErrors) {
-            setCurrentStepIndex((prev) => prev + 1);
-            return true;
-        }
-        return false;
-    };
-
-    const prev = () => {
-        if (isFirstStep) return;
-        setCurrentStepIndex((prev) => prev - 1);
-    };
-
-    const goTo = (index: number) => {
-        if (index >= 0 && index < totalSteps) {
-            setCurrentStepIndex(index);
-        }
-    };
-
-    const handleFormSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // In TanStack Form, the submission handler is defined inside your hook initialization: useForm({ onSubmit })
-        form.handleSubmit();
-    };
-
+const Step1Form = withForm({
+  ...wizardFormOpts,
+  props: {
+    step: 0,
+    setStep: (_step: number) => {},
+  },
+  render: function Render({ form, step, setStep }) {
     return (
-        <MultiStepFormContext.Provider
-            value={{
-                currentStepIndex,
-                totalSteps,
-                isFirstStep,
-                isLastStep,
-                next,
-                prev,
-                goTo,
-                isSubmitting,
+      <form.FormGroup
+        name="step1"
+        validators={{
+          onDynamic: step1Schema,
+        }}
+        onGroupSubmit={({ value: _value }) => {
+          setStep(step + 1)
+        }}
+        onGroupSubmitInvalid={() => {
+          // Just like a form, you can also handle invalid submits at the group level, which is useful for multi-step wizards to prevent going to the next step if the current step is invalid
+        }}
+      >
+        {(formGroup) => (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              formGroup.handleSubmit()
             }}
-        >
-            <form onSubmit={handleFormSubmit} className={cn("space-y-6", className)}>
-                {childrenArray.map((child, index) => {
-                    if (!React.isValidElement(child)) return null;
-                    return React.cloneElement(child as React.ReactElement<MultiStepFormStepProps>, {
-                        stepIndex: index,
-                        active: index === currentStepIndex,
-                    });
-                })}
-            </form>
-        </MultiStepFormContext.Provider>
-    );
-}
+          >
+            <form.AppField name="step1.name">
+              {(field) => <field.Text />}
+            </form.AppField>
 
-
-interface MultiStepFormStepProps {
-    children: React.ReactNode;
-    stepIndex?: number; // Injected by parent
-    active?: boolean;   // Injected by parent
-    className?: string;
-}
-
-export function MultiStepFormStep({
-    children,
-    active,
-    className,
-}: Readonly<MultiStepFormStepProps>) {
-    if (!active) return null;
-
-    return (
-        <div className={cn("animate-in fade-in-50 slide-in-from-bottom-2 duration-200", className)}>
-            {children}
-        </div>
-    );
-}
-
-// Optional navigation utility component
-export function MultiStepNavigation() {
-    const { isFirstStep, isLastStep, prev, next, isSubmitting } = useMultiStepForm();
-
-    return (
-        <div className="flex justify-between items-center pt-4 border-t border-border">
-            <Button
-                type="button"
-                variant="ghost"
-                onClick={prev}
-                disabled={isFirstStep || isSubmitting}
-            >
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Back
-            </Button>
-
-            {isLastStep ? (
-                <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : "Submit"}
-                    <Check className="ml-2 h-4 w-4" />
-                </Button>
-            ) : (
-                <Button type="button" onClick={next}>
-                    Next
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-            )}
-        </div>
-    );
-}
+            <form.AppForm>
+              <form.SubscribeButton label="Submit" />
+            </form.AppForm>
+            {/* formGroup contains errorMaps and errors, just like forms and fields */}
+            <pre>{JSON.stringify(formGroup.state.meta.errorMap, null, 2)}</pre>
+          </form>
+        )}
+      </form.FormGroup>
+    )
+  },
+})

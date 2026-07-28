@@ -12,6 +12,7 @@ interface FormFieldLayoutProps {
     required?: boolean
     children: React.ReactNode
     showResetFieldButton?: boolean
+    isValidating?: boolean
 }
 
 export function FormFieldLayout({
@@ -19,7 +20,8 @@ export function FormFieldLayout({
     description,
     required,
     children,
-    showResetFieldButton
+    showResetFieldButton,
+    isValidating
 }: Readonly<FormFieldLayoutProps>) {
     return (
         <div className="space-y-1.5 w-full">
@@ -33,7 +35,7 @@ export function FormFieldLayout({
                 {showResetFieldButton && <FieldResetValueButton/>}
             </div>
 
-            <FieldValidating />
+            <FieldValidating isValidating={isValidating} />
 
             {description && (
                 <FieldDescription>

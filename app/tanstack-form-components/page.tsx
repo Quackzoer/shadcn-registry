@@ -4,8 +4,9 @@ import { FormFieldCardSelectOption } from "@/registry/tanstack-form/components/f
 import { FormFieldLayout } from "@/registry/tanstack-form/components/fields/form-field-layout"
 import { FormAutosave } from "@/registry/tanstack-form/components/form/form-autosave"
 import { useAppForm } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useAsyncFieldValidator } from "@/registry/tanstack-form/hooks/use-async-field-validator"
 import { nuqsAdapter } from "@/registry/tanstack-form/lib/form-autosave-adapter"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import * as z from "zod"
 
 const formSchema = z.object({
@@ -32,6 +33,13 @@ export default function TanstackFormFieldsPage() {
         }
     })
     const adapter = useMemo(() => nuqsAdapter(), [])
+
+    const checkFirstNameTaken = useCallback(async (value: string) => {
+        if (!value) return undefined
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        return value.toLowerCase() === 'admin' ? 'This name is taken' : undefined
+    }, [])
+    const firstNameCheck = useAsyncFieldValidator(checkFirstNameTaken, 500)
     return (
         <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
             <header className="flex flex-col gap-1">
@@ -68,16 +76,16 @@ export default function TanstackFormFieldsPage() {
                     <form.AppField
                         name="firstName"
                         validators={{
-                            onChangeAsyncDebounceMs: 500,
-                            onChangeAsync: async ({ value }) => {
-                                if (!value) return undefined
-                                await new Promise((resolve) => setTimeout(resolve, 1000))
-                                return value.toLowerCase() === 'admin' ? 'This name is taken' : undefined
-                            },
+                            onChangeAsync: ({ value }) => firstNameCheck.validate(value),
                         }}
                     >
                         {(field) => (
-                            <FormFieldLayout label={'First Name'} required description={'Name you were assigned at birth'}>
+                            <FormFieldLayout
+                                label={'First Name'}
+                                required
+                                description={'Name you were assigned at birth'}
+                                isValidating={firstNameCheck.isValidating}
+                            >
                                 <field.Text/>
                             </FormFieldLayout>
                         )}

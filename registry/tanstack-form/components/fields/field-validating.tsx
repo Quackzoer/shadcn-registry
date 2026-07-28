@@ -3,9 +3,20 @@ import { Spinner } from "@/components/ui/spinner"
 import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
 import type { ReactNode } from "react"
 
-export function FieldValidating({ label = "Checking…" }: Readonly<{ label?: ReactNode }>) {
+export interface FieldValidatingProps {
+    label?: ReactNode
+    /**
+     * Overrides the field's built-in `meta.isValidating`. Pass this when the
+     * field's async validator is driven by `useAsyncFieldValidator` (see hook
+     * docs for why the built-in flag isn't reliable across repeated validations).
+     */
+    isValidating?: boolean
+}
+
+export function FieldValidating({ label = "Checking…", isValidating: isValidatingOverride }: Readonly<FieldValidatingProps>) {
     const field = useFieldContext()
-    const isValidating = useSelector(field.store, (state) => state.meta.isValidating)
+    const metaIsValidating = useSelector(field.store, (state) => state.meta.isValidating)
+    const isValidating = isValidatingOverride ?? metaIsValidating
 
     if (!isValidating) return null
 
