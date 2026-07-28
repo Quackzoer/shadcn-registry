@@ -25,19 +25,19 @@
  * SOFTWARE.
  */
 
+import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
-import { Loader2Icon } from "lucide-react"
 import type { ReactNode } from "react"
 
 export function LoadingSwap({
   isLoading,
   children,
   className,
-}: {
+}: Readonly<{
   isLoading: boolean
   children: ReactNode
   className?: string
-}) {
+}>) {
   return (
     <div className="grid grid-cols-1 items-center justify-items-center">
       <div
@@ -56,7 +56,7 @@ export function LoadingSwap({
           className,
         )}
       >
-        <Loader2Icon className="animate-spin" />
+        <Spinner />
       </div>
     </div>
   )
