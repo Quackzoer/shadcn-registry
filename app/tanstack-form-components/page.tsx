@@ -1,6 +1,5 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { FieldResetValueButton } from "@/registry/tanstack-form/components/fields/field-reset-value-button"
 import { FormFieldCardSelectOption } from "@/registry/tanstack-form/components/fields/form-field-card-select"
 import { FormFieldLayout } from "@/registry/tanstack-form/components/fields/form-field-layout"
 import { FormAutosave } from "@/registry/tanstack-form/components/form/form-autosave"
@@ -68,6 +67,14 @@ export default function TanstackFormFieldsPage() {
                     </FormAutosave>
                     <form.AppField
                         name="firstName"
+                        validators={{
+                            onChangeAsyncDebounceMs: 500,
+                            onChangeAsync: async ({ value }) => {
+                                if (!value) return undefined
+                                await new Promise((resolve) => setTimeout(resolve, 1000))
+                                return value.toLowerCase() === 'admin' ? 'This name is taken' : undefined
+                            },
+                        }}
                     >
                         {(field) => (
                             <FormFieldLayout label={'First Name'} required description={'Name you were assigned at birth'}>
@@ -80,10 +87,9 @@ export default function TanstackFormFieldsPage() {
                     >
                         {(field) => {
                             return (
-                                <div className="flex">
-                                    <field.Password className='w-full' />
-                                    <FieldResetValueButton />
-                                </div>
+                                <FormFieldLayout label='Password' showResetFieldButton>
+                                    <field.Password/>
+                                </FormFieldLayout>
                             )
                         }}
                     </form.AppField>
@@ -148,7 +154,7 @@ export default function TanstackFormFieldsPage() {
                         }}
                     </form.AppField>
                     <form.AppForm>
-                        <form.Submit/>
+                        <form.Submit />
                     </form.AppForm>
                 </form.Form>
             </main>

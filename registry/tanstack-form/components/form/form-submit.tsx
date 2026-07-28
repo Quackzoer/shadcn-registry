@@ -9,7 +9,7 @@ export interface FormSubmitButtonProps{
     label?: ReactNode
 } 
 
-export function FormSubmitButton({label}:Readonly<FormSubmitButtonProps>){
+export function FormSubmitButton({label = 'Submit'}:Readonly<FormSubmitButtonProps>){
     const form = useFormContext()
     return (
         <form.Subscribe selector={(state)=>state.isSubmitting}>
