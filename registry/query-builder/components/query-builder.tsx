@@ -96,6 +96,7 @@ function ConditionChip({
   entityChipClassName,
   operatorChipClassName,
   valueChipClassName,
+  queryWrapperClassName
 }: {
   condition: QueryCondition
   schema: readonly QueryFieldSchema[]
@@ -106,7 +107,8 @@ function ConditionChip({
   renderValueChip?: QueryBuilderProps["renderValueChip"]
   entityChipClassName?: QueryBuilderProps["entityChipClassName"]
   operatorChipClassName?: QueryBuilderProps["operatorChipClassName"]
-  valueChipClassName?: QueryBuilderProps["valueChipClassName"]
+  valueChipClassName?: QueryBuilderProps["valueChipClassName"],
+  queryWrapperClassName?: string
 }) {
   const fs = getFieldSchema(schema, condition.field)
 
@@ -153,6 +155,7 @@ function ConditionChip({
         dashed
           ? "border border-dashed border-muted-foreground/30 opacity-60"
           : "border border-transparent",
+          queryWrapperClassName
       )}
     >
       {entityContent !== null ? (
@@ -271,6 +274,7 @@ function QueryInput({
   entityChipClassName,
   operatorChipClassName,
   valueChipClassName,
+  queryWrapperClassName
 }: {
   schema: readonly QueryFieldSchema[];
   conditions: QueryCondition[];
@@ -283,6 +287,7 @@ function QueryInput({
   entityChipClassName?: QueryBuilderProps["entityChipClassName"];
   operatorChipClassName?: QueryBuilderProps["operatorChipClassName"];
   valueChipClassName?: QueryBuilderProps["valueChipClassName"];
+  queryWrapperClassName?: string
 }) {
   const [draft, setDraft] = React.useState("")
   const [focused, setFocused] = React.useState(false)
@@ -441,6 +446,7 @@ function QueryInput({
           entityChipClassName={entityChipClassName}
           operatorChipClassName={operatorChipClassName}
           valueChipClassName={valueChipClassName}
+          queryWrapperClassName={queryWrapperClassName}
         />
       ))}
 
@@ -456,6 +462,7 @@ function QueryInput({
           entityChipClassName={entityChipClassName}
           operatorChipClassName={operatorChipClassName}
           valueChipClassName={valueChipClassName}
+          queryWrapperClassName={queryWrapperClassName}
         />
       )}
 
@@ -519,6 +526,7 @@ function QueryBuilderInner<TData>(
     data,
     useQueryFilter: useQueryFilterProp,
     children,
+    queryWrapperClassName
   } = props
 
   const [internalConditions, setInternalConditions] = React.useState<
@@ -598,6 +606,7 @@ function QueryBuilderInner<TData>(
         entityChipClassName={entityChipClassName}
         operatorChipClassName={operatorChipClassName}
         valueChipClassName={valueChipClassName}
+        queryWrapperClassName={queryWrapperClassName}
       />
 
       {children?.({

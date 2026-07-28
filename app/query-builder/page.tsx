@@ -147,6 +147,8 @@ const resolver: QueryBuilderProps<User>["resolver"] = (field, operator, value) =
 // Page
 // ---------------------------------------------------------------------------
 
+
+
 export default function Page() {
   return (
     <div className="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 px-4 py-8">
@@ -174,6 +176,22 @@ export default function Page() {
             resolver={resolver}
             data={USERS}
             placeholder="field, operator, value..."
+            renderEntityChip={({field, fieldSchema})=>(
+              <Badge className="rounded-sm bg-slate-400 text-slate-700">
+                {fieldSchema?.label}
+              </Badge>
+            )}
+            renderOperatorChip={({operator, label})=>(
+              <Badge className="rounded-sm bg-slate-300 text-slate-700">
+                {label}
+              </Badge>
+            )}
+            renderValueChip={({value})=>(
+              <Badge className="rounded-sm bg-slate-400 text-slate-700">
+                {value}
+              </Badge>
+            )}
+            queryWrapperClassName={'border border-slate-500 bg-slate-600 rounded-sm p-2 py-1 h-min opacity-100'}
           >
             {({ getFilteredData, conditions }) => {
               const results = getFilteredData()

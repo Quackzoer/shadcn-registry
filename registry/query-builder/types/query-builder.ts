@@ -172,4 +172,5 @@ export interface QueryBuilderProps<
   renderValueChip?: (props: {
     value: string;
   }) => React.ReactNode;
+  queryWrapperClassName?: string
 }
