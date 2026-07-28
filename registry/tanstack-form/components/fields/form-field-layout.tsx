@@ -3,12 +3,15 @@ import * as React from "react"
 import { FieldLabel } from "./field-label"
 import { FieldDescription } from "./field-description"
 import { FieldError } from "./field-error"
+import { FieldValidating } from "./field-validating"
+import { FieldResetValueButton } from "./field-reset-value-button"
 
 interface FormFieldLayoutProps {
     label?: React.ReactNode
     description?: React.ReactNode
     required?: boolean
     children: React.ReactNode
+    showResetFieldButton?: boolean
 }
 
 export function FormFieldLayout({
@@ -16,6 +19,7 @@ export function FormFieldLayout({
     description,
     required,
     children,
+    showResetFieldButton
 }: Readonly<FormFieldLayoutProps>) {
     return (
         <div className="space-y-1.5 w-full">
@@ -24,8 +28,12 @@ export function FormFieldLayout({
                     {label}
                 </FieldLabel>
             )}
+            <div className="flex">
+                {children}
+                {showResetFieldButton && <FieldResetValueButton/>}
+            </div>
 
-            {children}
+            <FieldValidating />
 
             {description && (
                 <FieldDescription>
@@ -33,7 +41,7 @@ export function FormFieldLayout({
                 </FieldDescription>
             )}
 
-            <FieldError/>
+            <FieldError />
         </div>
     )
 }
