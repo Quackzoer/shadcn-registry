@@ -151,6 +151,21 @@ export default function Page() {
         >
           Update dialog example
         </Button>
+        <Button
+          onClick={async () => {
+            const res = await typeToConfirmDialog({
+              props: {
+                itemName: 'This will change after 5 seconds'
+              }
+            }).result().match(
+              ()=>'ok' as const,
+              ()=>'err' as const
+            )
+            console.log(res)
+          }}
+        >
+          Neverthrow
+        </Button>
       </main>
       <DynamicDialogProvider />
     </div>

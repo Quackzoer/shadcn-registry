@@ -106,6 +106,30 @@
       ]
     },
     {
+      "name": "dynamic-dialog-neverthrow",
+      "type": "registry:lib",
+      "title": "Dynamic Dialog — neverthrow",
+      "description": "Side-effect import that monkey-patches dynamic-dialog with neverthrow Result types. Adds .result() to every dialog and exports neverthrowDialog() and dialogResult() helpers.",
+      "dependencies": [
+        "neverthrow"
+      ],
+      "registryDependencies": [
+        "Quackzoer/shadcn-registry/dynamic-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/dynamic-dialog-neverthrow/lib/dynamic-dialog-neverthrow.ts",
+          "type": "registry:lib",
+          "target": "@lib/dynamic-dialog-neverthrow.ts"
+        },
+        {
+          "path": "registry/dynamic-dialog-neverthrow/index.ts",
+          "type": "registry:lib",
+          "target": "@lib/dynamic-dialog-neverthrow/index.ts"
+        }
+      ]
+    },
+    {
       "name": "react-query",
       "type": "registry:lib",
       "title": "React Query helpers and boilerplate",
