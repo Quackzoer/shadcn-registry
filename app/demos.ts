@@ -58,4 +58,9 @@ export const demos: Demo[] = [
     label: 'TanStack Form Components',
     description: 'Form field components built on TanStack Form',
   },
+  {
+    href: '/query-builder',
+    label: 'Query Builder',
+    description: 'Structured filter input with field and operator autocomplete',
+  },
 ]

@@ -514,6 +514,30 @@
           "target": "@ui/multi-step-form.tsx"
         }
       ]
+    },
+    {
+      "name": "query-builder",
+      "type": "registry:ui",
+      "title": "Query Builder",
+      "description": "Structured filter input with field and operator autocomplete. Parses field,operator,value queries with chip-based condition display.",
+      "registryDependencies": ["badge", "input-group", "scroll-area"],
+      "files": [
+        {
+          "path": "registry/query-builder/types/query-builder.ts",
+          "type": "registry:lib",
+          "target": "@lib/query-builder/types.ts"
+        },
+        {
+          "path": "registry/query-builder/lib/parse-query.ts",
+          "type": "registry:lib",
+          "target": "@lib/query-builder/parse-query.ts"
+        },
+        {
+          "path": "registry/query-builder/components/query-builder.tsx",
+          "type": "registry:ui",
+          "target": "@ui/query-builder.tsx"
+        }
+      ]
     }
   ]
 }
