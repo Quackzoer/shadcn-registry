@@ -2,9 +2,23 @@
 /* cSpell:disable */
 
 import { useForm } from '@tanstack/react-form'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { FormAutosaveAdapter } from '@/registry/tanstack-form/lib/form-autosave-adapter'
 import { useDebouncer } from '@tanstack/react-pacer'
+
+export type FormAutosaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+
+export interface FormAutosaveState {
+    status: FormAutosaveStatus
+    lastSavedAt: Date | null
+    error: unknown
+}
+
+const initialAutosaveState: FormAutosaveState = {
+    status: 'idle',
+    lastSavedAt: null,
+    error: null,
+}
 
 interface FormAutosaveProps {
     adapter: FormAutosaveAdapter
@@ -12,6 +26,8 @@ interface FormAutosaveProps {
     saveInterval?: number
     autoRestore?: boolean
     debounceMs?: number
+    onStatusChange?: (state: FormAutosaveState) => void
+    children?: (state: FormAutosaveState) => ReactNode
 }
 
 export function FormAutosave({
@@ -20,15 +36,33 @@ export function FormAutosave({
     saveInterval = 5000,
     autoRestore = false,
     debounceMs = 500,
+    onStatusChange,
+    children,
 }: FormAutosaveProps) {
     const form = useForm()
     const saveIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
     const hasUnsavedChangesRef = useRef(false)
+    const [state, setState] = useState<FormAutosaveState>(initialAutosaveState)
+
+    useEffect(() => {
+        onStatusChange?.(state)
+    }, [state, onStatusChange])
+
+    const performSave = useRef<() => Promise<void>>(async () => {})
+    performSave.current = async () => {
+        setState((prev) => ({ ...prev, status: 'saving' }))
+        try {
+            await adapter.save(storageKey, form.baseStore.state.values)
+            hasUnsavedChangesRef.current = false
+            setState({ status: 'saved', lastSavedAt: new Date(), error: null })
+        } catch (error) {
+            setState((prev) => ({ ...prev, status: 'error', error }))
+        }
+    }
 
     const debouncedSave = useDebouncer(
         () => {
-            adapter.save(storageKey, form.baseStore.state.values)
-            hasUnsavedChangesRef.current = false
+            performSave.current()
         },
         {
             wait: debounceMs,
@@ -63,8 +97,7 @@ export function FormAutosave({
     useEffect(() => {
         saveIntervalRef.current = setInterval(() => {
             if (hasUnsavedChangesRef.current) {
-                adapter.save(storageKey, form.baseStore.state.values)
-                hasUnsavedChangesRef.current = false
+                performSave.current()
             }
         }, saveInterval)
 
@@ -73,7 +106,7 @@ export function FormAutosave({
                 clearInterval(saveIntervalRef.current)
             }
         }
-    }, [form, adapter, storageKey, saveInterval])
+    }, [saveInterval])
 
-    return null
+    return children ? children(state) : null
 }

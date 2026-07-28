@@ -1,3 +1,5 @@
+import { parseAsJson } from "nuqs"
+
 export interface FormAutosaveAdapter {
   save(key: string, state: unknown): void | Promise<void>
   restore(key: string): unknown
@@ -57,6 +59,41 @@ export function createMemoryAdapter(): FormAutosaveAdapter {
     },
     restore(key: string) {
       return storage.get(key) ?? null
+    }
+  }
+}
+
+export function nuqsAdapter<T = unknown>(
+  schema?: (data: unknown) => T
+): FormAutosaveAdapter {
+  const parser = parseAsJson<T>(schema ? (v) => schema(v) : (v) => v as T)
+
+  return {
+    save(key: string, state: unknown) {
+      if (typeof window === 'undefined') return
+
+      const url = new URL(window.location.href)
+      // Serialize state using nuqs parser logic
+      const serialized = parser.serialize(state as T)
+
+      if (serialized) {
+        url.searchParams.set(key, serialized)
+      } else {
+        url.searchParams.delete(key)
+      }
+
+      // Sync state smoothly using nuqs history update
+      window.history.replaceState(null, '', url.toString())
+    },
+
+    restore(key: string) {
+      if (typeof window === 'undefined') return null
+
+      const searchParams = new URLSearchParams(window.location.search)
+      const rawValue = searchParams.get(key)
+
+      if (!rawValue) return null
+      return parser.parse(rawValue)
     }
   }
 }
