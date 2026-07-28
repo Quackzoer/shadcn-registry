@@ -1,6 +1,7 @@
 'use client'
 
 import { useDebouncer } from '@tanstack/react-pacer'
+import { detectPlatform, type RegisterableHotkey } from '@tanstack/hotkeys'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { SearchIcon, XIcon } from 'lucide-react'
 import {
@@ -10,7 +11,6 @@ import {
   useRef,
   useState,
   type ChangeEvent,
-  type KeyboardEvent,
   type ReactNode,
 } from 'react'
 
@@ -81,7 +81,7 @@ export interface SearchInputProps<TItem> {
    * Key that focuses the input with ⌘/Ctrl. `false` disables the shortcut.
    * @default 'k'
    */
-  shortcut?: string | false
+  shortcut?: RegisterableHotkey
 }
 
 /**
@@ -122,7 +122,7 @@ export function SearchInput<TItem>({
   formatCount,
   showClear = true,
   showPending = true,
-  shortcut = 'k',
+  shortcut = 'Control+K',
 }: SearchInputProps<TItem>) {
   const isControlled = value !== undefined
   const [internalQuery, setInternalQuery] = useState(defaultValue)
@@ -226,26 +226,46 @@ export function SearchInput<TItem>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items])
 
-  // ⌘K / Ctrl+K to focus.
-  useHotkey('Control+K',() => {
-    if (!shortcut) return
-    inputRef.current?.focus()
+  // `Mod` resolves to Cmd on macOS and Ctrl elsewhere, so one binding covers
+  // both platforms. `enabled` unregisters the hotkey entirely when the caller
+  // opts out, rather than registering a listener that early-returns.
+  // Cast because `shortcut` is an open `string` while RegisterableHotkey is a
+  // closed union of known key names — the value is validated at runtime instead.
+  useHotkey(shortcut, () => inputRef.current?.focus(), {
+    enabled: shortcut && !disabled,
+    preventDefault: true,
   })
+
+  // Scoped to the input via `target`, so these only fire while it has focus and
+  // don't hijack Escape or Enter for the rest of the page. `ignoreInputs: false`
+  // is required because hotkeys are suppressed inside form fields by default —
+  // which is exactly where these two need to work.
+  useHotkey('Escape', () => clear(), {
+    target: inputRef,
+    enabled: !disabled && rawQuery.length > 0,
+    ignoreInputs: false,
+    preventDefault: true,
+  })
+
+  // Enter skips the remaining debounce rather than making the user wait it out.
+  useHotkey('Enter', () => debouncer.flush(), {
+    target: inputRef,
+    enabled: !disabled,
+    ignoreInputs: false,
+    preventDefault: true,
+  })
+
+  // `Mod` renders as ⌘ on macOS and Ctrl elsewhere, so the hint has to match
+  // whatever the binding actually resolved to. Resolved after mount rather than
+  // during render: the server has no platform to detect, and guessing one would
+  // produce a hydration mismatch. Until then the hint is simply absent.
+  const [modLabel, setModLabel] = useState<string | null>(null)
+  useEffect(() => {
+    setModLabel(detectPlatform() === 'mac' ? '⌘' : 'Ctrl ')
+  }, [])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     commit(event.target.value)
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape' && rawQuery) {
-      event.preventDefault()
-      clear()
-    }
-    // Enter skips the remaining debounce rather than making the user wait.
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      debouncer.flush()
-    }
-  }
 
   const count = results.length
   const renderCount = useCallback(
@@ -284,7 +304,6 @@ export function SearchInput<TItem>({
           ref={inputRef}
           value={rawQuery}
           onChange={handleChange}
-          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
           autoFocus={autoFocus}
@@ -312,8 +331,11 @@ export function SearchInput<TItem>({
             >
               <XIcon />
             </InputGroupButton>
-          ) : shortcut ? (
-            <Kbd>⌘{shortcut.toUpperCase()}</Kbd>
+          ) : shortcut && modLabel ? (
+            <Kbd>
+              {modLabel}
+              {shortcut.toString()}
+            </Kbd>
           ) : null}
         </InputGroupAddon>
       </InputGroup>
