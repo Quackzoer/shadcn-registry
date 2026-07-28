@@ -63,4 +63,9 @@ export const demos: Demo[] = [
     label: 'Query Builder',
     description: 'Structured filter input with field and operator autocomplete',
   },
+  {
+    href: '/devtools',
+    label: 'DevTools',
+    description: 'Pluggable in-app devtools drawer with hotkey support',
+  },
 ]

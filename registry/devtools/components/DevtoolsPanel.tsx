@@ -23,7 +23,7 @@ export function DevtoolsPanel({
 
   if (plugins.length === 0) {
     return (
-      <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <Drawer open={isOpen} onOpenChange={setIsOpen} direction={position}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>DevTools</DrawerTitle>
@@ -36,11 +36,9 @@ export function DevtoolsPanel({
     );
   }
 
-  const activePlugin = plugins.find((p) => p.id === activeTab);
-
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerContent className="max-h-[50vh]">
+    <Drawer open={isOpen} onOpenChange={setIsOpen} direction={position}>
+      <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>DevTools</DrawerTitle>
         </DrawerHeader>

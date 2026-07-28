@@ -1,3 +1,5 @@
+import type { RegisterableHotkey } from "@tanstack/hotkeys";
+
 export interface DevtoolsPlugin {
   id: string;
   name: string;
@@ -15,6 +17,7 @@ export interface DevtoolsConfig {
   position?: "bottom" | "right" | "left";
   defaultOpen?: boolean;
   theme?: "light" | "dark" | "auto";
+  hotkey?: RegisterableHotkey | false;
   plugins?: DevtoolsPlugin[];
   onOpen?: () => void;
   onClose?: () => void;

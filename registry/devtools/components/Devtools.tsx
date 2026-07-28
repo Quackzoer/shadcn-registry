@@ -1,13 +1,27 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { DevtoolsProvider, useDevtools } from "@/registry/devtools/lib/context";
 import type { DevtoolsConfig } from "@/registry/devtools/types/devtools";
 import { DevtoolsButton } from "./DevtoolsButton";
 import { DevtoolsPanel } from "./DevtoolsPanel";
 
+const DEFAULT_HOTKEY = "Control+Shift+D" as const;
+
 function DevtoolsContent({ config }: { config: DevtoolsConfig }) {
-  const { setIsOpen, isOpen } = useDevtools();
+  const { setIsOpen, isOpen, registerPlugin, unregisterPlugin } = useDevtools();
+
+  useEffect(() => {
+    for (const plugin of config.plugins ?? []) {
+      registerPlugin(plugin);
+    }
+    return () => {
+      for (const plugin of config.plugins ?? []) {
+        unregisterPlugin(plugin.id);
+      }
+    };
+  }, [config.plugins, registerPlugin, unregisterPlugin]);
 
   useEffect(() => {
     if (config.defaultOpen) {
@@ -23,6 +37,15 @@ function DevtoolsContent({ config }: { config: DevtoolsConfig }) {
     }
   }, [isOpen, config]);
 
+  const hotkey = config.hotkey === false ? undefined : (config.hotkey ?? DEFAULT_HOTKEY);
+  const hotkeyEnabled = config.hotkey !== false;
+
+  useHotkey(
+    hotkey ?? DEFAULT_HOTKEY,
+    () => setIsOpen(!isOpen),
+    { enabled: hotkeyEnabled }
+  );
+
   const isEnabled =
     config.enabled !== false &&
     (process.env.NODE_ENV === "development" ||
@@ -34,7 +57,7 @@ function DevtoolsContent({ config }: { config: DevtoolsConfig }) {
 
   return (
     <>
-      <DevtoolsButton />
+      <DevtoolsButton position={config.position} />
       <DevtoolsPanel position={config.position} theme={config.theme} />
     </>
   );
@@ -50,6 +73,7 @@ export function Devtools({
   position = "bottom",
   defaultOpen = false,
   theme = "auto",
+  hotkey = DEFAULT_HOTKEY,
   plugins = [],
   onOpen,
   onClose,
@@ -62,6 +86,7 @@ export function Devtools({
           position,
           defaultOpen,
           theme,
+          hotkey,
           plugins,
           onOpen,
           onClose,
