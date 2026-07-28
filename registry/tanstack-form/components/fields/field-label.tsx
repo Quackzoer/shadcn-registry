@@ -25,6 +25,8 @@ export function FieldLabel({ children, required, renderRequired: _renderRequired
     const fieldErrors = useSelector(field.store, (state) => state.meta.errors)
     const renderer = _renderRequired ?? formMeta.renderRequired
     const isFacc = typeof renderer === 'function'
+    console.log('isFacc', isFacc)
+    console.log((required || isFacc))
     const renderRequired = isFacc ? renderer(required) : renderer
     return (
         <Label htmlFor={field.name} className={cn(

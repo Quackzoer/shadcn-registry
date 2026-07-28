@@ -12,7 +12,7 @@ export function FormPasswordField({ className }: Readonly<FormPasswordFieldProps
     const [showPassword, setShowPassword] = React.useState(false)
 
     return (
-        <div className={cn("relative", className)}>
+        <div className={cn("relative w-full", className)}>
             <FormTextField
                 type={showPassword ? 'text' : 'password'}
             />

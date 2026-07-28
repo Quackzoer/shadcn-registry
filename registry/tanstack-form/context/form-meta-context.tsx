@@ -1,12 +1,13 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { RequiredAsterisk } from "../components/fields/field-label";
+import { RequiredAsterisk, RequiredText } from "../components/fields/field-label";
 
 export interface FormMetaContext {
   renderRequired: React.ReactNode | ((required?: boolean) => React.ReactNode);
 }
 
 const defaultFormMetaContext: FormMetaContext = {
-  renderRequired: RequiredAsterisk,
+  // renderRequired: RequiredAsterisk,
+  renderRequired: (required) => RequiredText({required}),
 };
 
 export const formMetaContext = createContext<FormMetaContext>(defaultFormMetaContext);

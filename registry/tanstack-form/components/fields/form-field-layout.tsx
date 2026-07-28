@@ -28,7 +28,7 @@ export function FormFieldLayout({
                     {label}
                 </FieldLabel>
             )}
-            <div className="flex">
+            <div className="flex w-full">
                 {children}
                 {showResetFieldButton && <FieldResetValueButton/>}
             </div>
