@@ -1,8 +1,8 @@
 'use client'
 
-import { useDebouncer } from '@tanstack/react-pacer'
-import { detectPlatform, type RegisterableHotkey } from '@tanstack/hotkeys'
+import { type RegisterableHotkey } from '@tanstack/hotkeys'
 import { useHotkey } from '@tanstack/react-hotkeys'
+import { useDebouncer } from '@tanstack/react-pacer'
 import { SearchIcon, XIcon } from 'lucide-react'
 import {
   useCallback,
@@ -255,14 +255,6 @@ export function SearchInput<TItem>({
     preventDefault: true,
   })
 
-  // `Mod` renders as ⌘ on macOS and Ctrl elsewhere, so the hint has to match
-  // whatever the binding actually resolved to. Resolved after mount rather than
-  // during render: the server has no platform to detect, and guessing one would
-  // produce a hydration mismatch. Until then the hint is simply absent.
-  const [modLabel, setModLabel] = useState<string | null>(null)
-  useEffect(() => {
-    setModLabel(detectPlatform() === 'mac' ? '⌘' : 'Ctrl ')
-  }, [])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     commit(event.target.value)
@@ -331,9 +323,8 @@ export function SearchInput<TItem>({
             >
               <XIcon />
             </InputGroupButton>
-          ) : shortcut && modLabel ? (
+          ) : shortcut ? (
             <Kbd>
-              {modLabel}
               {shortcut.toString()}
             </Kbd>
           ) : null}
