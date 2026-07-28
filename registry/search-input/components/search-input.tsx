@@ -1,6 +1,6 @@
 'use client'
 
-import { type RegisterableHotkey } from '@tanstack/hotkeys'
+import { formatForDisplay, type RegisterableHotkey } from '@tanstack/hotkeys'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { useDebouncer } from '@tanstack/react-pacer'
 import { SearchIcon, XIcon } from 'lucide-react'
@@ -325,7 +325,7 @@ export function SearchInput<TItem>({
             </InputGroupButton>
           ) : shortcut ? (
             <Kbd>
-              {shortcut.toString()}
+              {formatForDisplay(shortcut)}
             </Kbd>
           ) : null}
         </InputGroupAddon>
