@@ -31,6 +31,7 @@ Two directories at the repo root are deliberately **not** part of this scheme:
 | [`data-table`](./data-table) | ✅ | — | Virtualized TanStack Table with per-instance state, row grouping, filters popover |
 | [`combobox`](./combobox) | ✅ | [`/combobox`](../app/combobox) | Composable combobox built on Base UI primitives |
 | [`action-button`](./action-button) | ✅ | [`/action-button`](../app/action-button) | Button that runs an async action, with confirm dialog and tooltip |
+| [`search-input`](./search-input) | ✅ | [`/search-input`](../app/search-input) | Debounced search over any list via a user-supplied filter, with result count |
 | [`loading-swap`](./loading-swap) | ✅ | — | Swaps content for a spinner without resizing. **Third-party** (WDS, MIT) |
 | [`breadcrumbs`](./breadcrumbs) | ✅ | — | Declarative breadcrumbs for nested routes; router-agnostic |
 | [`entity-sidebar`](./entity-sidebar) | ✅ | — | State + filter/sort primitives for a searchable entity list |

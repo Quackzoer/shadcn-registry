@@ -180,6 +180,21 @@
       ]
     },
     {
+      "name": "search-input",
+      "type": "registry:ui",
+      "title": "Search Input",
+      "description": "Debounced search over any list with a user-supplied filter function. Reports result count, separates debounce-pending from async-searching, discards stale responses, and supports controlled use, minimum length and a focus shortcut.",
+      "dependencies": ["@tanstack/react-pacer"],
+      "registryDependencies": ["input-group", "kbd", "spinner", "button"],
+      "files": [
+        {
+          "path": "registry/search-input/components/search-input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/search-input.tsx"
+        }
+      ]
+    },
+    {
       "name": "loading-swap",
       "type": "registry:ui",
       "title": "Loading Swap",
