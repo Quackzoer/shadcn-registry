@@ -23,7 +23,7 @@ export function FieldLabel({ children, required, renderRequired: _renderRequired
     const formMeta = useFormMetaContext()
     const field = useFieldContext<string>()
     const fieldErrors = useSelector(field.store, (state) => state.meta.errors)
-    const renderer = _renderRequired ?? formMeta?.renderRequired ?? <RequiredAsterisk/>
+    const renderer = _renderRequired ?? formMeta.renderRequired
     const isFacc = typeof renderer === 'function'
     const renderRequired = isFacc ? renderer(required) : renderer
     return (

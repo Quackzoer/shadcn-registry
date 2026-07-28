@@ -3,10 +3,12 @@ import { FieldResetValueButton } from "@/registry/tanstack-form/components/field
 import { FormFieldCardSelectOption } from "@/registry/tanstack-form/components/fields/form-field-card-select"
 import { FormFieldLayout } from "@/registry/tanstack-form/components/fields/form-field-layout"
 import { useAppForm } from "@/registry/tanstack-form/hooks/use-app-form"
-import { FormAutosave } from "@/registry/tanstack-form/components/form-autosave"
-import { localStorageAdapter } from "@/registry/tanstack-form/lib/form-autosave-adapter"
+import { FormAutosave } from "@/registry/tanstack-form/components/form/form-autosave"
+import { nuqsAdapter } from "@/registry/tanstack-form/lib/form-autosave-adapter"
 import { Button } from "@/components/ui/button"
 import * as z from "zod"
+import { useMemo } from "react"
+import { Form } from "@/registry/tanstack-form/components/form/form"
 
 const formSchema = z.object({
     firstName: z.string(),
@@ -31,6 +33,7 @@ export default function TanstackFormFieldsPage() {
             console.log(value)
         }
     })
+    const adapter = useMemo(() => nuqsAdapter(), [])
     return (
         <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
             <header className="flex flex-col gap-1">
@@ -43,18 +46,27 @@ export default function TanstackFormFieldsPage() {
             </header>
 
             <main className="flex flex-col flex-1 gap-10">
-                <form
+                <Form
                     onSubmit={(e) => {
                         e.preventDefault()
                         form.handleSubmit()
                     }}
                 >
                     <FormAutosave
-                        adapter={localStorageAdapter}
+                        adapter={adapter}
                         storageKey="tanstack-form-example"
                         debounceMs={300}
                         autoRestore
-                    />
+                    >
+                        {({ status, lastSavedAt }) => (
+                            <p className="text-xs text-muted-foreground mb-4">
+                                {status === 'saving' && 'Saving…'}
+                                {status === 'saved' && lastSavedAt && `Saved at ${lastSavedAt.toLocaleTimeString()}`}
+                                {status === 'error' && 'Failed to save'}
+                                {status === 'idle' && 'Not saved yet'}
+                            </p>
+                        )}
+                    </FormAutosave>
                     <form.AppField
                         name="firstName"
                     >
@@ -136,7 +148,7 @@ export default function TanstackFormFieldsPage() {
                             )
                         }}
                     </form.AppField>
-                </form>
+                </Form>
             </main>
         </div>
     );
