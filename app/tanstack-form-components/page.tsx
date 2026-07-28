@@ -1,14 +1,13 @@
 "use client"
+import { Button } from "@/components/ui/button"
 import { FieldResetValueButton } from "@/registry/tanstack-form/components/fields/field-reset-value-button"
 import { FormFieldCardSelectOption } from "@/registry/tanstack-form/components/fields/form-field-card-select"
 import { FormFieldLayout } from "@/registry/tanstack-form/components/fields/form-field-layout"
-import { useAppForm } from "@/registry/tanstack-form/hooks/use-app-form"
 import { FormAutosave } from "@/registry/tanstack-form/components/form/form-autosave"
+import { useAppForm } from "@/registry/tanstack-form/hooks/use-app-form"
 import { nuqsAdapter } from "@/registry/tanstack-form/lib/form-autosave-adapter"
-import { Button } from "@/components/ui/button"
-import * as z from "zod"
 import { useMemo } from "react"
-import { Form } from "@/registry/tanstack-form/components/form/form"
+import * as z from "zod"
 
 const formSchema = z.object({
     firstName: z.string(),
@@ -46,7 +45,7 @@ export default function TanstackFormFieldsPage() {
             </header>
 
             <main className="flex flex-col flex-1 gap-10">
-                <Form
+                <form.Form
                     onSubmit={(e) => {
                         e.preventDefault()
                         form.handleSubmit()
@@ -148,7 +147,10 @@ export default function TanstackFormFieldsPage() {
                             )
                         }}
                     </form.AppField>
-                </Form>
+                    <form.AppForm>
+                        <form.Submit/>
+                    </form.AppForm>
+                </form.Form>
             </main>
         </div>
     );
