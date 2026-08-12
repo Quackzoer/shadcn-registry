@@ -1,6 +1,6 @@
-import { Input } from "@/components/ui/input"
 import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
 import { HTMLInputTypeAttribute } from "react"
+import { FormFieldInput } from "./form-field-input"
 
 interface FormTextFieldProps {
     className?: string
@@ -11,7 +11,7 @@ export function FormTextField({ className, type = 'text' }: Readonly<FormTextFie
     const field = useFieldContext<string>()
 
     return (
-        <Input
+        <FormFieldInput
             id={field.name}
             type={type}
             value={field.state.value ?? ""}
