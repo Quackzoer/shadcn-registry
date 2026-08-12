@@ -39,7 +39,7 @@ export function FormCardSelectField<O extends FormFieldCardSelectOption<any>>({ 
                     setValue
                 })
                 return (
-                    <Card key={option.value} onClick={() => setValue()} className={
+                    <Card key={option.value + index} onClick={() => setValue()} className={
                         cn("basis-0 grow",
                             isSelected && 'bg-primary text-primary-foreground'
                         )

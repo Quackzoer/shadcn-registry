@@ -151,6 +151,7 @@ export default function TanstackFormFieldsPage() {
                                             <Button 
                                             variant={isSelected ? 'default' : 'outline'} 
                                             onClick={()=>setValue()}
+                                            key={option.value + index}
                                             >
                                                 {option.label}{' '}{index+1}
                                             </Button>
