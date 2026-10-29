@@ -11,6 +11,7 @@ import * as z from "zod"
 const formSchema = z.object({
     firstName: z.string(),
     password: z.string().min(8, 'Password must be at least 8 characters long'),
+    bio: z.string().max(200, 'Bio must be at most 200 characters'),
     accountType: z.enum(['personal', 'workRelated', 'other'])
 })
 
@@ -19,6 +20,7 @@ type FormSchema = z.infer<typeof formSchema>
 const formDefaultValues: Partial<FormSchema> = {
     firstName: '',
     password: '123',
+    bio: '',
 }
 
 export default function TanstackFormFieldsPage() {
@@ -99,6 +101,13 @@ export default function TanstackFormFieldsPage() {
                                 </FormFieldLayout>
                             )
                         }}
+                    </form.AppField>
+                    <form.AppField name='bio'>
+                        {(field) => (
+                            <FormFieldLayout label='Bio'>
+                                <field.Textarea maxLength={200} showCounter />
+                            </FormFieldLayout>
+                        )}
                     </form.AppField>
                     <form.AppField
                         name='accountType'
