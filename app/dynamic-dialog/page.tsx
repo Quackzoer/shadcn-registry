@@ -1,12 +1,12 @@
 "use client"
 
-import { Button } from "@/registry/ui/button"
-import { countdownDialog } from "@/components/dynamic-dialog/dialogs/countdown-dialog"
-import { typeToConfirmDialog } from "@/components/dynamic-dialog/dialogs/type-to-confirm-dialog"
-import { DynamicDialogProvider } from "@/components/dynamic-dialog/dynamic-dialog"
+import { Button } from "@/components/ui/button"
+import { countdownDialog } from "@/registry/dynamic-dialog/components/dialogs/countdown-dialog"
+import { typeToConfirmDialog } from "@/registry/dynamic-dialog/components/dialogs/type-to-confirm-dialog"
+import { DynamicDialogProvider } from "@/registry/dynamic-dialog/components/dynamic-dialog"
 import { testDialog } from "./test-dialog"
 import { openHookExampleDialogs } from "./hook-example-dialogs"
-import { loadingDialog } from "@/components/dynamic-dialog/dialogs/loading-dialog"
+import { loadingDialog } from "@/registry/dynamic-dialog/components/dialogs/loading-dialog"
 
 export default function Page() {
   return (
@@ -150,6 +150,21 @@ export default function Page() {
           }}
         >
           Update dialog example
+        </Button>
+        <Button
+          onClick={async () => {
+            const res = await typeToConfirmDialog({
+              props: {
+                itemName: 'This will change after 5 seconds'
+              }
+            }).result().match(
+              ()=>'ok' as const,
+              ()=>'err' as const
+            )
+            console.log(res)
+          }}
+        >
+          Neverthrow
         </Button>
       </main>
       <DynamicDialogProvider />

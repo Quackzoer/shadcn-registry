@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "react-hooks",
+  "title": "React Hooks",
+  "description": "Six small React hooks: click-outside, element size, mouse position, imperative-handle-as-state, remaining viewport height, and URL-backed pagination state.",
+  "dependencies": [
+    "nuqs"
+  ],
+  "files": [
+    {
+      "path": "registry/react-hooks/hooks/use-click-outside.ts",
+      "content": "import { RefObject, useEffect, useRef } from 'react'\n\n/**\n * Calls `handler` when a pointer event lands outside `ref`.\n *\n * Listens on both `mousedown` and `touchstart` rather than `click`, so the\n * handler runs before the element under the pointer can react — the usual\n * reason this hook exists (closing a menu before its trigger toggles again).\n */\nexport function useClickOutside<T extends HTMLElement>(\n  ref: RefObject<T | null>,\n  handler: (event: MouseEvent | TouchEvent) => void\n): void {\n  // Kept in a ref so an inline arrow function passed as `handler` does not\n  // tear down and re-attach both listeners on every render.\n  const handlerRef = useRef(handler)\n  handlerRef.current = handler\n\n  useEffect(() => {\n    const onPointerDown = (event: MouseEvent | TouchEvent) => {\n      const el = ref.current\n      if (!el || el.contains(event.target as Node)) return\n      handlerRef.current(event)\n    }\n\n    document.addEventListener('mousedown', onPointerDown)\n    document.addEventListener('touchstart', onPointerDown)\n\n    return () => {\n      document.removeEventListener('mousedown', onPointerDown)\n      document.removeEventListener('touchstart', onPointerDown)\n    }\n  }, [ref])\n}\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-click-outside.ts"
+    },
+    {
+      "path": "registry/react-hooks/hooks/use-element-size.ts",
+      "content": "import { RefObject, useLayoutEffect, useState } from 'react'\n\nexport interface ElementSize {\n  width: number\n  height: number\n}\n\n/**\n * Tracks an element's rendered width and height.\n *\n * Measures synchronously in a layout effect so the first paint has real\n * numbers, then keeps up to date via `ResizeObserver`.\n */\nexport function useElementSize<T extends HTMLElement = HTMLElement>(\n  ref?: RefObject<T | null>\n): ElementSize {\n  const [size, setSize] = useState<ElementSize>({ width: 0, height: 0 })\n\n  useLayoutEffect(() => {\n    const element = ref?.current\n    if (!element) {\n      setSize({ width: 0, height: 0 })\n      return\n    }\n\n    const measure = () => {\n      const rect = element.getBoundingClientRect()\n      // getBoundingClientRect reports 0 for elements that are laid out but not\n      // yet painted; offset/client sizes are the fallbacks that do report.\n      const next = {\n        width: rect.width || element.offsetWidth || element.clientWidth,\n        height: rect.height || element.offsetHeight || element.clientHeight,\n      }\n      setSize((prev) =>\n        prev.width === next.width && prev.height === next.height ? prev : next\n      )\n    }\n\n    measure()\n\n    // ResizeObserver fires once on observe, which covers the case where the\n    // element is measurable only after layout settles.\n    const observer = new ResizeObserver(measure)\n    observer.observe(element)\n    return () => observer.disconnect()\n  }, [ref])\n\n  return size\n}\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-element-size.ts"
+    },
+    {
+      "path": "registry/react-hooks/hooks/use-mouse-position.ts",
+      "content": "import { useEffect, useState } from 'react'\n\nexport interface MousePosition {\n  x: number | null\n  y: number | null\n}\n\n/**\n * The pointer's current viewport coordinates, or `null` before the first move.\n *\n * Note this re-renders on every `mousemove`. For anything that only needs the\n * position at a moment in time (a context menu, a drag start), read it from\n * the event instead.\n */\nexport function useMousePosition(): MousePosition {\n  const [position, setPosition] = useState<MousePosition>({ x: null, y: null })\n\n  useEffect(() => {\n    const update = (event: MouseEvent) =>\n      setPosition({ x: event.clientX, y: event.clientY })\n\n    window.addEventListener('mousemove', update)\n    return () => window.removeEventListener('mousemove', update)\n  }, [])\n\n  return position\n}\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-mouse-position.ts"
+    },
+    {
+      "path": "registry/react-hooks/hooks/use-access-imperative-handle.ts",
+      "content": "import { RefObject, useEffect, useState } from 'react'\n\n/**\n * Makes a ref's current value readable as state.\n *\n * Assigning to `ref.current` does not re-render, so a parent that needs to\n * *render* something derived from a child's `useImperativeHandle` can't just\n * read `ref.current` — on first render it is still null. This mirrors the ref\n * into state so the parent re-renders once the handle is attached.\n *\n * Child effects commit before parent effects, so by the time this effect runs\n * the child's imperative handle is already assigned — no timeout needed.\n */\nexport function useAccessImperativeHandle<T>(\n  ref: RefObject<T | null>\n): T | null {\n  const [handle, setHandle] = useState<T | null>(null)\n\n  useEffect(() => {\n    // Guarded so this only re-renders when the identity actually changes,\n    // rather than on every commit.\n    setHandle((prev) => (prev === ref.current ? prev : ref.current))\n  })\n\n  return handle\n}\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-access-imperative-handle.ts"
+    },
+    {
+      "path": "registry/react-hooks/hooks/use-remaining-height.ts",
+      "content": "import { useCallback, useRef, useState } from 'react'\n\nexport interface RemainingHeight {\n  /** Pixels from the element's top edge to the bottom of the viewport, minus `offset`. */\n  height: number\n  /** True until the first measurement lands. */\n  isLoading: boolean\n  /** Attach to the element whose remaining height you want: `<div ref={getHeight}>`. */\n  getHeight: (node: HTMLElement | null) => void\n  recalculate: () => void\n}\n\n/**\n * Measures how much vertical space is left between an element's top edge and\n * the bottom of the viewport — the usual way to size a scroll area that should\n * fill the rest of the page without a fixed height.\n *\n * Watches three things, because any of them can change the answer without the\n * others firing: window resize, the element's own box (ResizeObserver), and\n * structural or style changes in the parent (MutationObserver).\n *\n * Requires React 19: this returns a cleanup function from a callback ref,\n * which earlier versions silently ignore.\n */\nexport function useRemainingHeight(offset = 0): RemainingHeight {\n  const [height, setHeight] = useState(0)\n  const [isLoading, setIsLoading] = useState(true)\n  const nodeRef = useRef<HTMLElement | null>(null)\n\n  const updateHeight = useCallback(() => {\n    if (!nodeRef.current) return\n    // Deferred a frame so the measurement reflects the layout after whatever\n    // change triggered it, not the one before.\n    requestAnimationFrame(() => {\n      const node = nodeRef.current\n      if (!node) return\n      const rect = node.getBoundingClientRect()\n      setHeight(Math.max(0, window.innerHeight - rect.top - offset))\n      setIsLoading(false)\n    })\n  }, [offset])\n\n  const getHeight = useCallback(\n    (node: HTMLElement | null) => {\n      nodeRef.current = node\n      if (!node) return\n\n      updateHeight()\n      window.addEventListener('resize', updateHeight)\n\n      const resizeObserver = new ResizeObserver(updateHeight)\n      const mutationObserver = new MutationObserver(updateHeight)\n\n      resizeObserver.observe(node)\n      if (node.parentElement) {\n        resizeObserver.observe(node.parentElement)\n        mutationObserver.observe(node.parentElement, {\n          childList: true,\n          subtree: true,\n          attributes: true,\n          attributeFilter: ['style', 'class'],\n        })\n      }\n\n      return () => {\n        window.removeEventListener('resize', updateHeight)\n        resizeObserver.disconnect()\n        mutationObserver.disconnect()\n      }\n    },\n    [updateHeight]\n  )\n\n  return { height, isLoading, getHeight, recalculate: updateHeight }\n}\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-remaining-height.ts"
+    },
+    {
+      "path": "registry/react-hooks/hooks/use-pagination-query-state.ts",
+      "content": "import { parseAsIndex, parseAsInteger, useQueryStates } from 'nuqs'\n\nexport interface PaginationDefaults {\n  pageIndex: number\n  pageSize: number\n}\n\n/**\n * Pagination state stored in the URL rather than component state, so a paged\n * view survives reload and can be shared or linked to.\n *\n * `parseAsIndex` is deliberate: the URL shows a 1-based `?page=1` while the\n * value you read stays 0-based, which is what TanStack Table and most\n * pagination APIs expect.\n *\n * The URL keys are `page` and `perPage`; the state keys are `pageIndex` and\n * `pageSize`, so it drops straight into a TanStack Table `pagination` state.\n */\nexport function usePaginationQueryState(\n  defaultValues: PaginationDefaults = { pageIndex: 0, pageSize: 10 }\n) {\n  return useQueryStates(\n    {\n      pageIndex: parseAsIndex.withDefault(defaultValues.pageIndex),\n      pageSize: parseAsInteger.withDefault(defaultValues.pageSize),\n    },\n    {\n      urlKeys: { pageIndex: 'page', pageSize: 'perPage' },\n    }\n  )\n}\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-pagination-query-state.ts"
+    }
+  ],
+  "type": "registry:hook"
+}

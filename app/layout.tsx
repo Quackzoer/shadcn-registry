@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { demos } from "./demos";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,26 +29,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <nav>
-          <ol className="flex gap-4 p-4 border-b mb-8">
+        <nav className="border-b mb-8">
+          {/* Scrolls rather than wrapping, so the header stays one line as demos are added. */}
+          <ol className="flex gap-4 p-4 overflow-x-auto whitespace-nowrap text-sm">
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/" className="font-medium hover:underline">
+                Home
+              </Link>
             </li>
-            <li>
-              <Link href="/dynamic-dialog">Dynamic Dialog Example</Link>
-            </li>
-            <li>
-              <Link href="/react-query-factory">React Query Factory Example</Link>
-            </li>
-            <li>
-              <Link href="/combobox">Combobox Example</Link>
-            </li>
-            <li>
-              <Link href="/mark-searched-phrase">Mark Searched Phrase Example</Link>
-            </li>
-            <li>
-              <Link href="/tanstack-form-components">Tanstack Form Components</Link>
-            </li>
+            {demos.map((demo) => (
+              <li key={demo.href}>
+                <Link
+                  href={demo.href}
+                  className="text-muted-foreground hover:text-foreground hover:underline"
+                >
+                  {demo.label}
+                </Link>
+              </li>
+            ))}
           </ol>
         </nav>
         {children}

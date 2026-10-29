@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "loading-swap",
+  "title": "Loading Swap",
+  "description": "Swaps content for a spinner without the element changing size. Republished unmodified from WebDevSimplified's registry under its MIT license.",
+  "files": [
+    {
+      "path": "registry/loading-swap/components/loading-swap.tsx",
+      "content": "/**\n * LoadingSwap — from WebDevSimplified's shadcn registry, republished unmodified.\n *\n * Source: https://github.com/WebDevSimplified/wds-shadcn-registry\n * Docs:   https://wds-shadcn-registry.netlify.app/components/loading-swap/\n *\n * MIT License — Copyright (c) 2025 WebDevSimplified\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\nimport { cn } from \"@/lib/utils\"\nimport { Loader2Icon } from \"lucide-react\"\nimport type { ReactNode } from \"react\"\n\nexport function LoadingSwap({\n  isLoading,\n  children,\n  className,\n}: {\n  isLoading: boolean\n  children: ReactNode\n  className?: string\n}) {\n  return (\n    <div className=\"grid grid-cols-1 items-center justify-items-center\">\n      <div\n        className={cn(\n          \"col-start-1 col-end-2 row-start-1 row-end-2 w-full\",\n          isLoading ? \"invisible\" : \"visible\",\n          className,\n        )}\n      >\n        {children}\n      </div>\n      <div\n        className={cn(\n          \"col-start-1 col-end-2 row-start-1 row-end-2\",\n          isLoading ? \"visible\" : \"invisible\",\n          className,\n        )}\n      >\n        <Loader2Icon className=\"animate-spin\" />\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:ui",
+      "target": "@ui/loading-swap.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

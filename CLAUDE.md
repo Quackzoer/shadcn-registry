@@ -70,8 +70,38 @@ The confirmation dialog system is inspired by [Sonner](https://github.com/emilko
 - Multiple concurrent dialogs support
 
 ## File Organization
-- `app/` - Next.js 15 app router pages
-- `registry/blocks/` - Registry component definitions
-- `components/` - Shared application components
-- `lib/` - Utility functions (including standard `cn` helper)
-- `public/r/` - Generated registry JSON files (build output)
+
+- `app/` - Next.js 15 app router pages, one demo route per registry item
+- `registry/<item-name>/` - **all registry item source lives here**, one directory per item
+- `components/ui/` - vendored shadcn primitives, CLI-managed (`shadcn add button` writes here)
+- `lib/utils.ts` - the standard `cn` helper
+- `public/r/` - generated registry JSON files (build output)
+
+### Registry item layout
+
+Each item owns a directory and keeps everything related to it inside:
+
+```
+registry/<item-name>/
+├── components/   React components
+├── hooks/        React hooks
+├── lib/          non-React logic
+├── types/        type-only modules
+├── docs/         design notes
+└── README.md
+```
+
+Rules, following shadcn's own registry guidance:
+
+- Import between an item's own files with `@/registry/<item-name>/…`; the CLI
+  rewrites these to the consumer's aliases on install.
+- Import shadcn primitives with `@/components/ui/…`.
+- Never reach across items with a relative path (`../other-item/…`).
+- Give every file in `registry.json` an explicit `target`.
+- For an item whose files import each other across subfolders, keep the item
+  under one target root and use relative imports between its files, so the
+  paths survive installation regardless of consumer aliases. `store-slice`
+  is the reference example.
+
+See `registry/README.md` for the item index and the current publish status of
+each one.

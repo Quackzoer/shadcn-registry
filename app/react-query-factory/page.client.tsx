@@ -1,9 +1,9 @@
 "use client"
 
-import { dialog } from "@/registry/lib/dynamic-dialog/dialog"
-import { createUseQuery } from "@/lib/use-query"
-import { Button } from "@/registry/ui/button"
-import { DynamicDialogProvider } from "@/components/dynamic-dialog/dynamic-dialog"
+import { dialog } from "@/registry/dynamic-dialog/lib/dynamic-dialog-state"
+import { createUseQuery } from "@/registry/react-query/lib/use-query"
+import { Button } from "@/components/ui/button"
+import { DynamicDialogProvider } from "@/registry/dynamic-dialog/components/dynamic-dialog"
 
 interface ExampleQueryFnWithParamsProps {
     page?: number;

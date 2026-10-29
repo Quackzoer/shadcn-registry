@@ -10,12 +10,12 @@
       "description": "A dynamic dialog component.",
       "files": [
         {
-          "path": "components/dynamic-dialog/dynamic-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dynamic-dialog.tsx",
           "type": "registry:file",
           "target": "@components/dynamic-dialog/dynamic-dialog.tsx"
         },
         {
-          "path": "lib/dynamic-dialog-state.ts",
+          "path": "registry/dynamic-dialog/lib/dynamic-dialog-state.ts",
           "type": "registry:file",
           "target": "@lib/dynamic-dialog-state.ts"
         }
@@ -40,7 +40,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/type-to-confirm-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/type-to-confirm-dialog.tsx"
         }
@@ -58,7 +58,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/delayed-action-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/delayed-action-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/delayed-action-dialog.tsx"
         }
@@ -76,7 +76,7 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/countdown-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/countdown-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/countdown-dialog.tsx"
         }
@@ -99,9 +99,33 @@
       ],
       "files": [
         {
-          "path": "components/dynamic-dialog/dialogs/confirm-dialog.tsx",
+          "path": "registry/dynamic-dialog/components/dialogs/confirm-dialog.tsx",
           "type": "registry:component",
           "target": "@components/dynamic-dialog/dialogs/confirm-dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-dialog-neverthrow",
+      "type": "registry:lib",
+      "title": "Dynamic Dialog — neverthrow",
+      "description": "Side-effect import that monkey-patches dynamic-dialog with neverthrow Result types. Adds .result() to every dialog and exports neverthrowDialog() and dialogResult() helpers.",
+      "dependencies": [
+        "neverthrow"
+      ],
+      "registryDependencies": [
+        "Quackzoer/shadcn-registry/dynamic-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/dynamic-dialog-neverthrow/lib/dynamic-dialog-neverthrow.ts",
+          "type": "registry:lib",
+          "target": "@lib/dynamic-dialog-neverthrow.ts"
+        },
+        {
+          "path": "registry/dynamic-dialog-neverthrow/index.ts",
+          "type": "registry:lib",
+          "target": "@lib/dynamic-dialog-neverthrow/index.ts"
         }
       ]
     },
@@ -116,8 +140,323 @@
       ],
       "files": [
         {
-          "path": "lib/use-query.ts",
-          "type": "registry:lib"
+          "path": "registry/react-query/lib/use-query.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-query.ts"
+        },
+        {
+          "path": "registry/react-query/lib/create-query-hook.ts",
+          "type": "registry:lib",
+          "target": "@lib/create-query-hook.ts"
+        }
+      ]
+    },
+    {
+      "name": "store-slice",
+      "type": "registry:lib",
+      "title": "Store Slice",
+      "description": "Composable zustand slices that mirror TanStack Query. Generates state keys, setters and a one-call syncQuery from just a name and a data type, so an entity slice is one line instead of a hundred.",
+      "dependencies": [
+        "zustand",
+        "@tanstack/react-query"
+      ],
+      "files": [
+        {
+          "path": "registry/store-slice/index.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/index.ts"
+        },
+        {
+          "path": "registry/store-slice/types/query-state.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/types/query-state.ts"
+        },
+        {
+          "path": "registry/store-slice/types/slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/types/slice.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/query-snapshot.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/query-snapshot.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/create-entity-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/create-entity-slice.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/create-list-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/create-list-slice.ts"
+        },
+        {
+          "path": "registry/store-slice/lib/create-entity-access.ts",
+          "type": "registry:lib",
+          "target": "@lib/store-slice/lib/create-entity-access.ts"
+        },
+        {
+          "path": "registry/store-slice/hooks/use-sync-query.ts",
+          "type": "registry:hook",
+          "target": "@lib/store-slice/hooks/use-sync-query.ts"
+        }
+      ]
+    },
+    {
+      "name": "search-input",
+      "type": "registry:ui",
+      "title": "Search Input",
+      "description": "Debounced search over any list with a user-supplied filter function. Reports result count, separates debounce-pending from async-searching, discards stale responses, and supports controlled use, minimum length and a focus shortcut.",
+      "dependencies": [
+        "@tanstack/react-pacer",
+        "@tanstack/react-hotkeys",
+        "@tanstack/hotkeys"
+      ],
+      "registryDependencies": ["input-group", "kbd", "spinner", "button"],
+      "files": [
+        {
+          "path": "registry/search-input/components/search-input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/search-input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "loading-swap",
+      "type": "registry:ui",
+      "title": "Loading Swap",
+      "description": "Swaps content for a spinner without the element changing size. Republished unmodified from WebDevSimplified's registry under its MIT license.",
+      "files": [
+        {
+          "path": "registry/loading-swap/components/loading-swap.tsx",
+          "type": "registry:ui",
+          "target": "@ui/loading-swap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "action-button",
+      "type": "registry:ui",
+      "title": "Action Button",
+      "description": "A Button that runs an async action with a loading spinner, an optional confirmation dialog, and an optional tooltip that still works while disabled. Adapted from WebDevSimplified's ActionButton, using promise-based confirmDialog.",
+      "dependencies": ["sonner"],
+      "registryDependencies": [
+        "button",
+        "tooltip",
+        "Quackzoer/shadcn-registry/loading-swap",
+        "Quackzoer/shadcn-registry/dynamic-dialog",
+        "Quackzoer/shadcn-registry/dynamic-dialog-confirmation"
+      ],
+      "files": [
+        {
+          "path": "registry/action-button/components/action-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/action-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "ts-utils",
+      "type": "registry:lib",
+      "title": "TypeScript Utils",
+      "description": "Type-level utilities: Prettify, Autocomplete, CommonProperties, PrefixedKeys, WithRequired. No runtime code, no dependencies.",
+      "files": [
+        {
+          "path": "registry/ts-utils/types/ts-utils.ts",
+          "type": "registry:lib",
+          "target": "@lib/ts-utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "layout-slots",
+      "type": "registry:lib",
+      "title": "Layout Slots",
+      "description": "Lets nested routes render content into a parent layout — titles, header buttons — without prop drilling. Slots clear automatically on unmount.",
+      "dependencies": ["zustand"],
+      "files": [
+        {
+          "path": "registry/layout-slots/lib/layout-slots-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/layout-slots/lib/layout-slots-slice.ts"
+        },
+        {
+          "path": "registry/layout-slots/hooks/use-layout-slot.ts",
+          "type": "registry:hook",
+          "target": "@lib/layout-slots/hooks/use-layout-slot.ts"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumbs",
+      "type": "registry:component",
+      "title": "Breadcrumbs",
+      "description": "Declarative breadcrumbs for nested routes. Declare the hierarchy once and each screen points at its node; trails are derived, so moving a route re-parents its breadcrumbs. Router-agnostic via an injected adapter.",
+      "dependencies": ["zustand"],
+      "registryDependencies": ["button", "command", "popover", "spinner"],
+      "files": [
+        {
+          "path": "registry/breadcrumbs/types/breadcrumbs.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/types/breadcrumbs.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/types/router-adapter.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/types/router-adapter.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/lib/create-breadcrumb-router.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/lib/create-breadcrumb-router.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/lib/breadcrumbs-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/breadcrumbs/lib/breadcrumbs-slice.ts"
+        },
+        {
+          "path": "registry/breadcrumbs/components/breadcrumbs.tsx",
+          "type": "registry:component",
+          "target": "@lib/breadcrumbs/components/breadcrumbs.tsx"
+        },
+        {
+          "path": "registry/breadcrumbs/components/entity-breadcrumb.tsx",
+          "type": "registry:component",
+          "target": "@lib/breadcrumbs/components/entity-breadcrumb.tsx"
+        }
+      ]
+    },
+    {
+      "name": "entity-sidebar",
+      "type": "registry:lib",
+      "title": "Entity Sidebar State",
+      "description": "Zustand slice plus filter/sort primitives for a searchable, filterable, sortable entity list. Filters and sorts are stored as data, and both recurse into nested sub-entities.",
+      "dependencies": ["zustand"],
+      "files": [
+        {
+          "path": "registry/entity-sidebar/types/entity-sidebar.ts",
+          "type": "registry:lib",
+          "target": "@lib/entity-sidebar/types/entity-sidebar.ts"
+        },
+        {
+          "path": "registry/entity-sidebar/lib/entity-sidebar-slice.ts",
+          "type": "registry:lib",
+          "target": "@lib/entity-sidebar/lib/entity-sidebar-slice.ts"
+        },
+        {
+          "path": "registry/entity-sidebar/lib/filters-and-sorts.ts",
+          "type": "registry:lib",
+          "target": "@lib/entity-sidebar/lib/filters-and-sorts.ts"
+        }
+      ]
+    },
+    {
+      "name": "react-hooks",
+      "type": "registry:hook",
+      "title": "React Hooks",
+      "description": "Six small React hooks: click-outside, element size, mouse position, imperative-handle-as-state, remaining viewport height, and URL-backed pagination state.",
+      "dependencies": ["nuqs"],
+      "files": [
+        {
+          "path": "registry/react-hooks/hooks/use-click-outside.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-click-outside.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-element-size.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-element-size.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-mouse-position.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-mouse-position.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-access-imperative-handle.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-access-imperative-handle.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-remaining-height.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-remaining-height.ts"
+        },
+        {
+          "path": "registry/react-hooks/hooks/use-pagination-query-state.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-pagination-query-state.ts"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:component",
+      "title": "Data Table",
+      "description": "Virtualized TanStack Table wrapper with a per-instance zustand store, row grouping, column pinning, and a composable filters popover.",
+      "dependencies": [
+        "@tanstack/react-table",
+        "@tanstack/react-virtual",
+        "zustand"
+      ],
+      "registryDependencies": [
+        "table",
+        "button",
+        "checkbox",
+        "label",
+        "popover",
+        "separator",
+        "dropdown-menu",
+        "input-group",
+        "Quackzoer/shadcn-registry/combobox"
+      ],
+      "files": [
+        {
+          "path": "registry/data-table/components/data-table-context.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-context.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table-provider.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-provider.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table-column-header.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-column-header.tsx"
+        },
+        {
+          "path": "registry/data-table/components/data-table-search.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/data-table-search.tsx"
+        },
+        {
+          "path": "registry/data-table/components/table-filters-popover.tsx",
+          "type": "registry:component",
+          "target": "@components/data-table/table-filters-popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "A composable combobox built on Base UI primitives. Every part is a separate export — input, chips, list, groups, empty state — so the layout is yours to arrange.",
+      "dependencies": ["@base-ui/react"],
+      "registryDependencies": ["button", "input-group"],
+      "files": [
+        {
+          "path": "registry/combobox/components/combobox.tsx",
+          "type": "registry:ui",
+          "target": "@ui/combobox.tsx"
         }
       ]
     },
@@ -130,8 +469,9 @@
       "registryDependencies": ["label", "form"],
       "files": [
         {
-          "path": "components/ui/field-label.tsx",
-          "type": "registry:ui"
+          "path": "registry/field-label/components/field-label.tsx",
+          "type": "registry:ui",
+          "target": "@ui/field-label.tsx"
         }
       ]
     },
@@ -142,8 +482,9 @@
       "description": "Text element that applies style to text if provided value was found within it.",
       "files": [
         {
-          "path": "components/ui/mark-searched-phrase.tsx",
-          "type": "registry:ui"
+          "path": "registry/mark-searched-phrase/components/mark-searched-phrase.tsx",
+          "type": "registry:ui",
+          "target": "@ui/mark-searched-phrase.tsx"
         }
       ]
     },
@@ -154,8 +495,9 @@
       "description": "Component guarding its children based on user object and their permissions",
       "files": [
         {
-          "path": "components/ui/permission-guard.tsx",
-          "type": "registry:ui"
+          "path": "registry/permission-guard/components/permission-guard.tsx",
+          "type": "registry:ui",
+          "target": "@ui/permission-guard.tsx"
         }
       ]
     },
@@ -164,12 +506,43 @@
       "type": "registry:ui",
       "title": "Multi step form",
       "description": "Helper for creating multi step forms that handles validation and navigation",
+      "registryDependencies": ["button"],
       "files": [
         {
-          "path": "components/ui/multi-step-form.tsx",
-          "type": "registry:ui"
+          "path": "registry/multi-step-form/components/multi-step-form.tsx",
+          "type": "registry:ui",
+          "target": "@ui/multi-step-form.tsx"
         }
       ]
     },
+    {
+      "name": "query-builder",
+      "type": "registry:ui",
+      "title": "Query Builder",
+      "description": "Structured filter input with field and operator autocomplete. Parses field,operator,value queries with chip-based condition display.",
+      "registryDependencies": ["badge", "input-group", "scroll-area"],
+      "files": [
+        {
+          "path": "registry/query-builder/types/query-builder.ts",
+          "type": "registry:lib",
+          "target": "@lib/query-builder/types.ts"
+        },
+        {
+          "path": "registry/query-builder/lib/parse-query.ts",
+          "type": "registry:lib",
+          "target": "@lib/query-builder/parse-query.ts"
+        },
+        {
+          "path": "registry/query-builder/hooks/use-query-filter.ts",
+          "type": "registry:lib",
+          "target": "@lib/query-builder/use-query-filter.ts"
+        },
+        {
+          "path": "registry/query-builder/components/query-builder.tsx",
+          "type": "registry:ui",
+          "target": "@ui/query-builder.tsx"
+        }
+      ]
+    }
   ]
 }

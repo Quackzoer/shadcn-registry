@@ -1,16 +1,17 @@
 "use client"
-import { FieldResetValueButton } from "@/components/tanstack-form-field-components/field-reset-value-button"
-import { FormFieldCardSelectOption } from "@/components/tanstack-form-field-components/form-field-card-select"
-import { FormFieldLayout } from "@/components/tanstack-form-field-components/form-field-layout"
-import { useAppForm } from "@/components/tanstack-form-field-components/hook"
-import { FormAutosave } from "@/components/tanstack-form-components/form-autosave"
-import { localStorageAdapter } from "@/components/tanstack-form-components/form-autosave-adapter"
 import { Button } from "@/components/ui/button"
+import { FormFieldCardSelectOption } from "@/registry/tanstack-form/components/fields/form-field-card-select"
+import { FormFieldLayout } from "@/registry/tanstack-form/components/fields/form-field-layout"
+import { FormAutosave } from "@/registry/tanstack-form/components/form/form-autosave"
+import { useAppForm } from "@/registry/tanstack-form/hooks/use-app-form"
+import { nuqsAdapter } from "@/registry/tanstack-form/lib/form-autosave-adapter"
+import { useCallback, useMemo } from "react"
 import * as z from "zod"
 
 const formSchema = z.object({
     firstName: z.string(),
-    password: z.string(),
+    password: z.string().min(8, 'Password must be at least 8 characters long'),
+    bio: z.string().max(200, 'Bio must be at most 200 characters'),
     accountType: z.enum(['personal', 'workRelated', 'other'])
 })
 
@@ -19,6 +20,7 @@ type FormSchema = z.infer<typeof formSchema>
 const formDefaultValues: Partial<FormSchema> = {
     firstName: '',
     password: '123',
+    bio: '',
 }
 
 export default function TanstackFormFieldsPage() {
@@ -31,6 +33,13 @@ export default function TanstackFormFieldsPage() {
             console.log(value)
         }
     })
+    const adapter = useMemo(() => nuqsAdapter(), [])
+
+    const checkFirstNameTaken = useCallback(async (value: string) => {
+        if (!value) return undefined
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        return value.toLowerCase() === 'admin' ? 'This name is taken' : undefined
+    }, [])
     return (
         <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
             <header className="flex flex-col gap-1">
@@ -43,23 +52,41 @@ export default function TanstackFormFieldsPage() {
             </header>
 
             <main className="flex flex-col flex-1 gap-10">
-                <form
+                <form.Form
                     onSubmit={(e) => {
                         e.preventDefault()
                         form.handleSubmit()
                     }}
                 >
                     <FormAutosave
-                        adapter={localStorageAdapter}
+                        adapter={adapter}
                         storageKey="tanstack-form-example"
                         debounceMs={300}
                         autoRestore
-                    />
+                    >
+                        {({ status, lastSavedAt }) => (
+                            <p className="text-xs text-muted-foreground mb-4">
+                                {status === 'saving' && 'Saving…'}
+                                {status === 'saved' && lastSavedAt && `Saved at ${lastSavedAt.toLocaleTimeString()}`}
+                                {status === 'error' && 'Failed to save'}
+                                {status === 'idle' && 'Not saved yet'}
+                            </p>
+                        )}
+                    </FormAutosave>
                     <form.AppField
                         name="firstName"
+                        validators={{
+                            onChangeAsyncDebounceMs: 500,
+                            onChangeAsync: async ({ value }) => await checkFirstNameTaken(value)
+                        }}
                     >
                         {(field) => (
-                            <FormFieldLayout label={'First Name'} required description={'Name you were assigned at birth'}>
+                            <FormFieldLayout
+                                label={'First Name'}
+                                required
+                                description={'Name you were assigned at birth'}
+                                isValidating={field.getMeta().isValidating}
+                            >
                                 <field.Text/>
                             </FormFieldLayout>
                         )}
@@ -69,12 +96,18 @@ export default function TanstackFormFieldsPage() {
                     >
                         {(field) => {
                             return (
-                                <div className="flex">
-                                    <field.Password className='w-full' />
-                                    <FieldResetValueButton />
-                                </div>
+                                <FormFieldLayout label='Password' showResetFieldButton>
+                                    <field.Password/>
+                                </FormFieldLayout>
                             )
                         }}
+                    </form.AppField>
+                    <form.AppField name='bio'>
+                        {(field) => (
+                            <FormFieldLayout label='Bio'>
+                                <field.Textarea maxLength={200} showCounter />
+                            </FormFieldLayout>
+                        )}
                     </form.AppField>
                     <form.AppField
                         name='accountType'
@@ -127,6 +160,7 @@ export default function TanstackFormFieldsPage() {
                                             <Button 
                                             variant={isSelected ? 'default' : 'outline'} 
                                             onClick={()=>setValue()}
+                                            key={option.value + index}
                                             >
                                                 {option.label}{' '}{index+1}
                                             </Button>
@@ -136,7 +170,10 @@ export default function TanstackFormFieldsPage() {
                             )
                         }}
                     </form.AppField>
-                </form>
+                    <form.AppForm>
+                        <form.Submit />
+                    </form.AppForm>
+                </form.Form>
             </main>
         </div>
     );

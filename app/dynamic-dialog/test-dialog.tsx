@@ -1,6 +1,6 @@
-import { dialog, type DialogActions } from "@/lib/dynamic-dialog-state";
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter } from "@/registry/ui/alert-dialog";
-import { Button } from "@/registry/ui/button";
+import { dialog, type DialogActions } from "@/registry/dynamic-dialog/lib/dynamic-dialog-state";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 function TestDialog(props: DialogActions<string>) {
   return (

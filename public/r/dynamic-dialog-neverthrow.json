@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dynamic-dialog-neverthrow",
+  "title": "Dynamic Dialog — neverthrow",
+  "description": "Side-effect import that monkey-patches dynamic-dialog with neverthrow Result types. Adds .result() to every dialog and exports neverthrowDialog() and dialogResult() helpers.",
+  "dependencies": [
+    "neverthrow"
+  ],
+  "registryDependencies": [
+    "Quackzoer/shadcn-registry/dynamic-dialog"
+  ],
+  "files": [
+    {
+      "path": "registry/dynamic-dialog-neverthrow/lib/dynamic-dialog-neverthrow.ts",
+      "content": "import { fromSafePromise, type ResultAsync } from \"neverthrow\";\nimport {\n  dialog as originalDialog,\n  type DialogResult,\n  type DialogResultData,\n  type DialogOptions,\n  type DialogActions,\n} from \"@/registry/dynamic-dialog/lib/dynamic-dialog-state\";\n\n// ---------------------------------------------------------------------------\n// Error types\n// ---------------------------------------------------------------------------\n\nexport interface NeverthrowDialogDenied {\n  type: \"denied\";\n  id: string;\n}\n\nexport interface NeverthrowDialogDismissed {\n  type: \"dismissed\";\n  id: string;\n  reason?: string;\n}\n\nexport type NeverthrowDialogError<TValue = unknown> =\n  | NeverthrowDialogDenied\n  | NeverthrowDialogDismissed;\n\n// ---------------------------------------------------------------------------\n// Augment DialogResult with .result()\n// ---------------------------------------------------------------------------\n\ndeclare module \"@/registry/dynamic-dialog/lib/dynamic-dialog-state\" {\n  interface DialogResult<TValue = unknown> {\n    /** Wrap this dialog result as a neverthrow `ResultAsync`. */\n    result(): ResultAsync<TValue, NeverthrowDialogError<TValue>>;\n  }\n}\n\n// ---------------------------------------------------------------------------\n// Runtime: patch dialogObservable.showDialog so every result gets .result()\n// ---------------------------------------------------------------------------\n\nimport { dialogObservable } from \"@/registry/dynamic-dialog/lib/dynamic-dialog-state\";\n\nconst originalShowDialog = dialogObservable.showDialog.bind(dialogObservable);\n\ndialogObservable.showDialog = function <\n  TValue,\n>(\n  Component: Parameters<typeof originalShowDialog>[0],\n  componentProps: Record<string, unknown>,\n  options: DialogOptions,\n): DialogResult<TValue> {\n  const base = originalShowDialog<TValue>(Component, componentProps, options);\n\n  return Object.assign(base, {\n    result(): ResultAsync<TValue, NeverthrowDialogError<TValue>> {\n      return fromSafePromise(\n        new Promise<DialogResultData<TValue>>((resolve) => {\n          base.then(resolve);\n        }),\n      ).map((r) => {\n        if (r.confirmed) return r.value as TValue;\n        if (r.denied)\n          throw { type: \"denied\" as const, id: r.id };\n        throw {\n          type: \"dismissed\" as const,\n          id: r.id,\n          reason: r.reason,\n        };\n      });\n    },\n  });\n};\n\n// ---------------------------------------------------------------------------\n// Standalone wrapper: wrap any DialogResult after the fact\n// ---------------------------------------------------------------------------\n\nexport function dialogResult<TValue>(\n  result: DialogResult<TValue>,\n): ResultAsync<TValue, NeverthrowDialogError<TValue>> {\n  return fromSafePromise(\n    new Promise<DialogResultData<TValue>>((resolve) => {\n      result.then(resolve);\n    }),\n  ).map((r) => {\n    if (r.confirmed) return r.value as TValue;\n    if (r.denied)\n      throw { type: \"denied\" as const, id: r.id };\n    throw {\n      type: \"dismissed\" as const,\n      id: r.id,\n      reason: r.reason,\n    };\n  });\n}\n\n// ---------------------------------------------------------------------------\n// Explicit wrapper: use instead of dialog() for neverthrow-native code\n// ---------------------------------------------------------------------------\n\ntype OwnProps<TProps, TValue> = Omit<TProps, keyof DialogActions<TValue>>;\n\nexport function neverthrowDialog<\n  TProps extends DialogActions<TValue>,\n  TValue = TProps extends DialogActions<infer V> ? V : unknown,\n>(\n  Component: React.ComponentType<TProps>,\n  defaultOptions?: DialogOptions,\n) {\n  return (arg?: {\n    props?: OwnProps<TProps, TValue>;\n    options?: DialogOptions;\n  }) => {\n    const result = originalDialog(\n      Component as React.ComponentType<DialogActions<TValue>>,\n      defaultOptions,\n    )(arg);\n    return Object.assign(result, {\n      result(): ResultAsync<TValue, NeverthrowDialogError<TValue>> {\n        return dialogResult(result);\n      },\n    });\n  };\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/dynamic-dialog-neverthrow.ts"
+    },
+    {
+      "path": "registry/dynamic-dialog-neverthrow/index.ts",
+      "content": "export {\n  dialogResult,\n  neverthrowDialog,\n  type NeverthrowDialogDenied,\n  type NeverthrowDialogDismissed,\n  type NeverthrowDialogError,\n} from \"./lib/dynamic-dialog-neverthrow\";\n\n// Side-effect: monkey-patches dialog() so every result gets .result()\nimport \"./lib/dynamic-dialog-neverthrow\";\n",
+      "type": "registry:lib",
+      "target": "@lib/dynamic-dialog-neverthrow/index.ts"
+    }
+  ],
+  "type": "registry:lib"
+}
