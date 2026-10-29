@@ -3,7 +3,7 @@
 
 import { useForm } from '@tanstack/react-form'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { FormAutosaveAdapter } from '@/registry/tanstack-form/lib/form-autosave-adapter'
+import type { FormAutosaveAdapter } from '../../lib/form-autosave-adapter'
 import { useDebouncer } from '@tanstack/react-pacer'
 
 export type FormAutosaveStatus = 'idle' | 'saving' | 'saved' | 'error'

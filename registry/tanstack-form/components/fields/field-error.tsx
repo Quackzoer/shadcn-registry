@@ -1,5 +1,5 @@
 import { useSelector } from "@tanstack/react-form"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 
 // Schema validators (e.g. Zod) put issue objects with a `message` field in
 // `meta.errors`; plain validator functions can return a bare string. Normalize

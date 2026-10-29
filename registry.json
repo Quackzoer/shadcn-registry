@@ -213,7 +213,12 @@
         "@tanstack/react-hotkeys",
         "@tanstack/hotkeys"
       ],
-      "registryDependencies": ["input-group", "kbd", "spinner", "button"],
+      "registryDependencies": [
+        "input-group",
+        "kbd",
+        "spinner",
+        "button"
+      ],
       "files": [
         {
           "path": "registry/search-input/components/search-input.tsx",
@@ -240,7 +245,9 @@
       "type": "registry:ui",
       "title": "Action Button",
       "description": "A Button that runs an async action with a loading spinner, an optional confirmation dialog, and an optional tooltip that still works while disabled. Adapted from WebDevSimplified's ActionButton, using promise-based confirmDialog.",
-      "dependencies": ["sonner"],
+      "dependencies": [
+        "sonner"
+      ],
       "registryDependencies": [
         "button",
         "tooltip",
@@ -274,7 +281,9 @@
       "type": "registry:lib",
       "title": "Layout Slots",
       "description": "Lets nested routes render content into a parent layout — titles, header buttons — without prop drilling. Slots clear automatically on unmount.",
-      "dependencies": ["zustand"],
+      "dependencies": [
+        "zustand"
+      ],
       "files": [
         {
           "path": "registry/layout-slots/lib/layout-slots-slice.ts",
@@ -293,8 +302,15 @@
       "type": "registry:component",
       "title": "Breadcrumbs",
       "description": "Declarative breadcrumbs for nested routes. Declare the hierarchy once and each screen points at its node; trails are derived, so moving a route re-parents its breadcrumbs. Router-agnostic via an injected adapter.",
-      "dependencies": ["zustand"],
-      "registryDependencies": ["button", "command", "popover", "spinner"],
+      "dependencies": [
+        "zustand"
+      ],
+      "registryDependencies": [
+        "button",
+        "command",
+        "popover",
+        "spinner"
+      ],
       "files": [
         {
           "path": "registry/breadcrumbs/types/breadcrumbs.ts",
@@ -333,7 +349,9 @@
       "type": "registry:lib",
       "title": "Entity Sidebar State",
       "description": "Zustand slice plus filter/sort primitives for a searchable, filterable, sortable entity list. Filters and sorts are stored as data, and both recurse into nested sub-entities.",
-      "dependencies": ["zustand"],
+      "dependencies": [
+        "zustand"
+      ],
       "files": [
         {
           "path": "registry/entity-sidebar/types/entity-sidebar.ts",
@@ -357,7 +375,9 @@
       "type": "registry:hook",
       "title": "React Hooks",
       "description": "Six small React hooks: click-outside, element size, mouse position, imperative-handle-as-state, remaining viewport height, and URL-backed pagination state.",
-      "dependencies": ["nuqs"],
+      "dependencies": [
+        "nuqs"
+      ],
       "files": [
         {
           "path": "registry/react-hooks/hooks/use-click-outside.ts",
@@ -450,8 +470,13 @@
       "type": "registry:ui",
       "title": "Combobox",
       "description": "A composable combobox built on Base UI primitives. Every part is a separate export — input, chips, list, groups, empty state — so the layout is yours to arrange.",
-      "dependencies": ["@base-ui/react"],
-      "registryDependencies": ["button", "input-group"],
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "button",
+        "input-group"
+      ],
       "files": [
         {
           "path": "registry/combobox/components/combobox.tsx",
@@ -465,8 +490,14 @@
       "type": "registry:ui",
       "title": "Field Label",
       "description": "A form label that automatically shows a required asterisk based on the Zod schema. Use SchemaFormProvider instead of Form to enable schema introspection.",
-      "dependencies": ["react-hook-form", "zod"],
-      "registryDependencies": ["label", "form"],
+      "dependencies": [
+        "react-hook-form",
+        "zod"
+      ],
+      "registryDependencies": [
+        "label",
+        "form"
+      ],
       "files": [
         {
           "path": "registry/field-label/components/field-label.tsx",
@@ -506,7 +537,9 @@
       "type": "registry:ui",
       "title": "Multi step form",
       "description": "Helper for creating multi step forms that handles validation and navigation",
-      "registryDependencies": ["button"],
+      "registryDependencies": [
+        "button"
+      ],
       "files": [
         {
           "path": "registry/multi-step-form/components/multi-step-form.tsx",
@@ -520,7 +553,11 @@
       "type": "registry:ui",
       "title": "Query Builder",
       "description": "Structured filter input with field and operator autocomplete. Parses field,operator,value queries with chip-based condition display.",
-      "registryDependencies": ["badge", "input-group", "scroll-area"],
+      "registryDependencies": [
+        "badge",
+        "input-group",
+        "scroll-area"
+      ],
       "files": [
         {
           "path": "registry/query-builder/types/query-builder.ts",
@@ -541,6 +578,131 @@
           "path": "registry/query-builder/components/query-builder.tsx",
           "type": "registry:ui",
           "target": "@ui/query-builder.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tanstack-form",
+      "type": "registry:component",
+      "title": "TanStack Form Components",
+      "description": "Field and form components for TanStack Form built on createFormHook: text, password, textarea with character counter, card select, label/error/validating helpers, submit/reset buttons and autosave. Use via useAppForm.",
+      "dependencies": [
+        "@tanstack/react-form",
+        "@tanstack/react-pacer",
+        "nuqs",
+        "class-variance-authority",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "input",
+        "input-group",
+        "textarea",
+        "label",
+        "card",
+        "spinner",
+        "Quackzoer/shadcn-registry/loading-swap"
+      ],
+      "files": [
+        {
+          "path": "registry/tanstack-form/components/fields/character-counter.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/character-counter.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/field-description.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/field-description.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/field-error.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/field-error.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/field-label.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/field-label.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/field-reset-value-button.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/field-reset-value-button.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/field-validating.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/field-validating.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-field-card-select.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-field-card-select.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-field-input.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-field-input.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-field-layout.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-field-layout.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-password-field.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-password-field.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-text-field.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-text-field.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-textarea-field.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-textarea-field.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/form/form-autosave.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/form/form-autosave.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/form/form-reset.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/form/form-reset.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/form/form-submit.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/form/form-submit.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/form/form.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/form/form.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/context/form-meta-context.tsx",
+          "type": "registry:lib",
+          "target": "@components/tanstack-form/context/form-meta-context.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/hooks/use-app-form.ts",
+          "type": "registry:hook",
+          "target": "@components/tanstack-form/hooks/use-app-form.ts"
+        },
+        {
+          "path": "registry/tanstack-form/hooks/use-async-field-validator.ts",
+          "type": "registry:hook",
+          "target": "@components/tanstack-form/hooks/use-async-field-validator.ts"
+        },
+        {
+          "path": "registry/tanstack-form/lib/form-autosave-adapter.ts",
+          "type": "registry:lib",
+          "target": "@components/tanstack-form/lib/form-autosave-adapter.ts"
         }
       ]
     }

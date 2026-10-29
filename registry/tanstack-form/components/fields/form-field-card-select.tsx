@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 import { cn } from "@/lib/utils"
 
 export interface FormFieldCardSelectOption<V = string> {

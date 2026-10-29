@@ -1,5 +1,5 @@
 import { InputGroup, InputGroupTextarea } from "@/components/ui/input-group"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 import { useEffect, useRef } from "react"
 import { CharacterCounter } from "./character-counter"
 

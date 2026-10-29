@@ -1,6 +1,6 @@
 import { useSelector } from "@tanstack/react-form"
 import { Spinner } from "@/components/ui/spinner"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 import type { ReactNode } from "react"
 
 export interface FieldValidatingProps {

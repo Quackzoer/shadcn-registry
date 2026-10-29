@@ -45,7 +45,7 @@ Two directories at the repo root are deliberately **not** part of this scheme:
 | [`permission-guard`](./permission-guard) | ✅ | [`/permission-guard`](../app/permission-guard) | Renders children only for permitted users |
 | [`multi-step-form`](./multi-step-form) | ✅ | — | Multi-step form with per-step validation and navigation |
 | [`devtools`](./devtools) | — | — | Pluggable in-app devtools drawer. Typechecks clean; a publishing candidate |
-| [`tanstack-form`](./tanstack-form) | — | [`/tanstack-form-components`](../app/tanstack-form-components) | TanStack Form field components. **Does not typecheck** yet |
+| [`tanstack-form`](./tanstack-form) | ✅ | [`/tanstack-form-components`](../app/tanstack-form-components) | TanStack Form field components. Install with `shadcn add`; use via `useAppForm` |
 
 ### State-only items
 
@@ -56,7 +56,7 @@ sign-out, a particular page-header field set, typed route params — and chrome
 is exactly where apps diverge. What generalises is the model underneath.
 
 "Published" means the item has an entry in `registry.json` and is served from
-`public/r/<name>.json`. The three unpublished items are organized here but
+`public/r/<name>.json`. The unpublished items are organized here but
 intentionally left out of `registry.json` — publishing code that does not
 compile would hand consumers broken files.
 

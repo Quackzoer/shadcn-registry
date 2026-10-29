@@ -1,4 +1,4 @@
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 import { HTMLInputTypeAttribute } from "react"
 import { FormFieldInput } from "./form-field-input"
 

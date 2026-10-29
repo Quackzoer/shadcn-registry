@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { RotateCcw } from "lucide-react"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 
 export function FieldResetValueButton() {
     const field = useFieldContext()

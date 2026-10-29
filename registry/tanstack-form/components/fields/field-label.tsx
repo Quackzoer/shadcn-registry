@@ -1,7 +1,7 @@
 import { useSelector } from "@tanstack/react-form"
 import * as React from "react"
 import { Label } from "@/components/ui/label"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 import { cn } from "@/lib/utils"
 import { useFormMetaContext } from "../../context/form-meta-context"
 

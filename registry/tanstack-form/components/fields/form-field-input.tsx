@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input"
-import { useFieldContext } from "@/registry/tanstack-form/hooks/use-app-form"
+import { useFieldContext } from "../../hooks/use-app-form"
 import { useEffect, useRef } from "react"
 
 export function FormFieldInput(props: Readonly< React.ComponentProps<"input">>) {
