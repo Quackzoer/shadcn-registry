@@ -11,8 +11,8 @@ export interface FormLabelProps {
     renderRequired?: React.ReactNode | ((required?: boolean)=>React.ReactNode)
 }
 
-export function RequiredAsterisk(){
-    return <span className="text-destructive ml-0.5">*</span>
+export function RequiredAsterisk({required}:Readonly<{required?:boolean}>){
+    return <span className="text-destructive ml-0.5">{required && "*"}</span>
 }
 
 export function RequiredText({required}:Readonly<{required?:boolean}>){

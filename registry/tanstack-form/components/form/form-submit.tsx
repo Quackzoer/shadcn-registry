@@ -14,7 +14,7 @@ export function FormSubmitButton({label = 'Submit'}:Readonly<FormSubmitButtonPro
     return (
         <form.Subscribe selector={(state)=>state.isSubmitting}>
             {(isSubmitting)=>(
-                <Button>
+                <Button type="submit" disabled={isSubmitting}>
                     <LoadingSwap isLoading={isSubmitting}>
                         {label}
                     </LoadingSwap>

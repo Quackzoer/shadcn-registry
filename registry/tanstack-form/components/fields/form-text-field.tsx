@@ -2,12 +2,12 @@ import { useFieldContext } from "../../hooks/use-app-form"
 import { HTMLInputTypeAttribute } from "react"
 import { FormFieldInput } from "./form-field-input"
 
-interface FormTextFieldProps {
+interface FormTextFieldProps extends React.ComponentProps<"input"> {
     className?: string
-    type?: HTMLInputTypeAttribute
+    type?: HTMLInputTypeAttribute,
 }
 
-export function FormTextField({ className, type = 'text' }: Readonly<FormTextFieldProps>) {
+export function FormTextField({ className, type = 'text', ...props }:Readonly<FormTextFieldProps>) {
     const field = useFieldContext<string>()
 
     return (
@@ -18,6 +18,7 @@ export function FormTextField({ className, type = 'text' }: Readonly<FormTextFie
             onBlur={field.handleBlur}
             onChange={(e) => field.handleChange(e.target.value)}
             className={className}
+            {...props}
         />
     )
 }
