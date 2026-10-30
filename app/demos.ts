@@ -59,6 +59,11 @@ export const demos: Demo[] = [
     description: 'Form field components built on TanStack Form',
   },
   {
+    href: '/capture-input',
+    label: 'Capture Input',
+    description: 'Quick-capture text input with #tag, @project and !priority tokens and suggestions',
+  },
+  {
     href: '/query-builder',
     label: 'Query Builder',
     description: 'Structured filter input with field and operator autocomplete',

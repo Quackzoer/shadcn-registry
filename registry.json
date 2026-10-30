@@ -585,9 +585,10 @@
       "name": "tanstack-form",
       "type": "registry:component",
       "title": "TanStack Form Components",
-      "description": "Field and form components for TanStack Form built on createFormHook: text, password, textarea with character counter, card select, label/error/validating helpers, submit/reset buttons and autosave. Use via useAppForm.",
+      "description": "Field and form components for TanStack Form built on createFormHook: text, password, textarea with character counter, card select, a quick-capture input with #tag / @project / !priority tokens and suggestions, label/error/validating helpers, submit/reset buttons and autosave. Use via useAppForm.",
       "dependencies": [
         "@tanstack/react-form",
+        "@base-ui/react",
         "@tanstack/react-pacer",
         "nuqs",
         "class-variance-authority",
@@ -601,9 +602,15 @@
         "label",
         "card",
         "spinner",
-        "Quackzoer/shadcn-registry/loading-swap"
+        "Quackzoer/shadcn-registry/loading-swap",
+        "Quackzoer/shadcn-registry/combobox"
       ],
       "files": [
+        {
+          "path": "registry/tanstack-form/components/fields/capture-input.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/capture-input.tsx"
+        },
         {
           "path": "registry/tanstack-form/components/fields/character-counter.tsx",
           "type": "registry:component",
@@ -633,6 +640,11 @@
           "path": "registry/tanstack-form/components/fields/field-validating.tsx",
           "type": "registry:component",
           "target": "@components/tanstack-form/components/fields/field-validating.tsx"
+        },
+        {
+          "path": "registry/tanstack-form/components/fields/form-capture-field.tsx",
+          "type": "registry:component",
+          "target": "@components/tanstack-form/components/fields/form-capture-field.tsx"
         },
         {
           "path": "registry/tanstack-form/components/fields/form-field-card-select.tsx",
@@ -703,6 +715,11 @@
           "path": "registry/tanstack-form/lib/form-autosave-adapter.ts",
           "type": "registry:lib",
           "target": "@components/tanstack-form/lib/form-autosave-adapter.ts"
+        },
+        {
+          "path": "registry/tanstack-form/lib/capture/capture-parser.ts",
+          "type": "registry:lib",
+          "target": "@components/tanstack-form/lib/capture/capture-parser.ts"
         }
       ]
     }

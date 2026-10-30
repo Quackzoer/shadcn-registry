@@ -8,6 +8,7 @@ import { FieldError } from "../components/fields/field-error";
 import { FieldValidating } from "../components/fields/field-validating";
 import { FieldResetValueButton } from "../components/fields/field-reset-value-button";
 import { FormFieldInput } from "../components/fields/form-field-input";
+import { FormCaptureField } from "../components/fields/form-capture-field";
 import { Form } from "../components/form/form";
 import { FormSubmitButton } from "../components/form/form-submit";
 import { FormReset } from "../components/form/form-reset";
@@ -23,6 +24,7 @@ export const {useAppForm, withForm, withFieldGroup} = createFormHook({
         Password: FormPasswordField,
         CardSelect: FormCardSelectField,
         Textarea: FormTextareaField,
+        Capture: FormCaptureField,
         Input: FormFieldInput,
         Label: FieldLabel,
         Error: FieldError,

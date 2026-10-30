@@ -45,7 +45,7 @@ Two directories at the repo root are deliberately **not** part of this scheme:
 | [`permission-guard`](./permission-guard) | ✅ | [`/permission-guard`](../app/permission-guard) | Renders children only for permitted users |
 | [`multi-step-form`](./multi-step-form) | ✅ | — | Multi-step form with per-step validation and navigation |
 | [`devtools`](./devtools) | — | — | Pluggable in-app devtools drawer. Typechecks clean; a publishing candidate |
-| [`tanstack-form`](./tanstack-form) | ✅ | [`/tanstack-form-components`](../app/tanstack-form-components) | TanStack Form field components. Install with `shadcn add`; use via `useAppForm` |
+| [`tanstack-form`](./tanstack-form) | ✅ | [`/tanstack-form-components`](../app/tanstack-form-components), [`/capture-input`](../app/capture-input) | TanStack Form field components, including `field.Capture` — a quick-capture input with `#tag` / `@project` / `!priority` tokens ([docs](./tanstack-form/docs/capture-input.md)). Install with `shadcn add`; use via `useAppForm` |
 
 ### State-only items
 
